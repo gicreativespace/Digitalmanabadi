@@ -66,4 +66,3 @@ function bindCommunityModuleActions(){
   return { renderRegistration: communityRegister, communityModuleMarkup, bindCommunityModuleActions };
 }
 
-export function renderAlumniSponsorDashboardIntro() { return ""; }
