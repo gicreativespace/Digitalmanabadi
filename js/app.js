@@ -162,7 +162,7 @@ function welcome(){
   ${roleCard("heart-handshake","పూర్వ విద్యార్థి / దాత","Alumni / Donor","community","green")}
  </section>`;
  /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
- main.querySelectorAll("[data-role]").forEach(b=>b.removeAttribute("onclick"));
+ main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
 }
 function roleCard(ic,te,en,role,tone){
  const quote={hm:"A great school begins with great leadership.",teacher:"A teacher inspires a thousand possibilities.",parent:"Every child’s journey begins with family support.",community:"Stay connected. Make a difference."}[role];
