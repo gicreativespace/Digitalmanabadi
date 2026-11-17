@@ -57,7 +57,7 @@ const modules={
 };
 const main=document.querySelector("#mainView");
 document.documentElement.dataset.theme=state.theme;
-const iconSvg=(name)=>({school:"▦",presentation:"▤",users:"♧", "calendar-check":"▣","notebook-pen":"✎","book-open":"▤",megaphone:"◖", "calendar-days":"▦",utensils:"♨",sun:"☼","book-heart":"♡",quote:"❝",globe:"◎",palette:"▧","chart-no-axes-column":"▥",settings:"⚙",graduation-cap:"⌂",bell:"♢",user:"○",shield:"⬡"}[name]||"•");
+const iconSvg=(name)=>({school:"▦",presentation:"▤",users:"♧", "calendar-check":"▣","notebook-pen":"✎","book-open":"▤",megaphone:"◖", "calendar-days":"▦",utensils:"♨",sun:"☼","book-heart":"♡",quote:"❝",globe:"◎",palette:"▧","chart-no-axes-column":"▥",settings:"⚙","graduation-cap":"⌂",bell:"♢",user:"○",shield:"⬡"}[name]||"•");
 function headerMenu(kind){
  document.querySelectorAll(".header-menu").forEach(x=>x.remove());
  const anchor=document.querySelector(kind==="language"?"#languageToggle":"#themeToggle");
