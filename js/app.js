@@ -178,7 +178,7 @@ function login(){
  <p>${community?T("మీ పాఠశాలతో అనుబంధం కొనసాగించండి, అవసరాలకు స్పందించండి.","Stay connected with your school and respond to its needs."):parent?T("మీ Student ID మరియు Parent PINతో ప్రవేశించండి.","Sign in with your Student ID and Parent PIN."):T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account credentials.")}</p>
  ${parent?'<div class="field"><label>Student ID</label><input id="loginId" placeholder="Student ID"></div><div class="field"><label>Parent PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><button class="btn full" id="loginGo">Login</button><div class="link-row"><button class="text-link" id="startLink">మొదటిసారి? పిల్లలను లింక్ చేయండి</button></div>':
  community?'<div class="community-access-actions"><button class="btn full" id="communityRegister">Register as Alumni / Donor</button><button class="btn secondary full" id="communityPreview">Open Portal Preview</button></div><div class="demo-note">Preview only: registration approvals, secure sign-in and cross-device messages become live after Firebase integration.</div>':
- '<div class="field"><label>'+T("Login ID","Login ID")+'</label><input id="loginId" placeholder="'+T("మీ Login ID","Enter your Login ID")+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.</div>'}
+ '<div class="field"><label>'+(state.role==="hm"?"Official School Email":T("Login ID","Login ID"))+'</label><input id="loginId" type="'+(state.role==="hm"?"email":"text")+'" autocomplete="username" placeholder="'+(state.role==="hm"?"Enter official school email":T("మీ Login ID","Enter your Login ID"))+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.</div>'}
  </section>`;
  document.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
  if(parent)document.querySelector("#startLink").onclick=()=>{state.view="link";render()};
@@ -301,7 +301,7 @@ function dashboard(){
  <div class="section-head"><div><h2>మీ విభాగాలు</h2><p>మీ Roleకు అనుమతించిన సేవలు</p></div></div><section class="module-grid">${list.map(m=>`<button class="module-card" data-module="${m[2]}"><span class="card-icon">${iconSvg(m[0])}</span><strong>${m[1]}</strong><small>${m[3]}</small><span class="module-arrow">›</span></button>`).join("")}</section>
  ${commonHighlights()}`;
  main.querySelectorAll("[data-module]").forEach(b=>b.onclick=()=>{state.module=b.dataset.module;state.view="module";render()});
- document.querySelector("#switchRoleHome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+ document.querySelector("#switchRoleHome").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
  document.querySelector("#profileBtn").onclick=()=>{state.view="profile";render()};
 }
 function commonHighlights(){return `<section class="knowledge-card"><div class="knowledge-icon">◎</div><div><h2>${T("మన విజ్ఞాన ప్రపంచం","GI Knowledge World")}</h2><p>${T("జి.ఐ. నిర్వహించే ఒకే విజ్ఞాన బ్లాగ్ లింక్.","One centrally managed GI blog link.")}</p></div><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">${T("బ్లాగ్ తెరవండి","Open Blog")} ↗</a></section>`}
@@ -376,8 +376,8 @@ function settingsPage(){
  document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
  document.querySelector("#settingsLang").onclick=toggleLanguage;
  document.querySelector("#settingsTheme").onclick=toggleTheme;
- document.querySelector("#switchRole").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
- document.querySelector("#logout").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+ document.querySelector("#switchRole").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+ document.querySelector("#logout").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
 }
 function superAdmin(){
  renderSuperAdminLogin(main,{
@@ -420,7 +420,7 @@ function setupBottomNavigation(){
 }
 function updateBottomNavigation(){
  const nav=document.querySelector("#bottomNav");
- const visible=Boolean(state.role && state.authenticated);
+ const visible=Boolean(state.role && state.authenticated && state.role!=="superadmin");
  nav.hidden=!visible;
  document.body.classList.toggle("has-authenticated-role",visible);
  const active=state.view==="dashboard"?"navHome":state.view==="profile"?"navProfile":state.view==="settings"?"navSettings":state.view==="module" && state.module==="Events & Calendar"?"navCalendar":"";
