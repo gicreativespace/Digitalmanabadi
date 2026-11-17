@@ -151,8 +151,6 @@ function welcome(){
   </div>
   <div class="welcome-divider" aria-hidden="true"></div>
   <h1>${T("డిజిటల్ మన బడి","DIGITAL MANA BADI")}</h1>
-  <div class="welcome-platform">SCHOOL MANAGEMENT PLATFORM</div>
-  <p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
   <div class="welcome-school">
    <strong>MPMP SCHOOL</strong>
    <span>DAGGULURU</span>
@@ -401,9 +399,8 @@ function setupFooter(){
 function toast(msg){const el=document.createElement("div");el.className="toast";el.textContent=translateValue(msg);document.body.append(el);setTimeout(()=>el.remove(),2400)}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function render(){
- document.querySelector("#appName").textContent="BVR · COVMR · DNR";
+ document.querySelector("#appName").textContent="BVR · CVPMR · DNR";
  document.querySelector("#tagline").textContent="DIGITAL MANA BADI";
- document.querySelector("#brandSchool").textContent="MPMP School · Dagguluru";
  const theme=document.querySelector("#themeToggle");theme.textContent=state.theme==="light"?"☾":"☀";
  document.querySelector("#languageToggle").textContent=state.lang==="te"?"అ":"A";
  document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
