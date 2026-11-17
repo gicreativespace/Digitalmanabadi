@@ -38,3 +38,34 @@
 .main-view:has(.welcome-panel) .social-ribbon{flex:none;margin-top:clamp(7px,1.1vh,12px);margin-bottom:0}
 @media(max-height:700px){.main-view:has(.welcome-panel) .social-ribbon{margin-top:5px;padding-top:6px;padding-bottom:6px}.main-view:has(.welcome-panel) .social-ribbon-link img{width:20px;height:20px}}
 @media(prefers-reduced-motion:reduce){.social-ribbon,.social-ribbon-link,.social-ribbon-toggle{transition:none!important}}
+/* Closed state: hide the complete panel; leave only the slim arrow handle visible */
+.social-ribbon.compact{
+  width:83px;
+  right:-58px;
+  display:flex;
+  align-items:center;
+  transform:none;
+  transition:right .28s cubic-bezier(.2,.75,.25,1);
+}
+.social-ribbon.compact .social-ribbon-toggle{
+  left:0;
+  right:auto;
+  top:50%;
+  flex:0 0 25px;
+  width:25px;
+  z-index:2;
+}
+.social-ribbon.compact .social-ribbon-panel{
+  box-sizing:border-box;
+  flex:0 0 58px;
+  width:58px;
+  min-width:58px;
+  margin-left:25px;
+}
+.social-ribbon.compact.is-expanded{right:0;transform:none}
+@media(max-width:700px){
+ .social-ribbon.compact{right:-58px;transform:none}
+ .social-ribbon.compact .social-ribbon-toggle{left:0;right:auto;width:25px}
+ .social-ribbon.compact .social-ribbon-panel{flex-basis:58px;width:58px;min-width:58px;margin-left:25px}
+ .social-ribbon.compact.is-expanded{right:0;transform:none}
+}
