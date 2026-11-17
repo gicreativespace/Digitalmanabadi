@@ -85,6 +85,7 @@ function toggleLanguage(){
  state.lang=state.lang==="te"?"en":"te";
  localStorage.setItem("gim_lang",state.lang);
  render();
+ const popup=document.querySelector("#gcsWelcomePopup");if(popup)renderCreativeWelcome(popup);
 }
 function toggleTheme(){
  state.theme=state.theme==="light"?"dark":"light";
