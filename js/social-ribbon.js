@@ -20,7 +20,7 @@
     const el=document.createElement("aside");
     el.className="social-ribbon";el.id="socialMediaRibbon";
     el.setAttribute("aria-label","Connect with us");
-    el.innerHTML='<button type="button" class="social-ribbon-toggle" aria-expanded="false" aria-label="Open social links" title="Connect with us"><span aria-hidden="true">‹</span></button><div class="social-ribbon-panel"><div class="social-ribbon-links"></div></div>';
+    el.innerHTML='<button type="button" class="social-ribbon-toggle" aria-expanded="false" aria-label="Open social links" title="Connect with us"><span aria-hidden="true">‹</span></button><div class="social-ribbon-panel"><div class="social-ribbon-head">CONNECT WITH US</div><div class="social-ribbon-links"></div></div>';
     const links=el.querySelector(".social-ribbon-links");
     for(const item of items){
       const href=SOCIAL_LINKS[item.key];
@@ -30,7 +30,7 @@
       else{node.setAttribute("aria-disabled","true");node.title=item.label+" link will be added";}
       node.setAttribute("aria-label",item.label);
       const img=document.createElement("img");img.src=item.icon;img.alt=item.label;img.loading="eager";img.decoding="async";
-      node.append(img);links.append(node);
+      const label=document.createElement("span");label.className="social-name";label.textContent=item.label;node.append(img,label);links.append(node);
     }
     const toggle=el.querySelector(".social-ribbon-toggle");
     toggle.addEventListener("click",()=>{
