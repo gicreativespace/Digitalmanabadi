@@ -1,10 +1,12 @@
 import { APP_CONFIG } from "./config.js";
+import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal } from "./admin-portal.js";
 
 const savedRole = localStorage.getItem("gim_role") || null;
 const savedAuth = localStorage.getItem("gim_authenticated") === "true";
 const state = {
-  role: savedRole, authenticated: Boolean(savedRole && savedAuth),
-  view: savedRole && savedAuth ? "dashboard" : savedRole ? "login" : "welcome", module: null,
+  role: savedRole === "superadmin" ? null : savedRole, authenticated: Boolean(savedRole && savedAuth && !["hm","superadmin"].includes(savedRole)),
+  view: savedRole && savedAuth && !["hm","superadmin"].includes(savedRole) ? "dashboard" : savedRole && savedRole !== "superadmin" ? "login" : "welcome", module: null,
+  superAdminProfile: null, headMasterProfile: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
   selectedDate: 17, selectedMonth: 10, selectedYear: 2026, linkedStudent: null, parentLinked: false, communityType: null
@@ -185,10 +187,16 @@ function login(){
   document.querySelector("#communityPreview").onclick=()=>{state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render()};
   return;
  }
- document.querySelector("#loginGo").onclick=()=>{
-  const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value.trim();
-  if(APP_CONFIG.demoMode && !id && !pin){state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();return}
+ document.querySelector("#loginGo").onclick=async()=>{
+  const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value;
   if(!id||!pin){toast(T("రెండు వివరాలు నమోదు చేయండి.","Please enter both fields."));return}
+  if(state.role==="hm"){
+   const button=document.querySelector("#loginGo");button.disabled=true;button.textContent="Verifying…";
+   try{const result=await authenticateHeadMaster(id,pin);state.headMasterProfile=result.profile;state.authenticated=true;localStorage.setItem("gim_role","hm");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();}
+   catch(error){toast(error.message||"లాగిన్ ధృవీకరణ విఫలమైంది.");button.disabled=false;button.textContent=T("లాగిన్","Login");}
+   return;
+  }
+  if(APP_CONFIG.demoMode && !id && !pin){state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();return}
   if(parent&&!state.parentLinked){toast("ముందుగా మీ పిల్లలను లింక్ చేయండి.");return}
   if(parent&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){toast("Student ID లేదా PIN సరిపోలలేదు.");return}
   state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
@@ -278,6 +286,13 @@ function linking(){
  };
 }
 function dashboard(){
+ if(state.role==="superadmin"){
+  renderSuperAdminDashboard(main,state.superAdminProfile,{
+   onLogout:async()=>{await signOutPortal();state.role=null;state.authenticated=false;state.superAdminProfile=null;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render();},
+   onRefresh:()=>render()
+  });
+  return;
+ }
  const meta=roleMeta[state.role],list=modules[state.role]||[];
  main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.title,meta.title)}</h1><p>${T(meta.sub,meta.sub)}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
  ${state.role==="hm"?'<section class="stats-grid"><article class="stat-card"><strong>—</strong><span>విద్యార్థులు</span></article><article class="stat-card"><strong>—</strong><span>ఉపాధ్యాయులు</span></article><article class="stat-card"><strong>—</strong><span>ఈరోజు హాజరు</span></article><article class="stat-card"><strong>—</strong><span>పెండింగ్ ఆమోదాలు</span></article></section>':""}
@@ -365,9 +380,10 @@ function settingsPage(){
  document.querySelector("#logout").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
 }
 function superAdmin(){
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="superBack">← Back</button></div><section class="form-card super-card"><div class="login-symbol">⬡</div><h2>GI Super Admin</h2><p>Authorized GI Administrator Only</p><div class="field"><label>Admin ID</label><input placeholder="Admin ID"></div><div class="field"><label>Secure Password</label><input type="password" placeholder="••••••••"></div><button class="btn full" id="superContinue">Secure Login</button><div class="demo-note">Authentication placeholder — secure backend ఇంకా అనుసంధానం కాలేదు.</div></section>`;
- document.querySelector("#superBack").onclick=()=>{state.view="welcome";render()};
- document.querySelector("#superContinue").onclick=()=>toast("GI Super Admin Authentication ఇంకా సిద్ధం కాలేదు.");
+ renderSuperAdminLogin(main,{
+  onSuccess:user=>{state.role="superadmin";state.authenticated=true;state.superAdminProfile=user;localStorage.setItem("gim_role","superadmin");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();},
+  onBack:()=>{state.view="welcome";render();}
+ });
 }
 function renderCreativeWelcome(modal){
  const te=state.lang==="te";
