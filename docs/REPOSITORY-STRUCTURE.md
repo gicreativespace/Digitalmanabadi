@@ -35,6 +35,7 @@ Digitalmanabadi/
 │   │   ├── social-ribbon.js
 │   │   └── translations.js
 │   ├── sections/
+│   │   ├── README.md
 │   │   ├── super-admin/
 │   │   │   └── admin-portal.js
 │   │   ├── head-master/
