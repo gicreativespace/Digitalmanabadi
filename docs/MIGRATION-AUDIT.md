@@ -83,6 +83,6 @@ Do not implement these security-sensitive items as frontend-only checks. Follow 
 The footer and navigation extraction files and core delegates are present on the final main tree. The GI Creative Space footer popup, one-tap behavior, 850ms long-press Super Admin entry, and bottom navigation remain unchanged. Service worker cache is v54 and the core app URL is `20261117-44`.
 
 ## Final source checks
-- All 38 service-worker cache entries resolve to existing repository paths.
+- All 40 service-worker cache entries resolve to existing repository paths.
 - JavaScript source syntax checks passed for the active core, shared, role, and feature-module files after removing module import/export declarations for parse-only validation.
 - No browser runtime, mobile visual, PWA installation, live Firebase or deployed Pages test is claimed.
