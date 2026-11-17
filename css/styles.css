@@ -59,11 +59,11 @@ img,svg,video,canvas{max-width:100%}
 /* Keep the welcome footer inside the visible mobile viewport */
 html,body{min-height:100%;margin:0}
 .app-shell{min-height:100vh;min-height:100svh;min-height:100dvh;display:flex;flex-direction:column}
-.main-view{flex:1 0 auto;min-height:0}
+.main-view{flex:1 1 auto;min-height:0}
 .footer{flex:0 0 auto;position:relative;z-index:2}
 @media(max-width:520px){
  .app-shell{min-height:100vh;min-height:100svh;min-height:100dvh}
- .main-view{flex:1 0 auto;padding-top:clamp(5px,1.5vh,12px);padding-bottom:clamp(5px,1.5vh,12px)}
+ .main-view{flex:1 1 auto;min-height:0;padding-top:clamp(5px,1.5vh,12px);padding-bottom:clamp(5px,1.5vh,12px)}
  .footer{margin-top:auto;padding-top:7px;padding-bottom:max(9px,env(safe-area-inset-bottom));gap:2px}
  #footerSignature,#footerInspired{white-space:normal;line-height:1.25}
 }
