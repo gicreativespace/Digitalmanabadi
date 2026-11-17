@@ -165,6 +165,7 @@ function modulePage(){
  ${title==="Poster Studio"?'<div class="poster-demo"><div><strong>పాఠశాల కార్యక్రమం</strong><small>Poster Preview</small></div><button class="btn secondary" id="posterEdit">Edit Design</button></div>':""}
  <div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div></section>`;
  document.querySelector("#moduleBack").onclick=()=>{state.view="dashboard";render()};
+ main.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{state.selectedDate=Number(b.dataset.day);render()});
  const edit=document.querySelector("#posterEdit");if(edit)edit.onclick=()=>toast("Poster Editor UI తదుపరి Previewలో విస్తరిస్తాం.");
 }
 function calendarMarkup(){
