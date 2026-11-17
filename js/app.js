@@ -1,7 +1,10 @@
 import { APP_CONFIG } from "./config.js";
 
+const savedRole = localStorage.getItem("gim_role") || null;
+const savedAuth = localStorage.getItem("gim_authenticated") === "true";
 const state = {
-  role: localStorage.getItem("gim_role") || null, view: localStorage.getItem("gim_role") ? "dashboard" : "welcome", module: null,
+  role: savedRole, authenticated: Boolean(savedRole && savedAuth),
+  view: savedRole && savedAuth ? "dashboard" : savedRole ? "login" : "welcome", module: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
   selectedDate: 17, linkedStudent: null, parentLinked: false
@@ -89,7 +92,7 @@ function toggleTheme(){
 }
 document.querySelector("#languageToggle").onclick=toggleLanguage;
 document.querySelector("#themeToggle").onclick=toggleTheme;
-document.querySelector("#brandHome").onclick=()=>{state.view=state.role?"dashboard":"welcome";render()};
+document.querySelector("#brandHome").onclick=()=>{state.view=state.authenticated?"dashboard":state.role?"login":"welcome";render()};
 function welcome(){
  main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("స్వాగతం","Welcome")}</h1><p>${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
  <section class="role-stack">
@@ -97,7 +100,7 @@ function welcome(){
  ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
  ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
  </section>`;
- main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;localStorage.setItem("gim_role",state.role);state.view="login";render()});
+ main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.authenticated=false;localStorage.setItem("gim_role",state.role);localStorage.removeItem("gim_authenticated");state.view="login";render()});
 }
 function roleCard(ic,te,en,role,tone){return `<button class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${roleNames[role][1]}</small></span><span class="role-arrow">›</span></button>`}
 function login(){
@@ -107,15 +110,15 @@ function login(){
  ${parent?'<div class="field"><label>Student ID</label><input id="loginId" placeholder="Student ID"></div><div class="field"><label>Parent PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><button class="btn full" id="loginGo">Login</button><div class="link-row"><button class="text-link" id="startLink">మొదటిసారి? పిల్లలను లింక్ చేయండి</button></div>':
  '<div class="field"><label>'+T("Login ID","Login ID")+'</label><input id="loginId" placeholder="'+T("మీ Login ID","Enter your Login ID")+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.</div>'}
  </section>`;
- document.querySelector("#backWelcome").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
+ document.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
  if(parent)document.querySelector("#startLink").onclick=()=>{state.view="link";render()};
  document.querySelector("#loginGo").onclick=()=>{
   const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value.trim();
-  if(APP_CONFIG.demoMode && !id && !pin){state.view="dashboard";render();return}
+  if(APP_CONFIG.demoMode && !id && !pin){state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();return}
   if(!id||!pin){toast(T("రెండు వివరాలు నమోదు చేయండి.","Please enter both fields."));return}
   if(parent&&!state.parentLinked){toast("ముందుగా మీ పిల్లలను లింక్ చేయండి.");return}
   if(parent&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){toast("Student ID లేదా PIN సరిపోలలేదు.");return}
-  state.view="dashboard";render();
+  state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
  };
 }
 function linking(){
@@ -145,15 +148,10 @@ function dashboard(){
  ${state.role==="teacher"?'<section class="card assigned"><h3>నా తరగతులు</h3><p>మీకు కేటాయించిన తరగతులు మాత్రమే కనిపిస్తాయి.</p><div class="chips"><span>Class 3</span><span>Class 5</span></div></section>':""}
  ${state.role==="parent"?'<section class="feature-card blue parent-student"><div class="card-icon">♙</div><div><h3>లింక్ చేసిన విద్యార్థి</h3><p>'+(state.linkedStudent?escapeHtml(state.linkedStudent.className+" • Roll "+state.linkedStudent.roll):"విద్యార్థి వివరాలు")+'</p></div></section>':""}
  <div class="section-head"><div><h2>మీ విభాగాలు</h2><p>మీ Roleకు అనుమతించిన సేవలు</p></div></div><section class="module-grid">${list.map(m=>`<button class="module-card" data-module="${m[2]}"><span class="card-icon">${iconSvg(m[0])}</span><strong>${m[1]}</strong><small>${m[3]}</small><span class="module-arrow">›</span></button>`).join("")}</section>
- ${commonHighlights()}
- <nav class="bottom-nav"><button class="active" id="navHome">⌂<small>Home</small></button><button id="navCalendar">▦<small>Calendar</small></button><button id="navProfile">◉<small>Profile</small></button><button id="navSettings">⚙<small>Settings</small></button></nav>`;
+ ${commonHighlights()}`;
  main.querySelectorAll("[data-module]").forEach(b=>b.onclick=()=>{state.module=b.dataset.module;state.view="module";render()});
- document.querySelector("#switchRoleHome").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
+ document.querySelector("#switchRoleHome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
  document.querySelector("#profileBtn").onclick=()=>{state.view="profile";render()};
- document.querySelector("#navProfile").onclick=()=>{state.view="profile";render()};
- document.querySelector("#navSettings").onclick=()=>{state.view="settings";render()};
- document.querySelector("#navCalendar").onclick=()=>{state.module="Events & Calendar";state.view="module";render()};
- document.querySelector("#navHome").onclick=()=>{state.view="dashboard";render()};
 }
 function commonHighlights(){return `<section class="today-grid"><article class="card"><h3>☼ Today Special</h3><p>పుట్టినరోజులు మరియు క్యాలెండర్ ప్రత్యేక దినాలు.</p><div class="empty">డేటా అనుసంధానం తర్వాత నిజమైన వివరాలు కనిపిస్తాయి.</div></article><article class="feature-card blue"><div class="card-icon">◎</div><h3>మన విజ్ఞాన ప్రపంచం</h3><p>GI నిర్వహించే ఒకే Blog Link.</p><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">బ్లాగ్ తెరవండి ↗</a></article></section>`}
 function modulePage(){
@@ -199,8 +197,8 @@ function settingsPage(){
  document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
  document.querySelector("#settingsLang").onclick=toggleLanguage;
  document.querySelector("#settingsTheme").onclick=toggleTheme;
- document.querySelector("#switchRole").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
- document.querySelector("#logout").onclick=()=>{state.role=null;state.view="login";render()};
+ document.querySelector("#switchRole").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+ document.querySelector("#logout").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
 }
 function superAdmin(){
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="superBack">← Back</button></div><section class="form-card super-card"><div class="login-symbol">⬡</div><h2>GI Super Admin</h2><p>Authorized GI Administrator Only</p><div class="field"><label>Admin ID</label><input placeholder="Admin ID"></div><div class="field"><label>Secure Password</label><input type="password" placeholder="••••••••"></div><button class="btn full" id="superContinue">Secure Login</button><div class="demo-note">Authentication placeholder — secure backend ఇంకా అనుసంధానం కాలేదు.</div></section>`;
@@ -228,6 +226,26 @@ function render(){
  theme.setAttribute("aria-label",state.theme==="light"?"Switch to dark theme":"Switch to light theme");
  if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="link")linking();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
  applyTranslations();
+ updateBottomNavigation();
 }
-render();setupFooter();
+function setupBottomNavigation(){
+ const nav=document.querySelector("#bottomNav");
+ nav.querySelector("#navHome").onclick=()=>{state.module=null;state.view="dashboard";render()};
+ nav.querySelector("#navCalendar").onclick=()=>{state.module="Events & Calendar";state.view="module";render()};
+ nav.querySelector("#navProfile").onclick=()=>{state.view="profile";render()};
+ nav.querySelector("#navSettings").onclick=()=>{state.view="settings";render()};
+}
+function updateBottomNavigation(){
+ const nav=document.querySelector("#bottomNav");
+ const visible=Boolean(state.role && state.authenticated);
+ nav.hidden=!visible;
+ document.body.classList.toggle("has-authenticated-role",visible);
+ const active=state.view==="dashboard"?"navHome":state.view==="profile"?"navProfile":state.view==="settings"?"navSettings":state.view==="module" && state.module==="Events & Calendar"?"navCalendar":"";
+ nav.querySelectorAll("button").forEach(button=>{
+  const selected=button.id===active;
+  button.classList.toggle("active",selected);
+  if(selected)button.setAttribute("aria-current","page");else button.removeAttribute("aria-current");
+ });
+}
+render();setupFooter();setupBottomNavigation();updateBottomNavigation();
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
