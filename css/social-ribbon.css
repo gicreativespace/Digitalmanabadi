@@ -148,10 +148,24 @@
 }
 
 
-/* Welcome screen social logos: visible, self-contained assets with no captions. */
-.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{display:none!important}
-.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{gap:clamp(6px,1.5vw,12px)}
+/* Welcome screen social ribbon: compact premium heading, logos and labels. */
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{
+ display:flex!important;align-items:center;justify-content:center;
+ margin:0 0 5px!important;font-size:clamp(9px,1.2vh,11px)!important;
+ line-height:1.1;letter-spacing:.12em;color:var(--deep);
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{gap:clamp(5px,1.3vw,10px)}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{gap:3px;padding:2px 0}
 .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:22px;height:22px}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{
+ display:block!important;font-size:10px!important;line-height:1.1;color:var(--muted);white-space:nowrap;
+}
 @media(max-width:700px){
- .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:21px;height:21px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{font-size:9px!important;margin-bottom:3px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:19px;height:19px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:9px!important}
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:17px;height:17px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8px!important}
 }
