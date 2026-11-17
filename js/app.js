@@ -12,7 +12,7 @@ const teluguWords=[
 ];
 function applyTeluguWords(){
  if(state.lang!=="te")return;
- const replaceText=(value)=>{let out=value;for(const [en,te] of teluguWords){const escaped=en.replace(/[.*+?^${}()|[\]\\]/g,"\\const T=(te,en)=>state.lang==="te"?te:en;");out=out.replace(new RegExp(escaped,"gi"),te)}return out};
+ const replaceText=(value)=>{let out=value;for(const [en,te] of teluguWords)out=out.split(en).join(te);return out};
  const walk=(node)=>{for(const child of [...node.childNodes]){if(child.nodeType===3)child.nodeValue=replaceText(child.nodeValue);else if(child.nodeType===1){for(const attr of ["placeholder","title","aria-label"])if(child.hasAttribute(attr))child.setAttribute(attr,replaceText(child.getAttribute(attr)));walk(child)}}};
  walk(main);
 }
@@ -218,6 +218,7 @@ function render(){
  document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
  theme.setAttribute("aria-label",state.theme==="light"?"Switch to dark theme":"Switch to light theme");
  if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="link")linking();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
+ applyTeluguWords();
 }
 render();setupFooter();
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
