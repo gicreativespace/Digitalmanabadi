@@ -1,3 +1,9 @@
 # Alumni / Sponsor section
 
-Own Alumni/Sponsor registration, school support, contributions, volunteer and message workflows. Current implementation stores preview records in browser local storage; it is not cross-device or live school data. Extract after approval rules and secure data access are implemented.
+Own Alumni/Sponsor registration, school support, contributions, volunteer and message workflows.
+
+- `alumni-sponsor-section.js` owns registration, browser-local preview storage, community module markup and action handlers.
+- `dashboard.js` provides the role's dashboard extension point.
+- Records remain in the existing `gim_community_preview` localStorage key. This is not live, cross-device school data or secure account authentication.
+
+Preserve the existing preview data shape until an approved Firebase data model and Head Master approval rules are implemented.
