@@ -7,7 +7,7 @@
   <meta name="description" content="డిజిటల్ మన బడి — మన భవిష్యత్తు… మన గర్వం!">
   <title>డిజిటల్ మన బడి</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=20261117-10">
+  <link rel="stylesheet" href="css/styles.css?v=20261117-11">
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -22,11 +22,17 @@
       </div>
     </header>
     <main id="mainView" class="main-view" aria-live="polite"></main>
+    <nav class="bottom-nav" id="bottomNav" aria-label="ప్రధాన నావిగేషన్" hidden>
+      <button type="button" id="navHome" class="active" aria-label="హోమ్"><span class="nav-icon" aria-hidden="true">⌂</span><small data-te="హోమ్" data-en="Home">హోమ్</small></button>
+      <button type="button" id="navCalendar" aria-label="క్యాలెండర్"><span class="nav-icon" aria-hidden="true">▦</span><small data-te="క్యాలెండర్" data-en="Calendar">క్యాలెండర్</small></button>
+      <button type="button" id="navProfile" aria-label="వ్యక్తిగత వివరాలు"><span class="nav-icon" aria-hidden="true">◉</span><small data-te="వ్యక్తిగత వివరాలు" data-en="Personal Details">వ్యక్తిగత వివరాలు</small></button>
+      <button type="button" id="navSettings" aria-label="సెట్టింగులు"><span class="nav-icon" aria-hidden="true">⚙</span><small data-te="సెట్టింగులు" data-en="Settings">సెట్టింగులు</small></button>
+    </nav>
     <footer class="footer" id="appFooter">
       <button type="button" class="footer-link" id="footerSignature">A GI Creative Space work</button>
       <button type="button" class="footer-link" id="footerInspired">Inspired by Godavari.</button>
     </footer>
   </div>
-  <script type="module" src="js/app.js?v=20261117-10"></script>
+  <script type="module" src="js/app.js?v=20261117-11"></script>
 </body>
 </html>
