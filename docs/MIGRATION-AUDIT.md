@@ -15,7 +15,9 @@
 | 4 | #5 | Shared login controller and role-owned login views | Merged |
 | 5 | #6 | Shared dashboard, Profile and Settings screens | Merged |
 | 6 | #7 | Feature modules organized under `js/modules/` | Merged |
-| 7 | #8 | Footer and bottom-navigation controllers | Merged |
+| 7 | #8 | Footer and bottom-navigation controllers | Merged; restored/verified in PR #10 |
+| Docs | #9 | Repository structure, migration audit and login architecture documentation | Merged |
+| 7 restoration | #10 | Restore footer/navigation modules on the documentation-updated main tree | Merged |
 
 ## Current ownership
 
@@ -79,3 +81,8 @@ Do not implement these security-sensitive items as frontend-only checks. Follow 
 
 ## Stage 7 restoration verification
 The footer and navigation extraction files and core delegates are present on the final main tree. The GI Creative Space footer popup, one-tap behavior, 850ms long-press Super Admin entry, and bottom navigation remain unchanged. Service worker cache is v54 and the core app URL is `20261117-44`.
+
+## Final source checks
+- All 38 service-worker cache entries resolve to existing repository paths.
+- JavaScript source syntax checks passed for the active core, shared, role, and feature-module files after removing module import/export declarations for parse-only validation.
+- No browser runtime, mobile visual, PWA installation, live Firebase or deployed Pages test is claimed.
