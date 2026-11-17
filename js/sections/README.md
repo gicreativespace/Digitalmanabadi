@@ -1,11 +1,13 @@
 # Role sections — ownership and extraction status
 
-Each role owns its login/dashboard presentation and role-specific actions. Shared data services and common feature modules must not be duplicated.
+Each role owns its role-specific presentation and workflows. Shared data services and common feature modules must not be duplicated.
 
-- `super-admin/`: secure GI platform administration; implemented portal file is `super-admin/admin-portal.js`.
-- `head-master/`: school-level administration and approvals; current screen rendering remains in `js/core/app.js`.
-- `teacher/`: assigned classes, attendance, diary and homework; current screen rendering remains in `js/core/app.js` and is preview-only.
-- `parent/`: linked-child information and approved school updates; current linking is browser-local preview data.
-- `alumni-sponsor/`: alumni registration and school support; current records are browser-local preview data.
+- `super-admin/`: secure GI platform administration; implemented in `super-admin/admin-portal.js`. Head Master Firebase authentication currently shares its trusted helper from this portal.
+- `head-master/`: Head Master dashboard summary is extracted to `head-master/dashboard.js`. Remaining login handoff and school-management screens are still coordinated by `js/core/app.js`.
+- `teacher/`: Teacher dashboard summary is extracted to `teacher/dashboard.js`. Login and teaching workflows remain in the core controller and are preview-only.
+- `parent/`: Parent–Student linking workflow is extracted to `parent/parent-section.js`; the linked-student dashboard summary is in `parent/dashboard.js`. Current linking/login data remains browser-local preview data.
+- `alumni-sponsor/`: Registration, browser-local preview data, community module markup and action handlers are extracted to `alumni-sponsor/alumni-sponsor-section.js`; its dashboard entry is in `alumni-sponsor/dashboard.js`.
 
-Extract the remaining role screens in separate tested steps. Do not create duplicate placeholder implementations or claim preview flows are live authentication.
+## Extraction boundaries
+
+The core controller still owns shared login routing, module navigation, common state, and feature modules that are used across roles. Continue extracting those in tested steps with explicit dependencies. Do not claim preview flows are live authentication or cross-device data.
