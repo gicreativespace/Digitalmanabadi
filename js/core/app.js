@@ -181,7 +181,7 @@ const loginScreen = createLoginScreen({
  main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
 });
-const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,renderSuperAdminDashboard,signOutPortal});
+const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,escapeHtml,renderSuperAdminDashboard,signOutPortal});
 const accountScreens = createAccountScreens({main,state,roleNames,APP_CONFIG,render,toggleLanguage,toggleTheme,signOutPortal});
 
 render();setupFooter();setupBottomNavigation();updateBottomNavigation();

@@ -1,4 +1,4 @@
-export function createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,renderSuperAdminDashboard,signOutPortal}) {
+export function createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,escapeHtml,renderSuperAdminDashboard,signOutPortal}) {
 function dashboard(){
  if(state.role==="superadmin"){
   renderSuperAdminDashboard(main,state.superAdminProfile,{
