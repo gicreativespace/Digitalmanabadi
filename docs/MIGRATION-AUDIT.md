@@ -85,3 +85,12 @@ This audit and migration are source-level changes. A successful GitHub commit or
 - Super Admin login remains in its existing dedicated Super Admin portal module.
 - Service worker cache advanced to v51; core app URL advanced to `20261117-41`.
 - No authentication model or backend behavior was newly enabled. Teacher, Parent, and Alumni/Sponsor remain preview flows; existing security prerequisites remain outstanding.
+
+
+## Stage 5 — shared dashboard and account screens
+- Extracted the shared role dashboard renderer and common knowledge highlight into `js/shared/dashboard-screen.js`.
+- Extracted shared Profile and Settings screen renderers into `js/shared/account-screens.js`.
+- Core now delegates dashboard, profile, and settings rendering to the shared screen factories. Role-specific dashboard introductions remain in each role section.
+- Existing Super Admin dashboard handoff, module navigation, role switching, settings actions, and logout callbacks are retained.
+- Service worker cache advanced to v52; core app URL advanced to `20261117-42`.
+- No role permissions, authentication model, UI styling, Welcome Screen, footer, or social ribbon changed.

@@ -6,6 +6,8 @@ import { createAlumniSponsorSection } from "../sections/alumni-sponsor/alumni-sp
 import { createParentSection } from "../sections/parent/parent-section.js";
 import { createSharedScreens } from "../shared/module-screens.js";
 import { createLoginScreen } from "../shared/login-screen.js";
+import { createDashboardScreen } from "../shared/dashboard-screen.js";
+import { createAccountScreens } from "../shared/account-screens.js";
 import { getHeadMasterLoginView } from "../sections/head-master/login.js";
 import { getTeacherLoginView } from "../sections/teacher/login.js";
 import { getParentLoginView } from "../sections/parent/login.js";
@@ -118,36 +120,9 @@ function roleCard(ic,te,en,role,tone){
 function login(){loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
 function linking(){parentSection.renderLinking();}
-function dashboard(){
- if(state.role==="superadmin"){
-  renderSuperAdminDashboard(main,state.superAdminProfile,{
-   onLogout:async()=>{await signOutPortal();state.role=null;state.authenticated=false;state.superAdminProfile=null;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render();},
-   onRefresh:()=>render()
-  });
-  return;
- }
- const meta=roleMeta[state.role],list=modules[state.role]||[];
- main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.title,meta.title)}</h1><p>${state.role==="hm"&&state.headMasterProfile?.school?.schoolName?escapeHtml(state.headMasterProfile.school.schoolName):T(meta.sub,meta.sub)}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
- ${roleDashboardIntro[state.role]?.({state,escapeHtml})||""}
- <div class="section-head"><div><h2>మీ విభాగాలు</h2><p>మీ Roleకు అనుమతించిన సేవలు</p></div></div><section class="module-grid">${list.map(m=>`<button class="module-card" data-module="${m[2]}"><span class="card-icon">${iconSvg(m[0])}</span><strong>${m[1]}</strong><small>${m[3]}</small><span class="module-arrow">›</span></button>`).join("")}</section>
- ${commonHighlights()}`;
- main.querySelectorAll("[data-module]").forEach(b=>b.onclick=()=>{state.module=b.dataset.module;state.view="module";render()});
- document.querySelector("#switchRoleHome").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
- document.querySelector("#profileBtn").onclick=()=>{state.view="profile";render()};
-}
-function commonHighlights(){return `<section class="knowledge-card"><div class="knowledge-icon">◎</div><div><h2>${T("మన విజ్ఞాన ప్రపంచం","GI Knowledge World")}</h2><p>${T("జి.ఐ. నిర్వహించే ఒకే విజ్ఞాన బ్లాగ్ లింక్.","One centrally managed GI blog link.")}</p></div><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">${T("బ్లాగ్ తెరవండి","Open Blog")} ↗</a></section>`}
-function profilePage(){
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="profileBack">← Dashboard</button></div><section class="form-card"><div class="login-symbol">◉</div><h2>Profile</h2><p>${roleNames[state.role][0]} • ${APP_CONFIG.schoolName}</p><div class="detail-list"><div class="detail-row"><div><strong>Personal Information</strong><small>పేరు మరియు ప్రాథమిక వివరాలు</small></div>›</div><div class="detail-row"><div><strong>Role & Access</strong><small>మీకు అనుమతించిన విభాగాలు</small></div>›</div><div class="detail-row"><div><strong>School Information</strong><small>పాఠశాల వివరాలు</small></div>›</div></div></section>`;
- document.querySelector("#profileBack").onclick=()=>{state.view="dashboard";render()};
-}
-function settingsPage(){
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="settingsBack">← Dashboard</button></div><section class="card module-detail"><h2>Settings</h2><div class="detail-list"><div class="detail-row"><div><strong>Language</strong><small>తెలుగు / English</small></div><button class="btn secondary" id="settingsLang">Change</button></div><div class="detail-row"><div><strong>Theme</strong><small>Light / Dark</small></div><button class="btn secondary" id="settingsTheme">Change</button></div><div class="detail-row"><div><strong>Switch Role</strong><small>Welcome Screen‌కు తిరిగి వెళ్లండి</small></div><button class="btn secondary" id="switchRole">Switch</button></div><div class="detail-row"><div><strong>Logout</strong><small>ప్రస్తుత Session ముగించండి</small></div><button class="btn danger" id="logout">Logout</button></div></div></section>`;
- document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
- document.querySelector("#settingsLang").onclick=toggleLanguage;
- document.querySelector("#settingsTheme").onclick=toggleTheme;
- document.querySelector("#switchRole").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
- document.querySelector("#logout").onclick=async()=>{if(["hm","superadmin"].includes(state.role))await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
-}
+function dashboard(){dashboardScreen.render();}
+function profilePage(){accountScreens.profilePage();}
+function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
  renderSuperAdminLogin(main,{
   onSuccess:user=>{state.role="superadmin";state.authenticated=true;state.superAdminProfile=user;localStorage.setItem("gim_role","superadmin");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();},
@@ -206,6 +181,8 @@ const loginScreen = createLoginScreen({
  main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
 });
+const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,renderSuperAdminDashboard,signOutPortal});
+const accountScreens = createAccountScreens({main,state,roleNames,APP_CONFIG,render,toggleLanguage,toggleTheme,signOutPortal});
 
 render();setupFooter();setupBottomNavigation();updateBottomNavigation();
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
