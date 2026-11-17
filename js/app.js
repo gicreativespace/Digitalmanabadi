@@ -104,6 +104,24 @@ const modules={
  ]
 };
 const main=document.querySelector("#mainView");
+function selectWelcomeRole(role){
+ if(!roleNames[role])return;
+ state.role=role;state.authenticated=false;
+ localStorage.setItem("gim_role",role);localStorage.removeItem("gim_authenticated");
+ state.view="login";render();
+}
+main.addEventListener("pointerup",event=>{
+ const card=event.target.closest?.("[data-role]");
+ if(!card)return;
+ event.preventDefault();
+ selectWelcomeRole(card.dataset.role);
+},true);
+main.addEventListener("click",event=>{
+ const card=event.target.closest?.("[data-role]");
+ if(!card)return;
+ event.preventDefault();
+ selectWelcomeRole(card.dataset.role);
+},true);
 document.documentElement.dataset.theme=state.theme;
 const iconSvg=(name)=>({school:"▦",presentation:"▤",users:"♧", "calendar-check":"▣","notebook-pen":"✎","book-open":"▤",megaphone:"◖", "calendar-days":"▦",utensils:"♨",sun:"☼","book-heart":"♡",quote:"❝",globe:"◎",palette:"▧","chart-no-axes-column":"▥",settings:"⚙","graduation-cap":"⌂",bell:"♢",user:"○",shield:"⬡","heart-handshake":"♡","message-circle":"✉","clipboard-list":"▤","hand-heart":"♡","hand-coins":"◈",history:"↺",trophy:"♜"}[name]||"•");
 function toggleLanguage(){
@@ -143,7 +161,8 @@ function welcome(){
   ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
   ${roleCard("heart-handshake","పూర్వ విద్యార్థి / దాత","Alumni / Donor","community","green")}
  </section>`;
- main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.authenticated=false;localStorage.setItem("gim_role",state.role);localStorage.removeItem("gim_authenticated");state.view="login";render()});
+ /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
+ main.querySelectorAll("[data-role]").forEach(b=>b.removeAttribute("onclick"));
 }
 function roleCard(ic,te,en,role,tone){
  const quote={hm:"A great school begins with great leadership.",teacher:"A teacher inspires a thousand possibilities.",parent:"Every child’s journey begins with family support.",community:"Stay connected. Make a difference."}[role];
