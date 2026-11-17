@@ -142,35 +142,34 @@ document.querySelector("#languageToggle").onclick=toggleLanguage;
 document.querySelector("#themeToggle").onclick=toggleTheme;
 document.querySelector("#brandHome").onclick=()=>{state.view=state.authenticated?"dashboard":state.role?"login":"welcome";render()};
 function welcome(){
- main.innerHTML=`<section class="welcome-panel">
-  <div class="welcome-kicker">${T("విద్యాభివృద్ధికి అంకితం","A TRIBUTE TO EDUCATION")}</div>
+ main.innerHTML=`<section class="welcome-panel" aria-label="Digital Mana Badi welcome">
   <h2 class="welcome-intro">${T("స్వాగతం","Welcome to")}</h2>
   <div class="welcome-honourees" aria-label="BVR, CVPMR and DNR">
-   <h2>${T("బి.వి. రాజు","B. V. Raju")}</h2>
-   <h2>${T("సి.వి.పి. మూర్తి రాజు","C. V. P. Murthy Raju")}</h2>
+   <h2>${T("బి.వి. రాజు · సి.వి.పి. మూర్తి రాజు","B. V. Raju · C. V. P. Murthy Raju")}</h2>
    <h2>${T("దంతులూరి నారాయణ రాజు","Dantuluri Narayana Raju")}</h2>
   </div>
   <div class="welcome-divider" aria-hidden="true"></div>
   <h1>${T("డిజిటల్ మన బడి","Digital Mana Badi")}</h1>
   <div class="welcome-platform">SCHOOL MANAGEMENT PLATFORM</div>
   <p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
-  <p class="welcome-description"><span class="welcome-line">${T("విద్యతో వెలుగులు… ఆశయాలతో అభివృద్ధి…","Illuminating lives through education… advancing through aspirations…")}</span> <span class="welcome-line">${T("స్ఫూర్తితో సరికొత్త భవిష్యత్తు!","inspiring a brighter future!")}</span></p>
+  <div class="welcome-school">
+   <strong>${T("మన పాఠశాల పేరు","YOUR SCHOOL NAME")}</strong>
+   <span>${T("పాఠశాల ప్రాంతం · జిల్లా","School Location · District")}</span>
+  </div>
   <p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
  </section>
  <section class="role-stack" aria-label="Select your role">
-  ${roleCard("school","హెడ్ మాస్టర్","Head Master","hm","green")}
+  ${roleCard("school","ప్రధానోపాధ్యాయులు","Head Master","hm","green")}
   ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
   ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
-  ${roleCard("heart-handshake","పూర్వ విద్యార్థి / దాత","Alumni / Donor","community","green")}
+  ${roleCard("heart-handshake","పూర్వ విద్యార్థి / స్పాన్సర్","Alumni / Sponsor","community","green")}
  </section>`;
  /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
  main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
 }
 function roleCard(ic,te,en,role,tone){
- const quote={hm:"A great school begins with great leadership.",teacher:"A teacher inspires a thousand possibilities.",parent:"Every child’s journey begins with family support.",community:"Stay connected. Make a difference."}[role];
- return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${quote}</small></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
+ return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
 }
-
 function login(){
  const role=roleNames[state.role], parent=state.role==="parent", community=state.role==="community";
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="backWelcome">← ${T("వెనక్కి","Back")}</button><span class="pill">${T(role[0],role[1])}</span></div>
