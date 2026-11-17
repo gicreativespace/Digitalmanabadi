@@ -733,3 +733,13 @@ body{font-size:18px;line-height:1.65}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8px!important}
 }
 @media(prefers-reduced-motion:reduce){.role-card{transition:none!important}}
+
+
+/* Welcome identity: tribute names, app name and school name share one visual style. */
+.main-view:has(.welcome-panel) .welcome-honourees h2,
+.main-view:has(.welcome-panel) .welcome-panel h1,
+.main-view:has(.welcome-panel) .welcome-school strong{
+ font-size:clamp(14px,2.2vh,18px)!important;
+ font-weight:850!important;color:var(--deep)!important;
+ line-height:1.22!important;letter-spacing:.015em!important;margin:0!important;
+}
