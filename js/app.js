@@ -168,11 +168,11 @@ function renderSuperAdminLogin(){
 }
 function setupFooterActions(){
   const signature=document.querySelector('#footerSignature'),inspired=document.querySelector('#footerInspired');
-  [signature,inspired].forEach(el=>el.addEventListener('click',openFooterContact));
   let timer=null,longPressed=false;
+  inspired.addEventListener('click',openFooterContact);
+  signature.addEventListener('click',e=>{if(longPressed){e.preventDefault();e.stopImmediatePropagation();longPressed=false;return}openFooterContact()});
   signature.addEventListener('pointerdown',()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;renderSuperAdminLogin()},850)});
   ['pointerup','pointerleave','pointercancel'].forEach(ev=>signature.addEventListener(ev,()=>{if(timer)clearTimeout(timer)}));
-  signature.addEventListener('click',e=>{if(longPressed){e.preventDefault();e.stopImmediatePropagation();longPressed=false}});
 }
 function render(){document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;if(state.view==="welcome")renderWelcome();else if(state.view==="login")renderLogin();else if(state.view==="dashboard")renderDashboard();else if(state.view==="today")renderToday();else if(state.view==="superadmin")renderSuperAdminLogin()}
 render();
