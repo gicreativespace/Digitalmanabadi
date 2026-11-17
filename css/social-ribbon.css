@@ -69,3 +69,43 @@
  .social-ribbon.compact .social-ribbon-panel{flex-basis:58px;width:58px;min-width:58px;margin-left:25px}
  .social-ribbon.compact.is-expanded{right:0;transform:none}
 }
+
+/* Welcome screen: retain the original horizontal ribbon without an arrow control. */
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-toggle{
+  display:none!important;
+}
+/* Welcome typography: balanced spacing and readable wrapping across screen sizes. */
+.main-view:has(.welcome-panel) .welcome-panel .welcome-intro{
+  line-height:1.3;
+}
+.main-view:has(.welcome-panel) .welcome-honourees h2{
+  line-height:1.3;
+  overflow-wrap:normal;
+}
+.main-view:has(.welcome-panel) .welcome-panel h1{
+  line-height:1.14;
+  letter-spacing:-.02em;
+}
+.main-view:has(.welcome-panel) .welcome-panel .welcome-tagline{
+  line-height:1.35;
+  text-wrap:balance;
+}
+.main-view:has(.welcome-panel) .welcome-panel .welcome-description{
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+  padding-inline:clamp(2px,1.5vw,12px);
+  font-size:clamp(10px,1.55vh,14px);
+  line-height:1.4;
+  letter-spacing:normal;
+  white-space:normal;
+  overflow-wrap:normal;
+  transform:none;
+}
+@media(max-width:520px){
+  .main-view:has(.welcome-panel) .welcome-panel .welcome-description{
+    padding-inline:4px;
+    font-size:clamp(9px,1.5vh,12px);
+    line-height:1.42;
+  }
+}
