@@ -126,3 +126,45 @@ Likewise, secure school-record-based password recovery requires a trusted verifi
 
 ## 11. Current repository state / known issue
 At the time this specification was added, the app is still a frontend preview and Firebase is not integrated. The current login handler in js/app.js contains a demo-mode path that authenticates empty credentials, and the generic path accepts any non-empty ID/password for non-Parent roles. The Community "Open Portal Preview" action also sets the authenticated flag. These are preview shortcuts, not authentication. They must be removed or isolated behind an unmistakable preview-only mode before live authentication is enabled.
+
+
+## 12. Automatic Digital Mana Badi Login IDs — Teacher and Parent
+
+This section adds automatic platform-issued login IDs for Teacher and Parent accounts. It does not change the approved role-specific account creation, verification, approval, or daily sign-in rules.
+
+### General ID rules
+- Each school receives a unique, immutable short School Code (for example, `MPMP` for the illustrative school name `MPMP SCHOOL`). The code must be checked for uniqueness by trusted server-side logic; do not derive a supposedly unique code from the school name alone.
+- IDs are generated only after the required account details have been entered and the account-creation/linking workflow has passed its required checks.
+- IDs must be unique within the platform, collision-checked and allocated atomically by trusted server-side logic. Never rely on a client-side counter.
+- Sequence numbers are independent per school and role, monotonically increasing, and never reused after deletion, disabling, or rejection.
+- The issued ID is permanent. Changes to a Teacher's mobile number or a Parent's linked children must not silently change the ID.
+- The generated address-like string is a Digital Mana Badi platform login identifier / alias, not a mailbox. Do not claim that it can receive email. The reserved `@digitalmanabadi.com` suffix may be displayed only if the domain is controlled and authorized by the platform owner; otherwise display the identifier without implying a real email address.
+- These aliases do not replace the approved daily login UX: Teacher and Parent continue to sign in with registered mobile number + password. The platform ID is an additional stable account identifier and may be used internally for account mapping/support.
+- Do not create Firebase Email/Password users using a predictable synthetic email and then expose the mapping or pretend the alias is a deliverable email. The trusted authentication design remains a prerequisite for live mobile + password sign-in.
+
+### Teacher ID alias
+- Format: `{SCHOOL_CODE}{YY}T{SEQUENCE}`, with a fixed-width, zero-padded sequence (minimum three digits).
+- Example for school code `MPMP`, year `26`, first Teacher account: `MPMP26T001`.
+- Head Master enters the Teacher profile and registered mobile; the system validates required fields, allocates the next Teacher sequence for that school/year, and presents the generated ID.
+- The Head Master reviews and confirms the details. The Teacher account becomes usable only after the approved Head Master creation/activation flow and the Teacher's first-time verification/password setup.
+- Keep the existing separate Teacher ID record format (year + teacher number, e.g. `202601`) if needed by school operations; do not conflate that school-facing Teacher ID with the platform login alias unless the data model deliberately maps both fields.
+
+### Parent ID alias
+- Format: `{SCHOOL_CODE}{YY}P{SEQUENCE}`, with a fixed-width, zero-padded sequence (minimum three digits).
+- Example for school code `MPMP`, year `26`, first Parent account: `MPMP26P001`.
+- Parent account creation starts from the already approved Add Child flow. The parent supplies the school-scoped student identifier or class/roll, date of birth, and registered guardian mobile. No OTP is added to this agreed flow.
+- After trusted school-record matching and the Parent's confirmation of the child's identity and relationship, allocate the next Parent sequence and issue the platform ID.
+- No Head Master approval is required for a valid Parent-child link. One Parent account may link multiple children. Each additional child is linked to the existing Parent account rather than creating a duplicate Parent account.
+- Where a student has multiple registered guardians, each guardian may have a separate Parent account and relationship, subject to the existing guardian-record matching rules.
+
+### Account lifecycle and safeguards
+1. Collect the role-specific required details.
+2. Validate the school, role, account status, and required verification/approval conditions.
+3. Allocate the next sequence atomically on a trusted server; enforce uniqueness with database constraints/rules.
+4. Save the stable platform ID and role-specific account mapping.
+5. Show the generated ID for the user/Head Master to note; never show passwords or PINs.
+6. Complete the approved first-time password setup and optional device-local PIN setup.
+7. Audit the creation outcome with minimal metadata; never log credentials or sensitive PIN material.
+
+### Important implementation note
+Automatic ID generation is an account-identifier feature, not an authentication method. Firebase Authentication does not natively authenticate a mobile number with a password. A trusted phone-to-auth-account mapping and server-enforced recovery/session controls must be designed before enabling live Teacher/Parent mobile + password login. Do not implement account creation, sequence allocation, password validation, or school-record recovery solely in browser JavaScript or publicly readable Firestore documents.
