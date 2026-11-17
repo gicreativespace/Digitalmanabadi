@@ -20,8 +20,8 @@ function applyTeluguWords(){
 const roleNames={hm:["ప్రధానోపాధ్యాయులు","Headmaster"],teacher:["ఉపాధ్యాయుడు","Teacher"],parent:["తల్లిదండ్రులు","Parent"]};
 const roleMeta={
  hm:{tone:"green",icon:"school",title:"ప్రధానోపాధ్యాయుల ప్రధాన పేజీ",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
- teacher:{tone:"gold",icon:"presentation",title:"టీచర్ డాష్‌బోర్డ్",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
- parent:{tone:"blue",icon:"users",title:"పేరెంట్ డాష్‌బోర్డ్",sub:"మీ పిల్లల పాఠశాల సమాచారం"}
+ teacher:{tone:"gold",icon:"presentation",title:"ఉపాధ్యాయుల ప్రధాన పేజీ",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
+ parent:{tone:"blue",icon:"users",title:"తల్లిదండ్రుల ప్రధాన పేజీ",sub:"మీ పిల్లల పాఠశాల సమాచారం"}
 };
 const modules={
  hm:[
@@ -86,8 +86,8 @@ function welcome(){
  main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("స్వాగతం","Welcome")}</h1><p>${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
  <section class="role-stack">
  ${roleCard("school","హెడ్మాస్టర్","Headmaster","hm","green")}
- ${roleCard("presentation","టీచర్","Teacher","teacher","gold")}
- ${roleCard("users","పేరెంట్","Parent","parent","blue")}
+ ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
+ ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
  </section>`;
  main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;localStorage.setItem("gim_role",state.role);state.view="login";render()});
 }
