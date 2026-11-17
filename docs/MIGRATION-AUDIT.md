@@ -94,3 +94,11 @@ This audit and migration are source-level changes. A successful GitHub commit or
 - Existing Super Admin dashboard handoff, module navigation, role switching, settings actions, and logout callbacks are retained.
 - Service worker cache advanced to v52; core app URL advanced to `20261117-42`.
 - No role permissions, authentication model, UI styling, Welcome Screen, footer, or social ribbon changed.
+
+
+## Stage 6 — shared feature modules organization
+- Moved the module-page orchestration into `js/modules/module-page.js`.
+- Split calendar, Mid-Day Meal preview, and Poster Studio preview helpers into `js/modules/calendar.js`, `js/modules/mid-day-meal.js`, and `js/modules/poster-studio.js`.
+- Kept `js/shared/module-screens.js` as a compatibility re-export; core imports the new module path.
+- Service worker cache advanced to v53; core app URL advanced to `20261117-43`.
+- These remain frontend preview modules; no live data writes or authentication features were added.
