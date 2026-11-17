@@ -6,3 +6,52 @@
 
 .dashboard-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:520px){.dashboard-actions{gap:6px}.dashboard-actions .btn{padding:8px 9px;font-size:10px}.dashboard-head{flex-wrap:wrap}.dashboard-head>div:first-child{min-width:0;flex:1 1 100%}}
+
+/* Premium compact welcome layout and stacked signature */
+.footer{flex-direction:column;justify-content:center;align-items:center;gap:5px;padding:11px 0 13px;text-align:center}
+.footer-link{display:block;width:100%;font-size:11px;line-height:1.35;letter-spacing:.025em}
+#footerSignature{font-weight:750;color:var(--deep);letter-spacing:.04em}
+#footerInspired{font-size:10px;letter-spacing:.08em}
+.app-shell{width:100%;min-width:0}
+.main-view,.topbar,.footer{min-width:0}
+img,svg,video,canvas{max-width:100%}
+@media(max-width:520px){
+ .app-shell{padding:0 14px}
+ .topbar{height:60px;flex:none}
+ .brand-mark{width:35px;height:35px}
+ .icon-button{width:36px;height:36px}
+ .main-view{padding:12px 0 12px}
+ .welcome-panel{margin:4px 0 13px}
+ .welcome-emblem{width:44px;height:44px;margin:0 auto 8px}
+ .welcome-kicker{font-size:9px}
+ .welcome-panel h1{font-size:29px;margin:7px 0 4px}
+ .welcome-panel p{font-size:12px}
+ .role-stack{gap:9px}
+ .role-card{min-height:72px;padding:10px 13px;border-radius:15px;gap:11px}
+ .role-icon{width:39px;height:39px;border-radius:12px;font-size:21px}
+ .role-copy strong{font-size:15px}
+ .role-copy small{font-size:10px}
+ .role-arrow{font-size:25px}
+ .footer{flex:none;padding:9px 0 10px;gap:3px}
+ .footer-link{font-size:10px;padding:2px 0}
+ #footerInspired{font-size:9px}
+}
+@media(max-height:740px) and (max-width:520px){
+ .topbar{height:54px}
+ .main-view{padding:7px 0}
+ .welcome-panel{margin:0 0 9px}
+ .welcome-emblem{width:36px;height:36px;margin-bottom:5px}
+ .welcome-panel h1{font-size:26px;margin:5px 0 3px}
+ .role-stack{gap:7px}
+ .role-card{min-height:64px;padding:8px 11px}
+ .role-icon{width:35px;height:35px}
+ .footer{padding:6px 0 7px}
+}
+@media(max-width:360px){
+ .app-shell{padding:0 10px}
+ .brand-copy strong{font-size:12px}
+ .brand-copy small{font-size:9px}
+ .top-actions{gap:5px}
+ .icon-button{width:33px;height:33px}
+ .role-copy strong{font-size:14px}
+}
