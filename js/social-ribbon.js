@@ -1,4 +1,4 @@
-/* Social Media Ribbon — additive, independent from existing app modules */
+/* Social Media Ribbon — lightweight, additive and independent from app navigation */
 (() => {
   const SOCIAL_LINKS = { website:"", whatsapp:"", youtube:"", instagram:"", facebook:"" };
   const items = [
@@ -26,8 +26,13 @@
     }
     return el;
   };
-  let ribbon,scrollTimer,autoHidden=false,lastY=window.scrollY;
-  const syncLanguage=()=>{if(ribbon){ribbon.querySelector(".social-ribbon-head").textContent=document.documentElement.lang==="en"?"CONNECT WITH US":"మనతో అనుసంధానం అవ్వండి";}};
+  let ribbon,autoHidden=false,lastY=window.scrollY;
+  const syncLanguage=()=>{
+    if(!ribbon)return;
+    const head=ribbon.querySelector(".social-ribbon-head");
+    const next=document.documentElement.lang==="en"?"CONNECT WITH US":"మనతో అనుసంధానం అవ్వండి";
+    if(head.textContent!==next)head.textContent=next;
+  };
   const placeRibbon=()=>{
     const main=document.getElementById("mainView");if(!main||!ribbon)return;
     const welcome=main.querySelector(".welcome-panel"),roles=main.querySelector(".role-stack");
@@ -40,7 +45,7 @@
       const footer=document.getElementById("appFooter");
       if(footer&&footer.parentNode){
         if(ribbon.parentNode!==footer.parentNode||ribbon.nextElementSibling!==footer)footer.parentNode.insertBefore(ribbon,footer);
-      }else if(ribbon.parentElement!==main){main.append(ribbon);}
+      }else if(ribbon.parentElement!==main)main.append(ribbon);
       ribbon.classList.toggle("social-auto-hidden",autoHidden);
       ribbon.classList.toggle("social-auto-visible",!autoHidden);
     }
@@ -50,18 +55,16 @@
     const y=window.scrollY;
     if(y>lastY+3){autoHidden=true;ribbon?.classList.add("social-auto-hidden");ribbon?.classList.remove("social-auto-visible");}
     else if(y<lastY-3){autoHidden=false;ribbon?.classList.remove("social-auto-hidden");ribbon?.classList.add("social-auto-visible");}
-    lastY=y;clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(()=>{if(!autoHidden&&ribbon)ribbon.classList.add("social-auto-visible");},180);
+    lastY=y;
   };
   const start=()=>{
     const main=document.getElementById("mainView");if(!main)return;
     ribbon=makeRibbon();placeRibbon();
+    /* Observe only direct page renders, never the ribbon's own inner content. */
     const observer=new MutationObserver(()=>placeRibbon());
-    observer.observe(main,{childList:true,subtree:true});
+    observer.observe(main,{childList:true,subtree:false});
     window.addEventListener("scroll",onScroll,{passive:true});
-    window.addEventListener("wheel",()=>{if(window.scrollY<3){autoHidden=false;ribbon.classList.remove("social-auto-hidden");ribbon.classList.add("social-auto-visible");}},{passive:true});
     new MutationObserver(syncLanguage).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
-    setTimeout(placeRibbon,250);setTimeout(placeRibbon,900);
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
