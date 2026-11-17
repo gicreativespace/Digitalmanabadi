@@ -14,3 +14,7 @@ The current controller contains shared feature rendering and event handling. Ext
 | Alumni/Sponsor community | `communityRegister()`, `communityModuleMarkup()`, `bindCommunityModuleActions()` |
 
 These are mapping notes, not claims that every feature is already connected to live Firebase data.
+
+
+### Shared module screens
+The shared module-page renderer, calendar, Mid-Day Meal preview, and Poster Studio preview are implemented once in `../shared/module-screens.js`. Role-specific data and workflows stay in their owning role sections.

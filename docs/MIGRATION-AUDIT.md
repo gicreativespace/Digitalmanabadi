@@ -67,3 +67,12 @@
 ## Validation boundary
 
 This audit and migration are source-level changes. A successful GitHub commit or static syntax check does not prove that the deployed app has been visually tested or that live Firebase authentication/data features are production-ready.
+
+
+## Stage 3 — shared module screens extraction
+- Extracted the shared module-page renderer and its calendar, Mid-Day Meal, and Poster Studio helpers from the core controller into `js/shared/module-screens.js`.
+- The shared screen factory receives the existing app state, translations, school configuration, rendering callback, and Alumni/Sponsor section adapter; role-specific workflows remain in their role folders.
+- Core controller now imports and initializes the shared screen factory. Existing module names, markup, event handlers, and local preview behavior are retained.
+- Service worker cache advanced to v50 and includes the new shared module file; core module URL advanced to `20261117-40`.
+- No CSS, Welcome Screen, footer, social ribbon, Firebase configuration, or Firestore rules changed.
+- Validation performed: source transformation anchors and service-worker cache entry updated. Browser runtime testing remains required.
