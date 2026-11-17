@@ -12,7 +12,7 @@
     const el=document.createElement("aside");
     el.className="social-ribbon";el.id="socialMediaRibbon";
     el.setAttribute("aria-label","Connect with us");
-    el.innerHTML='<button type="button" class="social-ribbon-toggle" aria-expanded="false" aria-label="Open social links" title="Connect with us"><span aria-hidden="true">‹</span></button><div class="social-ribbon-panel"><div class="social-ribbon-head">మనతో అనుసంధానం అవ్వండి</div><div class="social-ribbon-links"></div></div>';
+    el.innerHTML='<button type="button" class="social-ribbon-toggle" aria-expanded="false" aria-label="Open social links" title="Connect with us"><span aria-hidden="true">‹</span></button><div class="social-ribbon-panel"><div class="social-ribbon-links"></div></div>';
     const links=el.querySelector(".social-ribbon-links");
     for(const item of items){
       const href=SOCIAL_LINKS[item.key];
@@ -20,9 +20,9 @@
       node.className="social-ribbon-link";
       if(href){node.href=href;node.target="_blank";node.rel="noopener noreferrer";}
       else{node.setAttribute("aria-disabled","true");node.title=item.label+" link will be added";}
+      node.setAttribute("aria-label",item.label);
       const img=document.createElement("img");img.src=item.icon;img.alt=item.label;img.loading="lazy";
-      const name=document.createElement("small");name.className="social-name";name.textContent=item.label;
-      node.append(img,name);links.append(node);
+      node.append(img);links.append(node);
     }
     const toggle=el.querySelector(".social-ribbon-toggle");
     toggle.addEventListener("click",()=>{
@@ -34,12 +34,6 @@
     return el;
   };
   let ribbon,placement="";
-  const syncLanguage=()=>{
-    if(!ribbon)return;
-    const head=ribbon.querySelector(".social-ribbon-head");
-    const next=document.documentElement.lang==="en"?"CONNECT WITH US":"మనతో అనుసంధానం అవ్వండి";
-    if(head.textContent!==next)head.textContent=next;
-  };
   const placeRibbon=()=>{
     const main=document.getElementById("mainView");if(!main||!ribbon)return;
     const welcome=main.querySelector(".welcome-panel"),roles=main.querySelector(".role-stack");
@@ -53,7 +47,6 @@
       ribbon.classList.remove("social-auto-visible");
       if(ribbon.parentElement!==document.body)document.body.append(ribbon);
     }
-    syncLanguage();
   };
   const start=()=>{
     const main=document.getElementById("mainView");if(!main)return;
@@ -61,7 +54,6 @@
     /* Observe only direct page renders, never the ribbon's own inner content. */
     const observer=new MutationObserver(()=>placeRibbon());
     observer.observe(main,{childList:true,subtree:false});
-    new MutationObserver(syncLanguage).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
