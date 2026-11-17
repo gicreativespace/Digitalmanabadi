@@ -145,9 +145,9 @@ function welcome(){
  main.innerHTML=`<section class="welcome-panel" aria-label="Digital Mana Badi welcome">
   <h2 class="welcome-intro">${T("స్వాగతం","Welcome to")}</h2>
   <div class="welcome-honourees" aria-label="B. V. Raju, C. V. P. Murthy Raju and D. N. Raju">
-   <h2>${T("బి.వి. రాజు","B. V. Raju")}</h2>
-   <h2>${T("సి.వి.పి. మూర్తి రాజు","C. V. P. Murthy Raju")}</h2>
-   <h2>${T("దంతులూరి నారాయణ రాజు","D. N. Raju")}</h2>
+   <h2>${T("శ్రీ బి.వి. రాజు","Sri B. V. Raju")}</h2>
+   <h2>${T("శ్రీ సి.వి.పి. మూర్తి రాజు","Sri C. V. P. Murthy Raju")}</h2>
+   <h2>${T("శ్రీ దంతులూరి నారాయణ రాజు","Sri D. N. Raju")}</h2>
   </div>
   <div class="welcome-divider" aria-hidden="true"></div>
   <h1>${T("డిజిటల్ మన బడి","DIGITAL MANA BADI")}</h1>
