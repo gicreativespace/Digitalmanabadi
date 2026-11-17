@@ -288,7 +288,7 @@ body{font-size:18px;line-height:1.65}
 .welcome-panel h1{font-size:clamp(31px,5vw,43px);line-height:1.15;margin:8px 0 4px;color:var(--deep);font-weight:900}
 .welcome-platform{font-size:13px;font-weight:850;letter-spacing:.13em;color:var(--green);margin:5px 0 8px}
 .welcome-panel .welcome-tagline{font-size:21px;font-weight:800;color:var(--gold);margin:5px 0 7px}
-.welcome-description{max-width:610px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.55}
+.welcome-description{width:100%;max-width:none;margin:0 auto;color:var(--muted);font-size:clamp(8px,1.55vw,15px);line-height:1.45;text-align:center;white-space:nowrap;letter-spacing:-.035em}
 .role-prompt{margin:19px 0 12px!important;font-size:16px!important;font-weight:850;letter-spacing:.08em;color:var(--deep)!important}
 .role-stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;max-width:760px}
 .role-card{min-height:166px;padding:17px 13px;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;border-radius:19px}
