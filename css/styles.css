@@ -262,3 +262,14 @@ body{font-size:18px;line-height:1.65}
  #footerInspired{font-size:10px}
  .bottom-nav small{font-size:11px}
 }
+
+/* Distinct soft-green theme: visibly different from Light Mode without black surfaces */
+[data-theme=dark]{color-scheme:light;--bg:#dcebe0;--surface:#edf5ef;--surface2:#cfe3d4;--text:#193c27;--muted:#405f49;--border:#b9d2bf;--deep:#123f25;--green:#236b3d;--gold:#b88b3f;--blue:#3e6992;--shadow:0 14px 34px rgba(22,66,37,.16)}
+[data-theme=dark] body{background:var(--bg);color:var(--text)}
+[data-theme=dark] .topbar,[data-theme=dark] .footer{border-color:var(--border)}
+[data-theme=dark] .role-card{background:var(--surface);border-color:var(--border);color:var(--text)}
+[data-theme=dark] .knowledge-card{background:linear-gradient(120deg,#d4e8d9,#f1e8d3);border-color:var(--border)}
+[data-theme=dark] .module-card,[data-theme=dark] .card,[data-theme=dark] .form-card{background:var(--surface);border-color:var(--border)}
+[data-theme=dark] .field input,[data-theme=dark] .field select,[data-theme=dark] .field textarea{background:#f5faf6;border-color:var(--border);color:var(--text)}
+[data-theme=dark] .bottom-nav{background:var(--surface);border-color:var(--border)}
+[data-theme=dark] .empty,[data-theme=dark] .demo-note{background:#d2e5d7;color:#345640}
