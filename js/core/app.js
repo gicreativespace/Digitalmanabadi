@@ -4,7 +4,7 @@ import { roleNames, roleMeta, modules } from "../shared/role-config.js";
 import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal } from "../sections/super-admin/admin-portal.js";
 import { createAlumniSponsorSection } from "../sections/alumni-sponsor/alumni-sponsor-section.js";
 import { createParentSection } from "../sections/parent/parent-section.js";
-import { createSharedScreens } from "../shared/module-screens.js";
+import { createModulePage } from "../modules/module-page.js";
 import { createLoginScreen } from "../shared/login-screen.js";
 import { createDashboardScreen } from "../shared/dashboard-screen.js";
 import { createAccountScreens } from "../shared/account-screens.js";
@@ -176,7 +176,7 @@ function updateBottomNavigation(){
 }
 const alumniSponsorSection = createAlumniSponsorSection({main,state,T,render,toast,escapeHtml});
 const parentSection = createParentSection({main,state,render,toast,escapeHtml});
-const { modulePage } = createSharedScreens({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
+const { modulePage } = createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
 const loginScreen = createLoginScreen({
  main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
