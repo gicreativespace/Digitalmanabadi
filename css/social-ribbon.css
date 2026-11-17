@@ -146,3 +146,28 @@
 @media(max-width:360px){
  .social-ribbon-link .social-name{font-size:12px}
 }
+
+
+/* Welcome screen: five official social logos only, positioned close to footer. */
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact){
+ width:100%;margin:auto auto 0!important;padding:4px 8px!important;
+ border:0;background:transparent;box-shadow:none;border-radius:0;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{display:none!important}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{
+ gap:0;padding:2px;background:transparent;transform:none;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+ width:22px;height:22px;
+}
+@media(max-width:700px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){padding:3px 6px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:20px;height:20px}
+}
+@media(max-height:680px) and (max-width:700px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){padding:2px 5px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:17px;height:17px}
+}
