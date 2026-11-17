@@ -5,6 +5,11 @@ import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboar
 import { createAlumniSponsorSection } from "../sections/alumni-sponsor/alumni-sponsor-section.js";
 import { createParentSection } from "../sections/parent/parent-section.js";
 import { createSharedScreens } from "../shared/module-screens.js";
+import { createLoginScreen } from "../shared/login-screen.js";
+import { getHeadMasterLoginView } from "../sections/head-master/login.js";
+import { getTeacherLoginView } from "../sections/teacher/login.js";
+import { getParentLoginView } from "../sections/parent/login.js";
+import { getAlumniSponsorLoginView } from "../sections/alumni-sponsor/login.js";
 import { renderHeadMasterDashboardIntro } from "../sections/head-master/dashboard.js";
 import { renderTeacherDashboardIntro } from "../sections/teacher/dashboard.js";
 import { renderParentDashboardIntro } from "../sections/parent/dashboard.js";
@@ -110,37 +115,7 @@ function welcome(){
 function roleCard(ic,te,en,role,tone){
  return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
 }
-function login(){
- const role=roleNames[state.role], parent=state.role==="parent", community=state.role==="community";
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="backWelcome">← ${T("వెనక్కి","Back")}</button><span class="pill">${T(role[0],role[1])}</span></div>
- <section class="form-card"><div class="login-symbol">${iconSvg(roleMeta[state.role].icon)}</div><h2>${community?T("Alumni / Donor ప్రవేశం","Alumni / Donor Access"):T(role[0]+" లాగిన్",role[1]+" Login")}</h2>
- <p>${community?T("మీ పాఠశాలతో అనుబంధం కొనసాగించండి, అవసరాలకు స్పందించండి.","Stay connected with your school and respond to its needs."):parent?T("మీ Student ID మరియు Parent PINతో ప్రవేశించండి.","Sign in with your Student ID and Parent PIN."):T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account credentials.")}</p>
- ${parent?'<div class="field"><label>Student ID</label><input id="loginId" placeholder="Student ID"></div><div class="field"><label>Parent PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><button class="btn full" id="loginGo">Login</button><div class="link-row"><button class="text-link" id="startLink">మొదటిసారి? పిల్లలను లింక్ చేయండి</button></div>':
- community?'<div class="community-access-actions"><button class="btn full" id="communityRegister">Register as Alumni / Donor</button><button class="btn secondary full" id="communityPreview">Open Portal Preview</button></div><div class="demo-note">Preview only: registration approvals, secure sign-in and cross-device messages become live after Firebase integration.</div>':
- '<div class="field"><label>'+(state.role==="hm"?"Official School Email":T("Login ID","Login ID"))+'</label><input id="loginId" type="'+(state.role==="hm"?"email":"text")+'" autocomplete="username" placeholder="'+(state.role==="hm"?"Enter official school email":T("మీ Login ID","Enter your Login ID"))+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">'+(state.role==="hm"?"Firebase Authenticationతో Head Master Email ధృవీకరణ.":"Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.")+'</div>'}
- </section>`;
- document.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
- if(parent)document.querySelector("#startLink").onclick=()=>{state.view="link";render()};
- if(community){
-  document.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
-  document.querySelector("#communityPreview").onclick=()=>{state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render()};
-  return;
- }
- document.querySelector("#loginGo").onclick=async()=>{
-  const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value;
-  if(!id||!pin){toast(T("రెండు వివరాలు నమోదు చేయండి.","Please enter both fields."));return}
-  if(state.role==="hm"){
-   const button=document.querySelector("#loginGo");button.disabled=true;button.textContent="Verifying…";
-   try{const result=await authenticateHeadMaster(id,pin);state.headMasterProfile=result.profile;state.authenticated=true;localStorage.setItem("gim_role","hm");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();}
-   catch(error){toast(error.message||"లాగిన్ ధృవీకరణ విఫలమైంది.");button.disabled=false;button.textContent=T("లాగిన్","Login");}
-   return;
-  }
-  if(APP_CONFIG.demoMode && !id && !pin){state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();return}
-  if(parent&&!state.parentLinked){toast("ముందుగా మీ పిల్లలను లింక్ చేయండి.");return}
-  if(parent&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){toast("Student ID లేదా PIN సరిపోలలేదు.");return}
-  state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
- };
-}
+const login = loginScreen.render;
 function communityRegister(){alumniSponsorSection.renderRegistration();}
 function linking(){parentSection.renderLinking();}
 function dashboard(){
@@ -227,6 +202,10 @@ function updateBottomNavigation(){
 const alumniSponsorSection = createAlumniSponsorSection({main,state,T,render,toast,escapeHtml});
 const parentSection = createParentSection({main,state,render,toast,escapeHtml});
 const { modulePage } = createSharedScreens({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
+const loginScreen = createLoginScreen({
+ main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,
+ roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
+});
 
 render();setupFooter();setupBottomNavigation();updateBottomNavigation();
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));

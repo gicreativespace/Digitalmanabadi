@@ -76,3 +76,12 @@ This audit and migration are source-level changes. A successful GitHub commit or
 - Service worker cache advanced to v50 and includes the new shared module file; core module URL advanced to `20261117-40`.
 - No CSS, Welcome Screen, footer, social ribbon, Firebase configuration, or Firestore rules changed.
 - Validation performed: source transformation anchors and service-worker cache entry updated. Browser runtime testing remains required.
+
+
+## Stage 4 — role-owned login screen extraction
+- Moved the shared login-screen controller into `js/shared/login-screen.js`.
+- Added role-owned login view modules for Head Master, Teacher, Parent, and Alumni/Sponsor under their respective `js/sections/<role>/login.js` folders.
+- The shared login controller composes role-owned form markup while retaining existing navigation, validation, Head Master Firebase sign-in call, Parent preview checks, and clearly labelled Alumni/Sponsor preview action.
+- Super Admin login remains in its existing dedicated Super Admin portal module.
+- Service worker cache advanced to v51; core app URL advanced to `20261117-41`.
+- No authentication model or backend behavior was newly enabled. Teacher, Parent, and Alumni/Sponsor remain preview flows; existing security prerequisites remain outstanding.
