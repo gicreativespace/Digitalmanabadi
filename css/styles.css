@@ -743,3 +743,102 @@ body{font-size:18px;line-height:1.65}
  font-weight:850!important;color:var(--deep)!important;
  line-height:1.22!important;letter-spacing:.015em!important;margin:0!important;
 }
+
+
+/* Welcome Screen — approved balanced spacing and enlarged role cards only. */
+@media(min-width:701px){
+ .main-view:has(.welcome-panel){
+  display:flex!important;flex-direction:column;justify-content:space-between!important;
+  min-height:0;box-sizing:border-box;overflow:hidden;
+  padding:clamp(12px,2vh,22px) 24px calc(72px + env(safe-area-inset-bottom,0px))!important;
+ }
+ .welcome-panel{width:100%;max-width:980px;margin:0 auto!important}
+ .role-stack{width:100%;max-width:980px;gap:14px;margin:0 auto}
+ .role-card{min-height:clamp(132px,17vh,160px);padding:18px 12px;gap:12px;border-radius:20px}
+ .role-icon{width:52px;height:52px;font-size:28px}
+ .role-copy strong{font-size:clamp(17px,1.5vw,20px)!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){
+  width:min(100%,760px);min-height:116px;box-sizing:border-box;
+  margin:clamp(12px,1.8vh,20px) auto 0;padding:13px 14px;
+ }
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{font-size:12px!important;margin-bottom:9px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:28px;height:28px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:11px!important}
+}
+@media(max-width:700px){
+ .app-shell:has(.welcome-panel){
+  height:100vh!important;height:100dvh!important;min-height:0!important;overflow:hidden!important;
+ }
+ .main-view:has(.welcome-panel){
+  display:flex!important;flex:1 1 auto;flex-direction:column;
+  justify-content:space-between!important;align-items:stretch;
+  min-height:0!important;box-sizing:border-box;overflow:hidden!important;
+  padding:10px 16px calc(64px + env(safe-area-inset-bottom,0px))!important;
+  gap:0!important;
+ }
+ .welcome-panel{flex:none;width:100%;margin:0!important}
+ .welcome-intro{margin:0 0 6px!important;font-size:clamp(16px,2.5vh,19px)}
+ .welcome-honourees{gap:3px}
+ .welcome-honourees h2{font-size:clamp(16px,2.4vh,19px)!important;line-height:1.22!important}
+ .welcome-divider{margin:7px auto}
+ .welcome-panel h1{margin:3px 0 2px!important}
+ .welcome-school{gap:2px}
+ .welcome-panel .role-prompt{margin:12px 0 0!important;font-size:clamp(13px,1.8vh,16px)!important}
+ .role-stack{
+  flex:none;width:100%;max-width:100%;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;margin:0 auto;
+ }
+ .role-card{
+  min-width:0;min-height:clamp(112px,14.5vh,126px);
+  padding:12px 7px;gap:8px;border-radius:18px;
+ }
+ .role-icon{
+  width:clamp(44px,5.6vh,50px);height:clamp(44px,5.6vh,50px);
+  border-radius:15px;font-size:clamp(25px,3.4vh,29px);
+ }
+ .role-copy strong{font-size:clamp(14px,4vw,16px)!important;line-height:1.25!important}
+ .role-card[data-role="community"] .role-copy strong{font-size:clamp(13px,3.65vw,15px)!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){
+  flex:none;width:100%;min-height:120px;box-sizing:border-box;
+  margin:clamp(10px,1.6vh,15px) auto 0;padding:12px 8px 13px;
+  border-radius:17px;display:flex;flex-direction:column;justify-content:center;
+ }
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{
+  margin:0 0 9px!important;font-size:11px!important;line-height:1.15;
+ }
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{gap:3px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{gap:4px;padding:2px 0}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:26px;height:26px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{
+  font-size:10px!important;line-height:1.15;white-space:nowrap;
+ }
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel){padding-left:12px!important;padding-right:12px!important}
+ .role-stack{gap:9px}
+ .role-card{min-height:clamp(104px,13.5vh,116px);padding:9px 5px;gap:7px}
+ .role-icon{width:42px;height:42px;font-size:25px}
+ .role-copy strong{font-size:clamp(13px,3.9vw,15px)!important}
+ .role-card[data-role="community"] .role-copy strong{font-size:clamp(12px,3.5vw,13.5px)!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){min-height:108px;padding:10px 5px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:23px;height:23px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8.5px!important}
+}
+@media(max-height:700px) and (max-width:700px){
+ .app-shell:has(.welcome-panel){height:100dvh!important;min-height:100dvh!important;overflow:hidden!important}
+ .main-view:has(.welcome-panel){
+  justify-content:flex-start!important;overflow-y:auto!important;overflow-x:hidden!important;
+  padding-top:6px!important;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important;
+  gap:12px!important;
+ }
+ .welcome-intro{font-size:15px}
+ .welcome-honourees h2{font-size:clamp(13px,2.4vh,16px)!important}
+ .welcome-divider{margin:4px auto}
+ .welcome-panel .role-prompt{margin-top:7px!important}
+ .role-card{min-height:82px;padding:7px 5px;gap:5px}
+ .role-icon{width:34px;height:34px;font-size:21px}
+ .role-copy strong{font-size:clamp(12px,3.8vw,14px)!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){min-height:96px;margin-top:0;padding:8px 6px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{margin-bottom:5px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:21px;height:21px}
+}
