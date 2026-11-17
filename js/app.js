@@ -85,7 +85,7 @@ const modules={
   ["book-heart","గొప్ప వ్యక్తులు","Great People","చూడటానికి మాత్రమే"],
   ["quote","గొప్ప సూక్తులు","Great Quotes","చూడటానికి మాత్రమే"],
   ["palette","Poster Studio","Poster Studio","పోస్టర్ తయారు చేసి డౌన్‌లోడ్ చేయండి"],
-  ["trophy","విద్యార్థుల ప్రతిభ","Merit & Excellence","మీ పిల్లల ఆమోదిత విజయాలు"]
+  ["trophy","విద్యార్థుల ప్రతిభ","Merit & Excellence Awards","మీ పిల్లల ఆమోదిత విజయాలు"]
  ],
  community:[
   ["book-heart","గొప్ప వ్యక్తులు","Great People","View Only"],
@@ -98,7 +98,8 @@ const modules={
   ["heart-handshake","విద్యార్థి దత్తత","Student Adoption","Full support or a specific educational need"],
   ["hand-coins","పాఠశాల స్పాన్సర్‌షిప్","School Sponsorship","Financial or material support"],
   ["graduation-cap","స్వచ్ఛంద సేవ","Volunteer & Mentorship","Share your time, skills and experience"],
-  ["history","నా సహాయాలు","My Contributions","View your support and response history"]
+  ["history","నా సహాయాలు","My Contributions","View your support and response history"],
+  ["trophy","మెరిట్ అవార్డులు","Merit & Excellence Awards","View class-wise best students and sponsor an award"]
  ]
 };
 const main=document.querySelector("#mainView");
@@ -215,7 +216,7 @@ function communityModuleMarkup(title){
  if(title==="Volunteer Management"&&isHM)return '<div class="community-panel"><h3>Volunteer & Mentorship Requests</h3>'+rows(d.volunteers,"No volunteer requests yet.")+'</div>';
  if(title==="Volunteer & Mentorship")return '<div class="community-panel"><h3>Offer Your Time & Skills</h3>'+formField("volunteerArea","Area of support","Career guidance / Digital skills / Sports")+formField("volunteerAvailability","Available time","Weekends / Monthly")+ '<div class="field"><label>Message</label><textarea id="volunteerMessage" rows="3"></textarea></div><button class="btn full" id="sendVolunteer">Send Volunteer Offer</button></div>';
  if(title==="Contact Head Master")return '<div class="community-panel"><h3>Contact Head Master</h3>'+formField("contactSubject","Subject","How can I help?")+ '<div class="field"><label>Message</label><textarea id="contactMessage" rows="4"></textarea></div><button class="btn full" id="sendHeadMessage">Send Message</button><p class="demo-note">Messages are stored only in this browser preview until Firebase messaging is connected.</p></div>';
- if(title==="Merit & Excellence Awards")return '<div class="community-panel"><h3>Last Year Class-wise Best Students</h3>'+ (isHM?formField("meritYear","Academic year","2025–2026")+formField("meritClass","Class","Class 5")+formField("meritStudent","Student name (school record)","Student name")+formField("meritAward","Recognition","Class Topper / Subject Excellence")+ '<div class="field"><label>Achievement details</label><textarea id="meritDetails" rows="2"></textarea></div><button class="btn full" id="saveMerit">Save Best Student</button>':"") + rows(d.merit,"No merit records have been published yet.")+(isCommunity?'<p class="demo-note">Support an approved award through the School Sponsorship process.</p>':"")+'</div>';
+ if(title==="Merit & Excellence Awards")return '<div class="community-panel"><h3>Last Year Class-wise Best Students</h3>'+ (isHM?formField("meritYear","Academic year","2025–2026")+formField("meritClass","Class","Class 5")+formField("meritStudent","Student name (school record)","Student name")+formField("meritAward","Recognition","Class Topper / Subject Excellence")+ '<div class="field"><label>Achievement details</label><textarea id="meritDetails" rows="2"></textarea></div><button class="btn full" id="saveMerit">Save Best Student</button>':"") + rows(d.merit,"No merit records have been published yet.")+(isCommunity?d.merit.map(x=>'<div class="community-actions"><button class="btn" data-sponsor-merit="'+x.id+'">Sponsor This Award</button></div>').join("")+'<p class="demo-note">Award sponsorship is coordinated and approved by the Head Master.</p>':"")+(state.role==="parent"?'<p class="demo-note">Only achievements approved for your linked child will be shown in the live system.</p>':"")+'</div>';
  if(title==="My Contributions")return '<div class="community-panel"><h3>My Contributions & Responses</h3>'+rows(d.responses,"No support responses recorded in this preview.")+'</div>';
  if(title==="My School")return '<div class="community-panel"><h3>My School</h3><p>School profile and approved school updates will appear here after school setup and Firebase integration.</p></div>';
  return "";
@@ -234,6 +235,7 @@ function bindCommunityModuleActions(){
  const volunteer=main.querySelector("#sendVolunteer");if(volunteer)volunteer.onclick=()=>{const area=document.querySelector("#volunteerArea").value.trim(),message=document.querySelector("#volunteerMessage").value.trim();if(!area){toast("Please enter your area of support.");return}d.volunteers.push({id:Date.now(),title:area,description:message+" • "+document.querySelector("#volunteerAvailability").value,status:"Pending"});d.responses.push({id:Date.now()+1,title:area,description:message,status:"Volunteer offer sent"});saveCommunityData(d);toast("Volunteer offer saved in this local preview.");render()};
  const contact=main.querySelector("#sendHeadMessage");if(contact)contact.onclick=()=>{const subject=document.querySelector("#contactSubject").value.trim(),message=document.querySelector("#contactMessage").value.trim();if(!message){toast("Please enter a message.");return}d.messages.push({id:Date.now(),title:subject||"Message from Alumni / Donor",description:message,status:"New"});saveCommunityData(d);toast("Message saved in this local preview.");render()};
  const merit=main.querySelector("#saveMerit");if(merit)merit.onclick=()=>{const student=document.querySelector("#meritStudent").value.trim();if(!student){toast("Please enter the student name.");return}d.merit.push({id:Date.now(),title:document.querySelector("#meritClass").value+" • "+student,description:document.querySelector("#meritYear").value+" • "+document.querySelector("#meritAward").value+" • "+document.querySelector("#meritDetails").value,status:"Published"});saveCommunityData(d);render()};
+ main.querySelectorAll("[data-sponsor-merit]").forEach(b=>b.onclick=()=>{const item=d.merit.find(x=>x.id===Number(b.dataset.sponsorMerit));if(item){d.responses.push({id:Date.now(),title:"Merit award sponsorship: "+item.title,description:item.description,status:"Sponsorship interest sent to Head Master"});saveCommunityData(d);toast("Award sponsorship interest saved in this local preview.");render()}});
 }
 function linking(){
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="linkBack">← వెనక్కి</button></div><section class="form-card"><div class="login-symbol">♧</div><h2>Parent–Student Linking</h2><p>విద్యార్థి వివరాలను నిర్ధారించి మీ Parent PIN సెట్ చేసుకోండి.</p>
