@@ -424,3 +424,70 @@ body{font-size:18px;line-height:1.65}
  .community-actions{flex-direction:column}
  .community-actions .btn{width:100%}
 }
+
+
+/* Welcome screen only: responsive one-viewport composition */
+.app-shell:has(.welcome-panel){height:100vh;height:100dvh;min-height:0;overflow:hidden}
+.main-view:has(.welcome-panel){
+  display:flex;flex-direction:column;justify-content:center;align-items:stretch;
+  min-height:0;overflow:hidden;
+  padding:clamp(8px,1.8dvh,20px) 0 calc(66px + env(safe-area-inset-bottom,0px));
+}
+.welcome-panel:has(+ .role-stack){margin:0 0 clamp(8px,1.5dvh,16px)}
+.welcome-panel .welcome-kicker{font-size:clamp(9px,1.15dvh,12px)}
+.welcome-panel .welcome-intro{margin:clamp(3px,.7dvh,8px) 0}
+.welcome-honourees{gap:clamp(1px,.35dvh,4px)}
+.welcome-honourees h2{font-size:clamp(16px,2.3vh,23px);line-height:1.28}
+.welcome-divider{margin:clamp(5px,1dvh,11px) auto}
+.welcome-panel h1{font-size:clamp(28px,4.5vh,42px);margin:4px 0}
+.welcome-platform{font-size:clamp(9px,1.25vh,12px);margin:3px 0 5px}
+.welcome-panel .welcome-tagline{font-size:clamp(15px,2.2vh,20px);margin:3px 0 5px}
+.welcome-panel .welcome-description{font-size:clamp(10px,1.45vh,14px);line-height:1.35;white-space:normal;letter-spacing:0;transform:none;width:100%;margin:0 auto}
+.role-prompt{font-size:clamp(12px,1.6vh,15px)!important;margin:clamp(6px,1.2vh,12px) 0 0!important}
+.role-stack{width:100%;max-width:900px;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1.2vw,13px);margin:0 auto}
+.role-card{
+  min-width:0;min-height:clamp(92px,13vh,128px);padding:clamp(10px,1.5vh,16px) 9px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:clamp(5px,.8vh,9px);
+  border-radius:20px;text-align:center;
+  border:1px solid color-mix(in srgb,var(--green) 22%,var(--border));
+  background:linear-gradient(150deg,var(--surface),var(--surface2));
+  box-shadow:0 7px 20px rgba(31,73,48,.07);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.role-card:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.role-card:active{transform:translateY(1px)}
+.role-icon{width:clamp(30px,4.2vh,40px);height:clamp(30px,4.2vh,40px);display:grid;place-items:center;border-radius:13px}
+.role-icon svg{width:clamp(19px,2.7vh,25px);height:clamp(19px,2.7vh,25px)}
+.role-copy{min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.role-copy strong{font-size:clamp(12px,1.7vh,16px);line-height:1.25;overflow-wrap:anywhere}
+.role-copy small{font-size:clamp(9px,1.2vh,11px);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.role-arrow{display:none}
+@media(max-width:700px){
+ .app-shell:has(.welcome-panel){height:100vh;height:100dvh;min-height:0}
+ .main-view:has(.welcome-panel){padding:clamp(5px,1dvh,10px) 0 calc(64px + env(safe-area-inset-bottom,0px))}
+ .welcome-panel:has(+ .role-stack){margin-bottom:clamp(6px,1.1dvh,10px)}
+ .welcome-honourees h2{font-size:clamp(15px,2.65vh,20px)}
+ .welcome-panel h1{font-size:clamp(27px,4.4vh,34px)}
+ .welcome-panel .welcome-tagline{font-size:clamp(14px,2.3vh,18px)}
+ .welcome-panel .welcome-description{font-size:clamp(9px,1.55vh,12px)}
+ .role-stack{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(7px,1.2vh,10px)}
+ .role-card{min-height:clamp(76px,12vh,96px);padding:clamp(7px,1.1vh,11px) 6px;gap:4px;border-radius:16px}
+ .role-icon{width:clamp(27px,4vh,34px);height:clamp(27px,4vh,34px)}
+ .role-copy strong{font-size:clamp(11px,1.8vh,14px)}
+ .role-copy small{font-size:clamp(8px,1.25vh,10px);line-height:1.2}
+}
+@media(max-height:680px){
+ .main-view:has(.welcome-panel){padding-top:4px;padding-bottom:calc(62px + env(safe-area-inset-bottom,0px))}
+ .welcome-panel:has(+ .role-stack){margin-bottom:5px}
+ .welcome-honourees h2{font-size:clamp(14px,2.25vh,18px)}
+ .welcome-divider{margin:4px auto}
+ .welcome-panel h1{font-size:clamp(25px,4vh,31px)}
+ .welcome-panel .welcome-tagline{font-size:clamp(13px,2vh,16px)}
+ .welcome-panel .welcome-description{font-size:clamp(8px,1.35vh,10px)}
+ .role-prompt{margin-top:5px!important}
+ .role-stack{gap:6px}
+ .role-card{min-height:clamp(68px,10vh,78px);padding:6px}
+}
+@media(hover:hover) and (pointer:fine){
+ .role-card:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:0 12px 26px rgba(31,73,48,.12)}
+}
