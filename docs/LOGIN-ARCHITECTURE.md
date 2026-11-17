@@ -168,3 +168,31 @@ This section adds automatic platform-issued login IDs for Teacher and Parent acc
 
 ### Important implementation note
 Automatic ID generation is an account-identifier feature, not an authentication method. Firebase Authentication does not natively authenticate a mobile number with a password. A trusted phone-to-auth-account mapping and server-enforced recovery/session controls must be designed before enabling live Teacher/Parent mobile + password login. Do not implement account creation, sequence allocation, password validation, or school-record recovery solely in browser JavaScript or publicly readable Firestore documents.
+
+
+## 13. Faster login experience and performance
+
+The login experience should be fast and low-friction without weakening authentication, authorization, or account-recovery safeguards.
+
+### Streamlined user experience
+- Keep the role selection and login entry clear; do not ask users to repeat profile details or account setup after the first successful setup.
+- After logout, remember only the registered mobile number for Teacher/Parent (and the registered email for email-login roles). Never store or prefill passwords.
+- On subsequent Teacher/Parent login, accept the registered mobile number + password as already approved. The platform-issued Teacher/Parent ID is an additional stable account identifier and must not add an unnecessary login step.
+- After a valid authenticated session resumes on the same active device, show the local four-digit PIN lock and return directly to the existing dashboard after PIN verification. Do not create a fresh login greeting or repeat account setup for a PIN resume.
+- Keep password reset, first-time verification, and optional PIN setup out of the normal daily-login path; show them only when the user chooses those actions or the account requires them.
+- Provide clear, concise validation messages and preserve the five-attempt / 30-second server-enforced lockout. Do not skip verification or reduce security checks to make login appear faster.
+
+### Technical performance
+- Load the minimum login screen assets and configuration required to render the login form; defer nonessential dashboard modules and media until after authentication.
+- Avoid duplicate Firebase reads. Fetch the authenticated user's role, school association, and essential profile/access metadata once per session and cache it in memory; refresh when the account, role, school settings, or authorization state changes.
+- Load dashboard modules and larger lists on demand. Paginate or query only the records needed for the current view; do not download all students, attendance, marks, notices, or messages during login.
+- Keep static greeting/quote libraries local so login does not require a Firestore read for a random quote.
+- Do not put high-churn data (attendance, homework, marks, activity feeds) into the central settings document or fetch it during authentication.
+- Use loading indicators only while a real operation is pending, prevent duplicate login submissions, and show recoverable network errors without silently treating a failed request as success.
+- Measure login response time and Firebase read counts in testing before claiming a performance improvement.
+
+### Security boundaries
+- PIN is permitted only to unlock an existing, still-valid session on the same active device. It must not create a new authenticated session, bypass a revoked session, or replace the account password.
+- Remembered identifiers and cached profile data are convenience features, not proof of identity or authorization.
+- Trusted server checks, school isolation, role permissions, single-device enforcement, and server-side failed-attempt limits remain mandatory.
+- The app must not claim instant login while Firebase authentication or trusted session validation is unavailable. The current frontend preview must remain clearly separate from live authenticated access.
