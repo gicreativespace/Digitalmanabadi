@@ -636,3 +636,100 @@ body{font-size:18px;line-height:1.65}
  .topbar .brand-copy strong{font-size:16px}
  .topbar .brand-copy small{font-size:13px!important}
 }
+
+
+/* Welcome Screen — final approved premium one-screen layout */
+.brand-button{min-width:0;flex:1;gap:9px}
+.brand-mark{flex:0 0 38px}
+.brand-copy{min-width:0;max-width:calc(100% - 2px);gap:1px!important}
+.brand-copy strong,
+.brand-copy small{color:var(--deep)!important}
+.brand-copy strong{font-size:clamp(11px,1.8vw,14px)!important;line-height:1.1;letter-spacing:.065em;font-weight:850}
+.brand-copy>small:not(.brand-school){font-size:clamp(12px,2vw,15px)!important;line-height:1.1;font-weight:900;letter-spacing:.025em}
+.brand-copy .brand-school{font-size:clamp(8px,1.25vw,10px)!important;line-height:1.15;font-weight:650;letter-spacing:.025em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.welcome-panel{margin:0 0 10px!important;text-align:center}
+.welcome-intro{margin:0 0 5px!important;color:var(--deep);font-size:clamp(16px,2.4vh,21px);font-weight:750;line-height:1.2}
+.welcome-honourees{display:grid;gap:3px;max-width:100%;margin:0 auto}
+.welcome-honourees h2{margin:0;color:var(--deep);font-size:clamp(15px,2.3vh,20px);font-weight:850;line-height:1.24;text-wrap:balance}
+.welcome-divider{width:66px;height:2px;margin:7px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.welcome-panel h1{margin:3px 0 2px!important;color:var(--deep);font-size:clamp(28px,4.6vh,42px);font-weight:950;line-height:1.08;letter-spacing:-.025em}
+.welcome-platform{margin:3px 0 4px;color:var(--green);font-size:clamp(9px,1.25vh,12px);font-weight:850;letter-spacing:.12em;line-height:1.2}
+.welcome-panel .welcome-tagline{margin:2px 0 6px;color:var(--gold);font-size:clamp(14px,2.1vh,19px);font-weight:850;line-height:1.25}
+.welcome-school{display:grid;gap:1px;margin:0 auto;color:var(--deep);line-height:1.25}
+.welcome-school strong{font-size:clamp(12px,1.7vh,15px);font-weight:850;letter-spacing:.035em}
+.welcome-school span{font-size:clamp(10px,1.4vh,13px);font-weight:650;color:var(--muted)}
+.welcome-panel .role-prompt{margin:8px 0 0!important;color:var(--deep)!important;font-size:clamp(12px,1.65vh,15px)!important;font-weight:900;letter-spacing:.1em;line-height:1.2}
+.role-stack{width:100%;max-width:900px;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 auto}
+.role-card{min-width:0;min-height:108px;padding:12px 9px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1px solid color-mix(in srgb,var(--green) 24%,var(--border));border-radius:19px;background:linear-gradient(145deg,var(--surface),var(--surface2));box-shadow:0 8px 22px rgba(31,73,48,.075);text-align:center}
+.role-icon{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:color-mix(in srgb,var(--green) 9%,var(--surface))}
+.role-copy{min-width:0;display:flex;align-items:center;justify-content:center}
+.role-copy strong{font-size:16px!important;line-height:1.25;font-weight:850;overflow-wrap:anywhere;text-align:center}
+.role-copy small{display:none!important}
+.role-arrow{display:none!important}
+@media(max-width:700px){
+ .app-shell:has(.welcome-panel){height:100vh!important;height:100dvh!important;min-height:0!important;overflow:hidden!important}
+ .topbar{height:64px!important;min-height:64px!important;flex:0 0 64px!important;gap:7px}
+ .brand-mark{width:35px;height:35px;flex-basis:35px}
+ .brand-copy strong{font-size:clamp(10px,3vw,12px)!important}
+ .brand-copy>small:not(.brand-school){font-size:clamp(12px,3.4vw,14px)!important}
+ .brand-copy .brand-school{font-size:clamp(8px,2.35vw,10px)!important}
+ .top-actions{gap:5px}
+ .icon-button{width:37px;height:37px;font-size:18px}
+ .main-view:has(.welcome-panel){display:flex!important;flex:1 1 auto;flex-direction:column;justify-content:center;align-items:stretch;min-height:0!important;overflow:hidden!important;padding:7px 0 calc(64px + env(safe-area-inset-bottom,0px))!important}
+ .welcome-panel{flex:none;margin:0 0 clamp(6px,1vh,10px)!important}
+ .welcome-intro{font-size:clamp(15px,2.3vh,18px)}
+ .welcome-honourees{gap:2px}
+ .welcome-honourees h2{font-size:clamp(14px,2.35vh,18px);line-height:1.2}
+ .welcome-divider{margin:5px auto}
+ .welcome-panel h1{font-size:clamp(26px,4.1vh,34px)}
+ .welcome-platform{font-size:clamp(8px,1.25vh,10px);letter-spacing:.1em}
+ .welcome-panel .welcome-tagline{font-size:clamp(13px,2vh,17px);margin-bottom:4px}
+ .welcome-school strong{font-size:clamp(11px,1.65vh,14px)}
+ .welcome-school span{font-size:clamp(9px,1.35vh,12px)}
+ .welcome-panel .role-prompt{margin-top:7px!important;font-size:clamp(11px,1.55vh,14px)!important}
+ .role-stack{flex:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:100%}
+ .role-card{min-height:clamp(78px,11.5vh,94px);padding:8px 6px;gap:6px;border-radius:16px}
+ .role-icon{width:clamp(30px,4.4vh,38px);height:clamp(30px,4.4vh,38px);font-size:21px}
+ .role-copy strong{font-size:clamp(12px,1.85vh,15px)!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){flex:none;width:100%;margin:clamp(6px,1vh,9px) auto 0;padding:5px 7px;border-radius:13px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{font-size:9px!important;margin-bottom:3px;line-height:1.1}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{gap:2px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{gap:2px;padding:1px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:18px;height:18px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:9px!important;line-height:1.1}
+}
+@media(max-width:380px){
+ .topbar{height:60px!important;min-height:60px!important;flex-basis:60px!important}
+ .brand-mark{width:32px;height:32px;flex-basis:32px}
+ .brand-copy strong{font-size:9px!important}
+ .brand-copy>small:not(.brand-school){font-size:11px!important}
+ .brand-copy .brand-school{font-size:7.5px!important}
+ .icon-button{width:34px;height:34px}
+ .role-stack{gap:7px}
+ .role-card{min-height:74px;padding:7px 4px}
+ .role-icon{width:29px;height:29px}
+ .role-copy strong{font-size:11.5px!important}
+}
+@media(max-height:680px) and (max-width:700px){
+ .topbar{height:56px!important;min-height:56px!important;flex-basis:56px!important}
+ .main-view:has(.welcome-panel){padding-top:4px!important;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))!important}
+ .welcome-panel{margin-bottom:5px!important}
+ .welcome-intro{font-size:14px}
+ .welcome-honourees h2{font-size:13px}
+ .welcome-divider{margin:3px auto}
+ .welcome-panel h1{font-size:24px}
+ .welcome-platform{margin:2px 0;font-size:8px}
+ .welcome-panel .welcome-tagline{font-size:12px;margin:2px 0 3px}
+ .welcome-school strong{font-size:10px}
+ .welcome-school span{font-size:8px}
+ .welcome-panel .role-prompt{margin-top:5px!important;font-size:10px!important}
+ .role-stack{gap:5px}
+ .role-card{min-height:64px;padding:5px 4px;gap:4px}
+ .role-icon{width:26px;height:26px}
+ .role-copy strong{font-size:11px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){margin-top:4px;padding:4px 5px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{font-size:8px!important;margin-bottom:2px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:15px;height:15px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8px!important}
+}
+@media(prefers-reduced-motion:reduce){.role-card{transition:none!important}}
