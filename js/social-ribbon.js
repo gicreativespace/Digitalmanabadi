@@ -12,7 +12,7 @@
     const el=document.createElement("aside");
     el.className="social-ribbon";el.id="socialMediaRibbon";
     el.setAttribute("aria-label","Connect with us");
-    el.innerHTML='<div class="social-ribbon-head">మనతో అనుసంధానం అవ్వండి</div><div class="social-ribbon-links"></div>';
+    el.innerHTML='<button type="button" class="social-ribbon-toggle" aria-expanded="false" aria-label="Open social links" title="Connect with us"><span aria-hidden="true">‹</span></button><div class="social-ribbon-panel"><div class="social-ribbon-head">మనతో అనుసంధానం అవ్వండి</div><div class="social-ribbon-links"></div></div>';
     const links=el.querySelector(".social-ribbon-links");
     for(const item of items){
       const href=SOCIAL_LINKS[item.key];
@@ -24,9 +24,16 @@
       const name=document.createElement("small");name.className="social-name";name.textContent=item.label;
       node.append(img,name);links.append(node);
     }
+    const toggle=el.querySelector(".social-ribbon-toggle");
+    toggle.addEventListener("click",()=>{
+      const expanded=el.classList.toggle("is-expanded");
+      toggle.setAttribute("aria-expanded",String(expanded));
+      toggle.setAttribute("aria-label",expanded?"Close social links":"Open social links");
+      toggle.querySelector("span").textContent=expanded?"›":"‹";
+    });
     return el;
   };
-  let ribbon,autoHidden=false,lastY=window.scrollY;
+  let ribbon,placement="";
   const syncLanguage=()=>{
     if(!ribbon)return;
     const head=ribbon.querySelector(".social-ribbon-head");
@@ -37,25 +44,16 @@
     const main=document.getElementById("mainView");if(!main||!ribbon)return;
     const welcome=main.querySelector(".welcome-panel"),roles=main.querySelector(".role-stack");
     if(welcome&&roles){
-      ribbon.classList.remove("compact","social-auto-hidden");
+      if(placement!=="welcome"){ribbon.classList.remove("compact","is-expanded");placement="welcome";}
       ribbon.classList.add("social-auto-visible");
       if(ribbon.parentElement!==main||roles.nextElementSibling!==ribbon)roles.insertAdjacentElement("afterend",ribbon);
     }else{
-      ribbon.classList.add("compact");
-      const footer=document.getElementById("appFooter");
-      if(footer&&footer.parentNode){
-        if(ribbon.parentNode!==footer.parentNode||ribbon.nextElementSibling!==footer)footer.parentNode.insertBefore(ribbon,footer);
-      }else if(ribbon.parentElement!==main)main.append(ribbon);
-      ribbon.classList.toggle("social-auto-hidden",autoHidden);
-      ribbon.classList.toggle("social-auto-visible",!autoHidden);
+      if(placement!=="side"){ribbon.classList.remove("is-expanded");placement="side";}
+      ribbon.classList.add("compact","social-auto-hidden");
+      ribbon.classList.remove("social-auto-visible");
+      if(ribbon.parentElement!==document.body)document.body.append(ribbon);
     }
     syncLanguage();
-  };
-  const onScroll=()=>{
-    const y=window.scrollY;
-    if(y>lastY+3){autoHidden=true;ribbon?.classList.add("social-auto-hidden");ribbon?.classList.remove("social-auto-visible");}
-    else if(y<lastY-3){autoHidden=false;ribbon?.classList.remove("social-auto-hidden");ribbon?.classList.add("social-auto-visible");}
-    lastY=y;
   };
   const start=()=>{
     const main=document.getElementById("mainView");if(!main)return;
@@ -63,7 +61,6 @@
     /* Observe only direct page renders, never the ribbon's own inner content. */
     const observer=new MutationObserver(()=>placeRibbon());
     observer.observe(main,{childList:true,subtree:false});
-    window.addEventListener("scroll",onScroll,{passive:true});
     new MutationObserver(syncLanguage).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
