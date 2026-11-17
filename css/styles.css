@@ -148,3 +148,117 @@ body.has-authenticated-role .main-view{padding-bottom:calc(var(--footer-bar-heig
  .main-view{padding-bottom:calc(var(--footer-bar-height) + 20px)}
  body.has-authenticated-role .main-view{padding-bottom:calc(var(--footer-bar-height) + var(--ribbon-height) + 20px)}
 }
+
+
+/* Digital Mana Badi — unified premium, high-readability system */
+:root{font-size:18px;--bg:#f4faf5;--surface:#fff;--surface2:#eaf4ec;--text:#203b2a;--muted:#526b5a;--border:#d7e8da;--deep:#194d31;--green:#2f8050;--gold:#d4ad63;--blue:#4777a8;--shadow:0 14px 36px rgba(29,76,46,.09)}
+/* The requested soft theme intentionally remains light, not charcoal/dark */
+[data-theme=dark]{color-scheme:light;--bg:#edf7ef;--surface:#fff;--surface2:#e3f1e6;--text:#1c422b;--muted:#526d5a;--border:#cfe3d3;--deep:#174a2e;--green:#287548;--gold:#d2a64f;--blue:#4777a8;--shadow:0 14px 36px rgba(29,76,46,.10)}
+body{font-size:18px;line-height:1.65}
+.app-shell{max-width:1040px;padding:0 24px}
+.main-view{max-width:900px;padding-top:30px}
+.topbar{min-height:82px}
+.brand-copy strong{font-size:21px}
+.brand-copy small{font-size:15px}
+.icon-button{width:48px;height:48px;font-size:22px}
+.welcome-panel{margin:10px 0 28px}
+.welcome-emblem{width:72px;height:72px}
+.welcome-kicker{font-size:13px}
+.welcome-panel h1{font-size:clamp(36px,5vw,48px)}
+.welcome-panel p{font-size:17px;line-height:1.65}
+.welcome-org{font-size:clamp(21px,3vw,27px);color:var(--deep);margin:20px 0 6px}
+.welcome-tagline{font-size:20px!important;font-weight:800;color:var(--green)!important}
+.role-prompt{margin-top:22px;font-weight:750;color:var(--deep)!important}
+.role-stack{max-width:700px;gap:16px}
+.role-card{min-height:118px;padding:22px 24px;border-radius:22px;gap:20px}
+.role-icon{width:58px;height:58px;font-size:29px;border-radius:17px}
+.role-copy strong{font-size:22px}
+.role-copy small{font-size:16px;line-height:1.5}
+.btn,.text-link{font-size:17px;min-height:48px}
+.field label{font-size:16px}
+.field input,.field select,.field textarea{font-size:18px;min-height:52px;padding:13px 15px}
+.form-card,.card{padding:28px;border-radius:24px}
+.form-card h2,.module-detail h2{font-size:27px}
+.form-card>p,.module-detail>p,.dashboard-head p,.assigned p,.today-grid p,.feature-card p,.detail-row small,.module-card small,.empty,.demo-note{font-size:16px;line-height:1.7}
+.dashboard-head h1{font-size:clamp(28px,4vw,36px)}
+.section-head h2{font-size:24px}
+.section-head p,.pill,.stat-card span{font-size:15px}
+.stat-card strong{font-size:32px}
+.module-grid{gap:14px}
+.module-card{min-height:160px;padding:19px;border-radius:20px;gap:12px}
+.module-card strong{font-size:18px;line-height:1.5}
+.module-card small{font-size:15px}
+.card-icon{width:46px;height:46px;font-size:25px}
+.detail-row strong{font-size:17px}
+.detail-row small{font-size:15px}
+.calendar-grid>b,.day{font-size:17px;min-height:46px}
+.bottom-nav small{font-size:13px}
+#footerSignature{font-size:13px}
+#footerInspired{font-size:12px}
+.knowledge-card{display:flex;align-items:center;gap:18px;margin-top:22px;padding:22px 24px;border:1px solid var(--border);border-radius:22px;background:linear-gradient(120deg,#e7f3e9,#fff9e9);box-shadow:var(--shadow)}
+.knowledge-card>div:nth-child(2){flex:1;min-width:0}
+.knowledge-card h2{margin:0 0 4px;color:var(--deep);font-size:22px}
+.knowledge-card p{margin:0;color:var(--muted);font-size:15px}
+.knowledge-card a{font-size:16px;font-weight:800;color:var(--deep);white-space:nowrap}
+.knowledge-icon{width:54px;height:54px;border-radius:17px;background:#fff;display:grid;place-items:center;color:var(--green);font-size:28px}
+.poster-editor,.meal-day{margin-top:20px;padding:22px;border:1px solid var(--border);border-radius:20px;background:var(--surface2)}
+.poster-canvas-wrap{max-width:520px;margin:20px auto;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}
+.poster-canvas-wrap canvas{display:block;width:100%;height:auto}
+.poster-actions{display:flex;gap:12px;flex-wrap:wrap}
+.poster-actions .btn{flex:1}
+.meal-result{margin-top:18px;padding:20px;border-radius:16px;background:var(--surface)}
+.meal-result h3{font-size:21px;color:var(--deep)}
+.meal-result p,.meal-sponsor{font-size:16px;line-height:1.65;color:var(--muted)}
+@media(max-width:700px){.app-shell{padding:0 17px}.main-view{padding-top:20px}.module-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.role-card{min-height:106px}.role-copy strong{font-size:20px}.role-copy small{font-size:14px}.module-card{min-height:150px}.knowledge-card{align-items:flex-start;flex-wrap:wrap}.knowledge-card a{margin-left:72px}}
+@media(max-width:520px){
+ :root{font-size:16px}
+ body{font-size:16px;line-height:1.6}
+ .app-shell{padding:0 14px}
+ .topbar{height:68px;min-height:68px}
+ .brand-copy strong{font-size:17px}
+ .brand-copy small{font-size:12px}
+ .icon-button{width:42px;height:42px}
+ .main-view{padding:18px 0 24px}
+ .welcome-panel{margin:4px 0 20px}
+ .welcome-emblem{width:54px;height:54px;margin-bottom:9px}
+ .welcome-kicker{font-size:10px}
+ .welcome-panel h1{font-size:32px;margin:8px 0 5px}
+ .welcome-tagline{font-size:17px!important}
+ .welcome-org{font-size:20px;margin:14px 0 5px}
+ .welcome-panel p{font-size:14px}
+ .role-prompt{font-size:16px!important;margin-top:17px}
+ .role-stack{gap:11px}
+ .role-card{min-height:91px;padding:13px 14px;gap:12px;border-radius:17px}
+ .role-icon{width:44px;height:44px;font-size:23px}
+ .role-copy strong{font-size:17px}
+ .role-copy small{font-size:12px;line-height:1.4}
+ .role-arrow{font-size:25px}
+ .btn,.text-link{font-size:15px;min-height:44px}
+ .field label{font-size:14px}
+ .field input,.field select,.field textarea{font-size:16px;min-height:47px}
+ .form-card,.card{padding:19px;border-radius:19px}
+ .form-card h2,.module-detail h2{font-size:23px}
+ .form-card>p,.module-detail>p,.dashboard-head p,.assigned p,.today-grid p,.feature-card p,.detail-row small,.module-card small,.empty,.demo-note{font-size:14px}
+ .dashboard-head h1{font-size:25px}
+ .section-head h2{font-size:20px}
+ .module-grid{gap:10px}
+ .module-card{min-height:132px;padding:13px;gap:8px}
+ .module-card strong{font-size:15px}
+ .module-card small{font-size:12px}
+ .card-icon{width:39px;height:39px;font-size:21px}
+ .stats-grid{gap:8px}
+ .stat-card{padding:12px}
+ .stat-card strong{font-size:25px}
+ .stat-card span,.pill{font-size:12px}
+ .knowledge-card{padding:16px;gap:12px}
+ .knowledge-card h2{font-size:18px}
+ .knowledge-card p{font-size:13px}
+ .knowledge-card a{font-size:14px;margin-left:0}
+ .knowledge-icon{width:44px;height:44px}
+ .poster-editor,.meal-day{padding:15px}
+ .poster-actions{flex-direction:column}
+ .footer{width:100%}
+ #footerSignature{font-size:11px}
+ #footerInspired{font-size:10px}
+ .bottom-nav small{font-size:11px}
+}
