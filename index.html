@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#173b2b">
+  <meta name="theme-color" content="#245b3d">
   <meta name="description" content="డిజిటల్ మన బడి — మన భవిష్యత్తు… మన గర్వం!">
   <title>డిజిటల్ మన బడి</title>
   <link rel="manifest" href="manifest.webmanifest">
@@ -13,18 +13,18 @@
   <div id="app" class="app-shell">
     <header class="topbar">
       <button class="brand-button" id="brandHome" aria-label="Home">
-        <span class="brand-mark">మ</span>
+        <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-copy"><strong id="appName">డిజిటల్ మన బడి</strong><small id="tagline">మన భవిష్యత్తు… మన గర్వం!</small></span>
       </button>
       <div class="top-actions">
-        <button class="icon-button" id="languageToggle" title="Language">EN</button>
-        <button class="icon-button" id="themeToggle" title="Theme">☾</button>
+        <button class="icon-button" id="languageToggle" aria-label="Choose language" title="భాష">文</button>
+        <button class="icon-button" id="themeToggle" aria-label="Choose theme" title="థీమ్">☾</button>
       </div>
     </header>
     <main id="mainView" class="main-view" aria-live="polite"></main>
-    <footer class="footer">
-      <span>A GI Creative Space work</span>
-      <span>Inspired by Godavari.</span>
+    <footer class="footer" id="appFooter">
+      <button type="button" class="footer-link" id="footerSignature">A GI Creative Space work</button>
+      <button type="button" class="footer-link" id="footerInspired">Inspired by Godavari.</button>
     </footer>
   </div>
   <script type="module" src="js/app.js"></script>

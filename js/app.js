@@ -1,163 +1,211 @@
 import { APP_CONFIG } from "./config.js";
 
 const state = {
-  role: null, view: "welcome", theme: localStorage.getItem("gim_theme") || "light",
-  lang: localStorage.getItem("gim_lang") || "te", selectedDate: 17,
-  greatPerson: { title: "చింతలపాటి మూర్తిరాజు", summary: "విద్య, సమాజ సేవ, గ్రామీణ అభివృద్ధి కోసం కృషి చేసిన వ్యక్తి.", url: "" },
-  greatQuote: { quote: "ప్రయత్నం ఆపనంత వరకు అపజయం అంతిమం కాదు.", author: "మూలం ధృవీకరించాల్సిన మాట" }
+  role: null, view: "welcome", module: null,
+  theme: localStorage.getItem("gim_theme") || "light",
+  lang: localStorage.getItem("gim_lang") || "te",
+  selectedDate: 17, linkedStudent: null, parentLinked: false
 };
-
-const modules = {
-  hm: [
-    ["👩‍🎓","విద్యార్థుల నిర్వహణ","విద్యార్థుల వివరాలు, తరగతులు"],
-    ["👩‍🏫","టీచర్ నిర్వహణ","టీచర్ ప్రొఫైల్స్, కేటాయింపులు"],
-    ["📋","హాజరు","ఉదయం, మధ్యాహ్నం హాజరు"],
-    ["📖","డైలీ డైరీ","విషయాల వారీగా డైరీ"],
-    ["✏️","హోంవర్క్","హోంవర్క్ నిర్వహణ"],
-    ["📢","నోటీసు బోర్డు","నోటీసులు, ఆమోదాలు"],
-    ["📅","ఈవెంట్స్ & క్యాలెండర్","కార్యక్రమాలు, సెలవులు"],
-    ["🍲","మధ్యాహ్న భోజనం","ప్లాన్ చేసిన / వడ్డించిన భోజనం"],
-    ["📝","లీవ్ అభ్యర్థనలు","సెలవుల ఆమోదం"],
-    ["🕒","టైమ్‌టేబుల్","పాఠశాల, పరీక్షల టైమ్‌టేబుల్"],
-    ["📊","రిపోర్ట్స్","రోజువారీ, నెలవారీ నివేదికలు"],
-    ["⚙️","సెట్టింగ్స్","పాఠశాల వివరాలు, సెట్టింగ్స్"]
-  ],
-  teacher: [
-    ["📋","ఉదయం హాజరు","కేటాయించిన తరగతి"],
-    ["📋","మధ్యాహ్న హాజరు","కేటాయించిన తరగతి"],
-    ["📖","డైలీ డైరీ","విషయాల వారీగా నమోదు"],
-    ["✏️","హోంవర్క్","హోంవర్క్ నమోదు"],
-    ["📢","నోటీసులు","నోటీసులు చూడండి"],
-    ["🗓️","నా టైమ్‌టేబుల్","ఈరోజు పీరియడ్లు"],
-    ["📅","క్యాలెండర్","స్కూల్ కార్యక్రమాలు"],
-    ["☑️","నా పనుల స్థితి","సమర్పణల స్థితి"]
-  ],
-  student: [
-    ["📅","నా రోజు","ఈరోజు ముఖ్య సమాచారం"],
-    ["📖","డైలీ డైరీ","ఆమోదించిన డైరీ"],
-    ["✏️","హోంవర్క్","నా హోంవర్క్"],
-    ["🕒","టైమ్‌టేబుల్","పాఠశాల టైమ్‌టేబుల్"],
-    ["📢","నోటీసులు","పాఠశాల నోటీసులు"],
-    ["🎉","ఈవెంట్స్","ప్రత్యేక కార్యక్రమాలు"]
-  ],
-  parent: [
-    ["👧","నా పిల్లలు","లింక్ చేసిన విద్యార్థులు"],
-    ["📊","హాజరు","రోజువారీ, నెలవారీ హాజరు"],
-    ["📖","డైలీ డైరీ","ఆమోదించిన డైరీ"],
-    ["✏️","హోంవర్క్","పిల్లల హోంవర్క్"],
-    ["📝","లీవ్ అప్లై","సెలవు అభ్యర్థన"],
-    ["🍲","మధ్యాహ్న భోజనం","రోజువారీ భోజన వివరాలు"],
-    ["📅","క్యాలెండర్","ఈవెంట్స్, సెలవులు"]
-  ]
+const T=(te,en)=>state.lang==="te"?te:en;
+const roleNames={hm:["ప్రిన్సిపాల్","Headmaster / Principal"],teacher:["టీచర్","Teacher"],parent:["పేరెంట్","Parent"]};
+const roleMeta={
+ hm:{tone:"green",icon:"school",title:"ప్రిన్సిపాల్ డాష్‌బోర్డ్",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
+ teacher:{tone:"gold",icon:"presentation",title:"టీచర్ డాష్‌బోర్డ్",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
+ parent:{tone:"blue",icon:"users",title:"పేరెంట్ డాష్‌బోర్డ్",sub:"మీ పిల్లల పాఠశాల సమాచారం"}
 };
-
-const t = (te,en) => state.lang === "te" ? te : en;
-const main = document.querySelector("#mainView");
-document.documentElement.dataset.theme = state.theme;
-
-document.querySelector("#themeToggle").addEventListener("click", () => {
-  state.theme = state.theme === "light" ? "dark" : "light";
-  document.documentElement.dataset.theme = state.theme;
-  localStorage.setItem("gim_theme", state.theme);
-  document.querySelector("#themeToggle").textContent = state.theme === "light" ? "☾" : "☀";
-});
-document.querySelector("#languageToggle").addEventListener("click", () => {
-  state.lang = state.lang === "te" ? "en" : "te";
-  localStorage.setItem("gim_lang", state.lang);
-  document.querySelector("#languageToggle").textContent = state.lang === "te" ? "EN" : "తె";
-  render();
-});
-document.querySelector("#brandHome").addEventListener("click", () => {
-  state.view = state.role ? "dashboard" : "welcome"; render();
-});
-document.querySelector("#themeToggle").textContent = state.theme === "light" ? "☾" : "☀";
-document.querySelector("#languageToggle").textContent = state.lang === "te" ? "EN" : "తె";
-
-function renderWelcome() {
-  main.innerHTML = `
-    <section class="hero">
-      <div class="eyebrow">GI SCHOOL MANAGEMENT PLATFORM</div>
-      <h1>${t("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</h1>
-      <p>${t("విద్యార్థులు, ఉపాధ్యాయులు, తల్లిదండ్రులు, పాఠశాల యాజమాన్యాన్ని ఒకే డిజిటల్ వేదికపైకి తీసుకువచ్చే మన ప్రయత్నం.","A simple digital platform connecting students, teachers, parents and school leadership.")}</p>
-    </section>
-    <div class="section-head"><div><h2>${t("మీ లాగిన్ ఎంచుకోండి","Choose your login")}</h2><p>${t("కొనసాగడానికి మీ పాత్రను ఎంచుకోండి.","Select your role to continue.")}</p></div><span class="pill">● ${t("డెమో ప్రోటోటైప్","Demo prototype")}</span></div>
-    <section class="grid">
-      ${roleCard("🏫","ప్రిన్సిపాల్ / HM","Principal / HM","hm")}
-      ${roleCard("👩‍🏫","టీచర్","Teacher","teacher")}
-      ${roleCard("🎒","విద్యార్థి","Student","student")}
-      ${roleCard("👨‍👩‍👧","పేరెంట్","Parent","parent")}
-    </section>
-    <div class="card-row">
-      <article class="feature-card blue"><div class="card-icon">🌍</div><h3>మన విజ్ఞాన ప్రపంచం</h3><p>చరిత్ర, విజ్ఞానం, సాంకేతికం, కొత్త సంగతులు.</p><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">బ్లాగ్‌ను సందర్శించండి ↗</a></article>
-      <article class="feature-card"><div class="card-icon">✨</div><h3>ఈరోజు విశేషం</h3><p>పుట్టినరోజులు, ప్రత్యేక రోజులు, పాఠశాల కార్యక్రమాలు.</p><button class="btn ghost" data-action="today">వివరాలు చూడండి →</button></article>
-    </div>`;
-  main.querySelectorAll("[data-role]").forEach(b => b.addEventListener("click", () => {
-    state.role = b.dataset.role; state.view = "login"; render();
-  }));
-  main.querySelector('[data-action="today"]').addEventListener("click", () => { state.view="today"; render(); });
+const modules={
+ hm:[
+  ["calendar-check","హాజరు","Attendance","ఉదయం / సాయంత్రం హాజరు, సవరణల ఆమోదం"],
+  ["users","ఉపాధ్యాయులు","Teachers","ఉపాధ్యాయుల వివరాలు, తరగతుల కేటాయింపు"],
+  ["graduation-cap","విద్యార్థులు","Students","విద్యార్థుల వివరాలు, తరగతి / రోల్ నిర్వహణ"],
+  ["notebook-pen","డైలీ డైరీ","Daily Diary","విషయాల వారీగా సమర్పణలు, ఆమోదాలు"],
+  ["book-open","హోంవర్క్","Homework","హోంవర్క్ నిర్వహణ, సమర్పణలు"],
+  ["megaphone","నోటీసు బోర్డు","Notice Board","నోటీసుల పరిశీలన, ఆమోదం, ప్రచురణ"],
+  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు"],
+  ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","ప్రణాళిక మరియు వడ్డించిన భోజనం"],
+  ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు"],
+  ["book-heart","గొప్ప వ్యక్తులు","Great People","విద్యార్థులకు ఉపయోగకరమైన జీవిత విశేషాలు"],
+  ["quote","గొప్ప మాటలు","Great Quotes","ప్రేరణాత్మక సూక్తులు"],
+  ["globe","మన విజ్ఞాన ప్రపంచం","GI Knowledge World","GI నిర్వహించే Blog Link"],
+  ["palette","Poster Studio","Poster Studio","పాఠశాల పోస్టర్ల రూపకల్పన"],
+  ["chart-no-axes-column","రిపోర్ట్స్","Reports","పాఠశాల నివేదికలు"],
+  ["settings","పాఠశాల సెట్టింగ్స్","School Settings","పాఠశాల ప్రాథమిక సెట్టింగ్స్"]
+ ],
+ teacher:[
+  ["calendar-check","హాజరు","Attendance","కేటాయించిన తరగతులకు ఉదయం / సాయంత్రం హాజరు"],
+  ["notebook-pen","డైలీ డైరీ","Daily Diary","విషయాల వారీగా డైరీ నమోదు, సమర్పణ"],
+  ["book-open","హోంవర్క్","Homework","విద్యార్థులకు హోంవర్క్ ఇవ్వడం"],
+  ["megaphone","నోటీసులు","Notices","పాఠశాల నోటీసులు చూడటం"],
+  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు చూడటం"],
+  ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","కేటాయించిన నమోదు / పరిశీలన"],
+  ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు"],
+  ["book-heart","గొప్ప వ్యక్తులు","Great People","View Only"],
+  ["quote","గొప్ప మాటలు","Great Quotes","View Only"],
+  ["globe","మన విజ్ఞాన ప్రపంచం","GI Knowledge World","GI Blog Link"],
+  ["palette","Poster Studio","Poster Studio","పోస్టర్ తయారీ"]
+ ],
+ parent:[
+  ["calendar-check","నా పిల్లల హాజరు","Attendance","రోజువారీ మరియు నెలవారీ హాజరు"],
+  ["notebook-pen","డైలీ డైరీ","Daily Diary","HM ఆమోదించిన డైరీ మాత్రమే"],
+  ["book-open","హోంవర్క్","Homework","ఇచ్చిన హోంవర్క్ వివరాలు"],
+  ["megaphone","నోటీసులు","Notices","పాఠశాల ఆమోదించిన నోటీసులు"],
+  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు"],
+  ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","వాస్తవంగా వడ్డించిన భోజన వివరాలు"],
+  ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు"],
+  ["globe","మన విజ్ఞాన ప్రపంచం","GI Knowledge World","GI Blog Link"]
+ ]
+};
+const main=document.querySelector("#mainView");
+document.documentElement.dataset.theme=state.theme;
+const iconSvg=(name)=>({school:"▦",presentation:"▤",users:"♧", "calendar-check":"▣","notebook-pen":"✎","book-open":"▤",megaphone:"◖", "calendar-days":"▦",utensils:"♨",sun:"☼","book-heart":"♡",quote:"❝",globe:"◎",palette:"▧","chart-no-axes-column":"▥",settings:"⚙","graduation-cap":"⌂",bell:"♢",user:"○",shield:"⬡"}[name]||"•");
+function headerMenu(kind){
+ document.querySelectorAll(".header-menu").forEach(x=>x.remove());
+ const anchor=document.querySelector(kind==="language"?"#languageToggle":"#themeToggle");
+ const menu=document.createElement("div");menu.className="header-menu";
+ const opts=kind==="language"?[["te","తెలుగు"],["en","English"]]:[["light","Light"],["dark","Dark"]];
+ menu.innerHTML=opts.map(([v,l])=>'<button class="menu-option '+((kind==="language"?state.lang:state.theme)===v?"active":"")+'" data-v="'+v+'">'+l+'</button>').join("");
+ anchor.parentElement.append(menu);
+ menu.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{
+  if(kind==="language"){state.lang=b.dataset.v;localStorage.setItem("gim_lang",state.lang);render()}
+  else{state.theme=b.dataset.v;localStorage.setItem("gim_theme",state.theme);document.documentElement.dataset.theme=state.theme;render()}
+ });
 }
-function roleCard(icon,te,en,role){return `<article class="role-card"><div class="role-icon">${icon}</div><div><h3>${t(te,en)}</h3><p>${t("సురక్షిత లాగిన్ ద్వారా కొనసాగండి.","Continue with demo sign-in.")}</p></div><button class="btn" data-role="${role}">${t("కొనసాగండి","Continue")} →</button></article>`}
-
-function renderLogin() {
-  const labels = {hm:["ప్రిన్సిపాల్ / HM","Principal / HM"],teacher:["టీచర్","Teacher"],student:["విద్యార్థి","Student"],parent:["పేరెంట్","Parent"]};
-  const name = labels[state.role] || labels.hm;
-  main.innerHTML = `<div class="backline"><button class="btn secondary" id="back">← ${t("వెనక్కి","Back")}</button><span class="pill">${t(name[0],name[1])}</span></div>
-    <section class="form-card"><h2>${t("లాగిన్","Login")}</h2><p>${t("ఇది ప్రోటోటైప్ మాత్రమే. డెమో బటన్‌తో డాష్‌బోర్డ్ చూడండి.","Prototype only. Use the demo button to preview the dashboard.")}</p>
-    <div class="field"><label>${t("పేరు / యూజర్ ID","Name / User ID")}</label><input placeholder="${t("మీ పేరు నమోదు చేయండి","Enter your name")}"></div>
-    <div class="field"><label>${t("PIN / Password","PIN / Password")}</label><input type="password" placeholder="••••"></div>
-    <button class="btn" id="demoLogin" style="width:100%">${t("డెమో డాష్‌బోర్డ్ తెరవండి","Open demo dashboard")}</button>
-    <p style="margin-top:14px;font-size:11px">${t("నిజమైన Authentication ఇంకా అనుసంధానం కాలేదు.","Real authentication is not connected yet.")}</p></section>`;
-  document.querySelector("#back").onclick=()=>{state.view="welcome";render()};
-  document.querySelector("#demoLogin").onclick=()=>{state.view="dashboard";render()};
+document.querySelector("#languageToggle").onclick=()=>headerMenu("language");
+document.querySelector("#themeToggle").onclick=()=>headerMenu("theme");
+document.addEventListener("click",e=>{if(!e.target.closest(".top-actions"))document.querySelectorAll(".header-menu").forEach(x=>x.remove())});
+document.querySelector("#brandHome").onclick=()=>{state.view=state.role?"dashboard":"welcome";render()};
+function welcome(){
+ main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("స్వాగతం","Welcome")}</h1><p>${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
+ <section class="role-stack">
+ ${roleCard("school","ప్రిన్సిపాల్","Headmaster / Principal","hm","green")}
+ ${roleCard("presentation","టీచర్","Teacher","teacher","gold")}
+ ${roleCard("users","పేరెంట్","Parent","parent","blue")}
+ </section>`;
+ main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.view="login";render()});
 }
-function renderDashboard() {
-  const roleName = {hm:["ప్రిన్సిపాల్ డాష్‌బోర్డ్","Principal Dashboard"],teacher:["టీచర్ డాష్‌బోర్డ్","Teacher Dashboard"],student:["విద్యార్థి డాష్‌బోర్డ్","Student Dashboard"],parent:["పేరెంట్ డాష్‌బోర్డ్","Parent Dashboard"]}[state.role];
-  const list = modules[state.role] || modules.student;
-  main.innerHTML = `<div class="dashboard-head"><div><span class="pill">${t("నమస్కారం!","Welcome!")}</span><h1>${t(roleName[0],roleName[1])}</h1><p>${APP_CONFIG.schoolName} · ${t("ఈరోజు మీ పాఠశాల సమాచారం","Your school at a glance")}</p></div><button class="btn secondary" id="logout">${t("లాగౌట్","Logout")}</button></div>
-    ${renderDailyCards()}
-    <div class="section-head"><div><h2>${t("మీ విభాగాలు","Your modules")}</h2><p>${t("మీ పాత్రకు సంబంధించిన సేవలు","Services for your role")}</p></div></div>
-    <section class="module-grid">${list.map(m=>`<article class="module-card" data-module="${m[1]}"><div class="card-icon">${m[0]}</div><h3>${m[1]}</h3><p>${m[2]}</p></article>`).join("")}</section>
-    <div class="section-head"><div><h2>${t("ఈరోజు క్యాలెండర్","Today's calendar")}</h2><p>${t("తేదీని ఎంచుకుని ఆ రోజు వివరాలు చూడండి.","Select a date to preview its details.")}</p></div></div>
-    ${calendarCard()}`;
-  document.querySelector("#logout").onclick=()=>{state.role=null;state.view="welcome";render()};
-  main.querySelectorAll("[data-module]").forEach(el=>el.addEventListener("click",()=>showToast(`${el.dataset.module} — ${t("ఈ మాడ్యూల్ తదుపరి దశలో నిర్మిస్తాం.","This module is planned for the next build stage.")}`)));
-  main.querySelectorAll("[data-action='edit-person']").forEach(b=>b.onclick=()=>editContent("person"));
-  main.querySelectorAll("[data-action='edit-quote']").forEach(b=>b.onclick=()=>editContent("quote"));
-  main.querySelectorAll(".day[data-day]").forEach(b=>b.onclick=()=>{state.selectedDate=Number(b.dataset.day);render()});
+function roleCard(ic,te,en,role,tone){return `<button class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${roleNames[role][1]}</small></span><span class="role-arrow">›</span></button>`}
+function login(){
+ const role=roleNames[state.role], parent=state.role==="parent";
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="backWelcome">← ${T("వెనక్కి","Back")}</button><span class="pill">${T(role[0],role[1])}</span></div>
+ <section class="form-card"><div class="login-symbol">${iconSvg(roleMeta[state.role].icon)}</div><h2>${T(role[0]+" లాగిన్",role[1]+" Login")}</h2><p>${parent?T("మీ Student ID మరియు Parent PINతో ప్రవేశించండి.","Sign in with your Student ID and Parent PIN."):T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account credentials.")}</p>
+ ${parent?'<div class="field"><label>Student ID</label><input id="loginId" placeholder="Student ID"></div><div class="field"><label>Parent PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><button class="btn full" id="loginGo">Login</button><div class="link-row"><button class="text-link" id="startLink">మొదటిసారి? పిల్లలను లింక్ చేయండి</button></div>':
+ '<div class="field"><label>'+T("Login ID","Login ID")+'</label><input id="loginId" placeholder="'+T("మీ Login ID","Enter your Login ID")+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.</div>'}
+ </section>`;
+ document.querySelector("#backWelcome").onclick=()=>{state.role=null;state.view="welcome";render()};
+ if(parent)document.querySelector("#startLink").onclick=()=>{state.view="link";render()};
+ document.querySelector("#loginGo").onclick=()=>{
+  const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value.trim();
+  if(!id||!pin){toast(T("రెండు వివరాలు నమోదు చేయండి.","Please enter both fields."));return}
+  if(parent&&!state.parentLinked){toast("ముందుగా మీ పిల్లలను లింక్ చేయండి.");return}
+  if(parent&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){toast("Student ID లేదా PIN సరిపోలలేదు.");return}
+  state.view="dashboard";render();
+ };
 }
-function renderDailyCards() {
-  const isHM = state.role === "hm";
-  const knowledgeCards = state.role !== "parent" ? `<section class="card-row">
-    <article class="feature-card green"><div class="card-icon">📚</div><h3>గొప్ప వ్యక్తులు</h3><p><strong>${escapeHtml(state.greatPerson.title)}</strong><br>${escapeHtml(state.greatPerson.summary)}</p><a href="${state.greatPerson.url || "#"}" ${state.greatPerson.url?'target="_blank" rel="noopener"':''}>${t("పూర్తి వివరాలు","Read more")} ↗</a>${isHM?'<button class="btn secondary" data-action="edit-person" style="margin-top:12px">Edit</button>':''}</article>
-    <article class="feature-card gold"><div class="card-icon">💡</div><h3>గొప్ప మాటలు</h3><p><strong>“${escapeHtml(state.greatQuote.quote)}”</strong><br>${escapeHtml(state.greatQuote.author)}</p>${isHM?'<button class="btn secondary" data-action="edit-quote" style="margin-top:12px">Edit</button>':''}</article>
-    </section>` : "";
-  return `${knowledgeCards}
-    <section class="today-grid">
-      <article class="card"><h3>🎂 ${t("ఈరోజు విశేషం","Today Special")}</h3><div class="birthday-item"><div class="avatar">🎉</div><div class="item-copy"><strong>${t("డెమో విద్యార్థి పుట్టినరోజు","Demo student birthday")}</strong><small>${t("తరగతి 3 · DOB ఆధారిత డెమో","Class 3 · DOB-based demo")}</small></div></div><div class="birthday-item"><div class="avatar">📅</div><div class="item-copy"><strong>${t("ఈరోజు ప్రత్యేకత","Today's observance")}</strong><small>${t("క్యాలెండర్ డెమో సమాచారం","Calendar demo information")}</small></div></div></article>
-      <article class="feature-card blue"><div class="card-icon">🌐</div><h3>మన విజ్ఞాన ప్రపంచం</h3><p>చరిత్ర, విజ్ఞానం, సాంకేతికం, వినోదం — మరెన్నో అంశాలు ఒకే చోట.</p><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">బ్లాగ్ తెరవండి ↗</a></article>
-    </section>`;
-}
-function calendarCard(){
-  const names=["ఆది","సోమ","మంగళ","బుధ","గురు","శుక్ర","శని"];
-  const days=Array.from({length:30},(_,i)=>i+1);
-  return `<article class="card" style="margin-top:14px"><div class="dashboard-head"><div><h3>${t("నవంబర్ 2026","November 2026")}</h3><p class="muted">${t("డెమో క్యాలెండర్","Demo calendar")}</p></div><span class="pill">${t("ఎంచుకున్న తేదీ","Selected")}: ${state.selectedDate}</span></div><div class="calendar">${names.map(n=>`<div class="day-name">${n}</div>`).join("")}${days.map(d=>`<button class="day ${[5,14,17,25].includes(d)?"has-event":""} ${state.selectedDate===d?"selected":""}" data-day="${d}">${d}</button>`).join("")}</div><div class="empty" style="margin-top:14px">${state.selectedDate===17?t("ఈ తేదీకి డెమో ప్రత్యేక సమాచారం ఉంది.","Demo special information for this date.") : t("ఈ తేదీకి ప్రస్తుతం డెమో కార్యక్రమాలు లేవు.","No demo events for this date.")}</div></article>`;
-}
-function editContent(type){
-  const person=type==="person";
-  const current=person?state.greatPerson:state.greatQuote;
-  const fields=person?`<div class="field"><label>వ్యక్తి పేరు</label><input id="f1" value="${escapeAttr(current.title)}"></div><div class="field"><label>చిన్న పరిచయం</label><textarea id="f2">${escapeHtml(current.summary)}</textarea></div><div class="field"><label>వ్యాసం లింక్</label><input id="f3" value="${escapeAttr(current.url)}" placeholder="https://..."></div>`:`<div class="field"><label>మంచి మాట</label><textarea id="f1">${escapeHtml(current.quote)}</textarea></div><div class="field"><label>చెప్పిన వ్యక్తి / మూలం</label><input id="f2" value="${escapeAttr(current.author)}"></div>`;
-  main.innerHTML=`<div class="backline"><button class="btn secondary" id="cancel">← వెనక్కి</button></div><section class="form-card"><h2>${person?"గొప్ప వ్యక్తులు Edit":"గొప్ప మాటలు Edit"}</h2>${fields}<button class="btn" id="save" style="width:100%">Save & Publish</button><p style="margin-top:12px">Demo only: ఈ మార్పు ప్రస్తుతం ఈ browser sessionలో మాత్రమే ఉంటుంది. Firebase ఇంకా అనుసంధానం కాలేదు.</p></section>`;
-  document.querySelector("#cancel").onclick=()=>{state.view="dashboard";render()};
-  document.querySelector("#save").onclick=()=>{
-    if(person){state.greatPerson={title:document.querySelector("#f1").value,summary:document.querySelector("#f2").value,url:document.querySelector("#f3").value}}
-    else{state.greatQuote={quote:document.querySelector("#f1").value,author:document.querySelector("#f2").value}}
-    state.view="dashboard";render();showToast("Demo content updated");
+function linking(){
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="linkBack">← వెనక్కి</button></div><section class="form-card"><div class="login-symbol">♧</div><h2>Parent–Student Linking</h2><p>విద్యార్థి వివరాలను నిర్ధారించి మీ Parent PIN సెట్ చేసుకోండి.</p>
+ <div class="stepper"><span class="active">1. వివరాలు</span><span>2. DOB</span><span>3. PIN</span></div>
+ <div class="field"><label>Class / తరగతి</label><select id="linkClass"><option value="">తరగతి ఎంచుకోండి</option>${Array.from({length:10},(_,i)=>'<option>Class '+(i+1)+'</option>').join("")}</select></div>
+ <div class="field"><label>Student ID</label><input id="studentId" placeholder="Student ID"></div>
+ <div class="field"><label>Roll Number</label><input id="rollNo" placeholder="Roll Number"></div>
+ <button class="btn full" id="verifyStudent">విద్యార్థి వివరాలు నిర్ధారించు</button>
+ <div id="studentVerifyArea"></div></section>`;
+ document.querySelector("#linkBack").onclick=()=>{state.view="login";render()};
+ document.querySelector("#verifyStudent").onclick=()=>{
+  const cls=document.querySelector("#linkClass").value,id=document.querySelector("#studentId").value.trim(),roll=document.querySelector("#rollNo").value.trim();
+  if(!cls||!id||!roll){toast("Class, Student ID, Roll Number నమోదు చేయండి.");return}
+  document.querySelector("#studentVerifyArea").innerHTML=`<div class="verified-student"><strong>విద్యార్థి వివరాలు</strong><p>డెమో విద్యార్థి • ${cls} • Roll No: ${escapeHtml(roll)}</p><div class="field"><label>Date of Birth</label><input id="studentDob" type="date"></div><div class="field"><label>మీ 4-digit Parent PIN సెట్ చేయండి</label><input id="newParentPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><div class="field"><label>Confirm Parent PIN</label><input id="confirmParentPin" type="password" inputmode="numeric" maxlength="4" placeholder="మళ్లీ PIN నమోదు చేయండి"></div><button class="btn full" id="completeLink">Confirm & Link Parent</button></div>`;
+  document.querySelector("#completeLink").onclick=()=>{
+   const dob=document.querySelector("#studentDob").value,pin=document.querySelector("#newParentPin").value,confirm=document.querySelector("#confirmParentPin").value;
+   if(!dob||!/^[0-9]{4}$/.test(pin)||pin!==confirm){toast("DOB నమోదు చేసి ఒకే 4-digit PIN రెండుసార్లు నమోదు చేయండి.");return}
+   state.linkedStudent={id,roll,className:cls,pin};state.parentLinked=true;toast("Parent Linking పూర్తయింది.");state.view="login";render();
   };
+ };
 }
-function renderToday(){main.innerHTML=`<div class="backline"><button class="btn secondary" id="back">← వెనక్కి</button></div><section class="card"><h2>🎂 ఈరోజు విశేషం – Today Special</h2><p>పుట్టినరోజులు, జాతీయ / అంతర్జాతీయ దినోత్సవాలు, పాఠశాల ఈవెంట్స్ ఇక్కడ ఒకేచోట కనిపిస్తాయి.</p><div class="empty">ఇది ప్రస్తుతం డెమో స్క్రీన్. నిజమైన DOB మరియు క్యాలెండర్ డేటా Firebase అనుసంధానం తర్వాత వస్తాయి.</div></section>`;document.querySelector("#back").onclick=()=>{state.view="welcome";render()}}
+function dashboard(){
+ const meta=roleMeta[state.role],list=modules[state.role]||[];
+ main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.title,meta.title)}</h1><p>${T(meta.sub,meta.sub)}</p></div><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div>
+ ${state.role==="hm"?'<section class="stats-grid"><article class="stat-card"><strong>—</strong><span>విద్యార్థులు</span></article><article class="stat-card"><strong>—</strong><span>ఉపాధ్యాయులు</span></article><article class="stat-card"><strong>—</strong><span>ఈరోజు హాజరు</span></article><article class="stat-card"><strong>—</strong><span>పెండింగ్ ఆమోదాలు</span></article></section>':""}
+ ${state.role==="teacher"?'<section class="card assigned"><h3>నా తరగతులు</h3><p>మీకు కేటాయించిన తరగతులు మాత్రమే కనిపిస్తాయి.</p><div class="chips"><span>Class 3</span><span>Class 5</span></div></section>':""}
+ ${state.role==="parent"?'<section class="feature-card blue parent-student"><div class="card-icon">♙</div><div><h3>లింక్ చేసిన విద్యార్థి</h3><p>'+(state.linkedStudent?escapeHtml(state.linkedStudent.className+" • Roll "+state.linkedStudent.roll):"విద్యార్థి వివరాలు")+'</p></div></section>':""}
+ <div class="section-head"><div><h2>మీ విభాగాలు</h2><p>మీ Roleకు అనుమతించిన సేవలు</p></div></div><section class="module-grid">${list.map(m=>`<button class="module-card" data-module="${m[2]}"><span class="card-icon">${iconSvg(m[0])}</span><strong>${m[1]}</strong><small>${m[3]}</small><span class="module-arrow">›</span></button>`).join("")}</section>
+ ${commonHighlights()}
+ <nav class="bottom-nav"><button class="active" id="navHome">⌂<small>Home</small></button><button id="navCalendar">▦<small>Calendar</small></button><button id="navProfile">◉<small>Profile</small></button><button id="navSettings">⚙<small>Settings</small></button></nav>`;
+ main.querySelectorAll("[data-module]").forEach(b=>b.onclick=()=>{state.module=b.dataset.module;state.view="module";render()});
+ document.querySelector("#profileBtn").onclick=()=>{state.view="profile";render()};
+ document.querySelector("#navProfile").onclick=()=>{state.view="profile";render()};
+ document.querySelector("#navSettings").onclick=()=>{state.view="settings";render()};
+ document.querySelector("#navCalendar").onclick=()=>{state.module="Events & Calendar";state.view="module";render()};
+ document.querySelector("#navHome").onclick=()=>{state.view="dashboard";render()};
+}
+function commonHighlights(){return `<section class="today-grid"><article class="card"><h3>☼ Today Special</h3><p>పుట్టినరోజులు మరియు క్యాలెండర్ ప్రత్యేక దినాలు.</p><div class="empty">డేటా అనుసంధానం తర్వాత నిజమైన వివరాలు కనిపిస్తాయి.</div></article><article class="feature-card blue"><div class="card-icon">◎</div><h3>మన విజ్ఞాన ప్రపంచం</h3><p>GI నిర్వహించే ఒకే Blog Link.</p><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">బ్లాగ్ తెరవండి ↗</a></article></section>`}
+function modulePage(){
+ const title=state.module||"Module";
+ const cfg={
+ "Attendance":["హాజరు నిర్వహణ","ఉదయం / సాయంత్రం Attendance","HM సవరణల ఆమోదం మరియు Audit History","తరగతి వారీగా హాజరు నివేదికలు"],
+ "Teachers":["ఉపాధ్యాయుల జాబితా","కొత్త ఉపాధ్యాయుడిని చేర్చండి","ప్రొఫైల్ మరియు కేటాయించిన తరగతులు"],
+ "Students":["విద్యార్థుల జాబితా","విద్యార్థిని చేర్చండి","Class / Roll Number నిర్వహణ"],
+ "Daily Diary":["విషయాల వారీగా డైరీ","Teacher Submission","HM Review → Approve / Reject","Parentకు Approved Diary మాత్రమే"],
+ "Homework":["హోంవర్క్ జాబితా","విషయం, తరగతి, Due Date","Parent View"],
+ "Notice Board":["నోటీసుల జాబితా","Create Notice","HM Approval → Publish"],
+ "Events & Calendar":["నెలవారీ క్యాలెండర్","Event Date Highlight","ఎంచుకున్న తేదీకి అన్ని ఈవెంట్లు"],
+ "Mid-Day Meal":["Planned Menu","Actually Served","రోజువారీ రికార్డ్"],
+ "Today Special":["పుట్టినరోజులు","జాతీయ / అంతర్జాతీయ ప్రత్యేక దినాలు","పాఠశాల ప్రత్యేకతలు"],
+ "Great People":["గొప్ప వ్యక్తుల జాబితా","HM నిర్వహణ","Teacher / Parent View Only"],
+ "Great Quotes":["గొప్ప మాటలు","HM నిర్వహణ","Teacher / Parent View Only"],
+ "GI Knowledge World":["మన విజ్ఞాన ప్రపంచం","ఒకే GI Blog Link","వ్యాసాలు యాప్‌లో నిల్వ చేయబడవు"],
+ "Poster Studio":["Poster Templates","Text / Color / Layout Edit","Local Preview → Share"],
+ "Reports":["రోజువారీ నివేదికలు","నెలవారీ నివేదికలు","Attendance Summary"],
+ "School Settings":["పాఠశాల ప్రాథమిక వివరాలు","అనుమతులు మరియు సెట్టింగ్స్"]
+ }[title]||["విభాగ వివరాలు","డెమో సమాచారం","ఈ స్క్రీన్ UI Preview దశలో ఉంది"];
+ const calendar=title==="Events & Calendar";
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="moduleBack">← Dashboard</button><span class="pill">${escapeHtml(title)}</span></div><section class="card module-detail"><h2>${escapeHtml(title)}</h2><p>ఈ విభాగానికి సంబంధించిన వివరాలు మరియు చర్యలు.</p>
+ ${calendar?calendarMarkup():""}
+ <div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>
+ ${title==="Mid-Day Meal"?'<div class="split-panels"><div class="feature-card gold"><h3>Planned Menu</h3><p>ప్రణాళిక చేసిన మెనూ</p></div><div class="feature-card green"><h3>Actually Served</h3><p>వాస్తవంగా వడ్డించినది</p></div></div>':""}
+ ${title==="Poster Studio"?'<div class="poster-demo"><div><strong>పాఠశాల కార్యక్రమం</strong><small>Poster Preview</small></div><button class="btn secondary" id="posterEdit">Edit Design</button></div>':""}
+ <div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div></section>`;
+ document.querySelector("#moduleBack").onclick=()=>{state.view="dashboard";render()};
+ main.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{state.selectedDate=Number(b.dataset.day);render()});
+ const edit=document.querySelector("#posterEdit");if(edit)edit.onclick=()=>toast("Poster Editor UI తదుపరి Previewలో విస్తరిస్తాం.");
+}
+function calendarMarkup(){
+ const days=["ఆ","సో","మం","బు","గు","శు","శ"];
+ return `<div class="calendar-title"><strong>నవంబర్ 2026</strong><span>ఈవెంట్ తేదీలు ప్రత్యేకంగా గుర్తించబడతాయి</span></div><div class="calendar-grid">${days.map(d=>'<b>'+d+'</b>').join("")}${Array.from({length:35},(_,i)=>{const n=i-5;return n<1||n>30?'<span></span>':'<button class="day '+([14,17,25].includes(n)?"has-event ":"")+(state.selectedDate===n?"selected":"")+'" data-day="'+n+'">'+n+'</button>'}).join("")}</div><div class="selected-event"><strong>ఎంచుకున్న తేదీ: ${state.selectedDate} నవంబర్</strong><p>${[14,17,25].includes(state.selectedDate)?"ఈ తేదీకి సంబంధించిన అన్ని ఈవెంట్లు క్రింద కనిపిస్తాయి.":"ఈ తేదీకి ఈవెంట్లు నమోదు కాలేదు."}</p></div>`;
+}
+function profilePage(){
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="profileBack">← Dashboard</button></div><section class="form-card"><div class="login-symbol">◉</div><h2>Profile</h2><p>${roleNames[state.role][0]} • ${APP_CONFIG.schoolName}</p><div class="detail-list"><div class="detail-row"><div><strong>Personal Information</strong><small>పేరు మరియు ప్రాథమిక వివరాలు</small></div>›</div><div class="detail-row"><div><strong>Role & Access</strong><small>మీకు అనుమతించిన విభాగాలు</small></div>›</div><div class="detail-row"><div><strong>School Information</strong><small>పాఠశాల వివరాలు</small></div>›</div></div></section>`;
+ document.querySelector("#profileBack").onclick=()=>{state.view="dashboard";render()};
+}
+function settingsPage(){
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="settingsBack">← Dashboard</button></div><section class="card module-detail"><h2>Settings</h2><div class="detail-list"><div class="detail-row"><div><strong>Language</strong><small>తెలుగు / English</small></div><button class="btn secondary" id="settingsLang">Change</button></div><div class="detail-row"><div><strong>Theme</strong><small>Light / Dark</small></div><button class="btn secondary" id="settingsTheme">Change</button></div><div class="detail-row"><div><strong>Switch Role</strong><small>Welcome Screen‌కు తిరిగి వెళ్లండి</small></div><button class="btn secondary" id="switchRole">Switch</button></div><div class="detail-row"><div><strong>Logout</strong><small>ప్రస్తుత Session ముగించండి</small></div><button class="btn danger" id="logout">Logout</button></div></div></section>`;
+ document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
+ document.querySelector("#settingsLang").onclick=()=>headerMenu("language");
+ document.querySelector("#settingsTheme").onclick=()=>headerMenu("theme");
+ document.querySelector("#switchRole").onclick=()=>{state.role=null;state.view="welcome";render()};
+ document.querySelector("#logout").onclick=()=>{state.role=null;state.view="login";render()};
+}
+function superAdmin(){
+ main.innerHTML=`<div class="backline"><button class="btn secondary" id="superBack">← Back</button></div><section class="form-card super-card"><div class="login-symbol">⬡</div><h2>GI Super Admin</h2><p>Authorized GI Administrator Only</p><div class="field"><label>Admin ID</label><input placeholder="Admin ID"></div><div class="field"><label>Secure Password</label><input type="password" placeholder="••••••••"></div><button class="btn full" id="superContinue">Secure Login</button><div class="demo-note">Authentication placeholder — secure backend ఇంకా అనుసంధానం కాలేదు.</div></section>`;
+ document.querySelector("#superBack").onclick=()=>{state.view="welcome";render()};
+ document.querySelector("#superContinue").onclick=()=>toast("GI Super Admin Authentication ఇంకా సిద్ధం కాలేదు.");
+}
+function contactPopup(){
+ const modal=document.createElement("div");modal.className="modal-backdrop";modal.innerHTML='<section class="contact-popover"><button class="modal-close">×</button><h2>For Your Digital Needs</h2><p>Contact</p><a class="whatsapp-link" href="https://wa.me/918985361991" target="_blank" rel="noopener">◉</a></section>';document.body.append(modal);
+ modal.querySelector(".modal-close").onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove()};
+}
+function setupFooter(){
+ const sig=document.querySelector("#footerSignature"),inspired=document.querySelector("#footerInspired");let timer=null,long=false;
+ inspired.onclick=contactPopup;sig.onclick=e=>{if(long){e.preventDefault();long=false;return}contactPopup()};
+ sig.onpointerdown=()=>{long=false;timer=setTimeout(()=>{long=true;state.view="superadmin";render()},850)};
+ ["pointerup","pointerleave","pointercancel"].forEach(ev=>sig.addEventListener(ev,()=>clearTimeout(timer)));
+}
+function toast(msg){const el=document.createElement("div");el.className="toast";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),2400)}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function escapeAttr(s=""){return escapeHtml(s)}
-function showToast(msg){const el=document.createElement("div");el.className="toast";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),2400)}
-function render(){document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;if(state.view==="welcome")renderWelcome();else if(state.view==="login")renderLogin();else if(state.view==="dashboard")renderDashboard();else if(state.view==="today")renderToday()}
-render();
-if("serviceWorker" in navigator && location.protocol.startsWith("http")) window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
+function render(){
+ document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;
+ document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;
+ const theme=document.querySelector("#themeToggle");theme.textContent=state.theme==="light"?"☾":"☀";
+ if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="link")linking();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
+}
+render();setupFooter();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
