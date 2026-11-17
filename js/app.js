@@ -116,6 +116,11 @@ function welcome(){
  </section>`;
  main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.authenticated=false;localStorage.setItem("gim_role",state.role);localStorage.removeItem("gim_authenticated");state.view="login";render()});
 }
+function roleCard(ic,te,en,role,tone){
+ const quote={hm:"A great school begins with great leadership.",teacher:"A teacher inspires a thousand possibilities.",parent:"Every child’s journey begins with family support."}[role];
+ return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${quote}</small></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
+}
+
 function login(){
  const role=roleNames[state.role], parent=state.role==="parent";
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="backWelcome">← ${T("వెనక్కి","Back")}</button><span class="pill">${T(role[0],role[1])}</span></div>
