@@ -78,3 +78,42 @@ html,body{min-height:100%;margin:0}
  .role-icon{width:32px;height:32px}
  .footer{padding-top:5px;padding-bottom:max(7px,env(safe-area-inset-bottom))}
 }
+
+
+/* Unified fixed header and accessible reading scale */
+:root{font-size:17px}
+body{font-size:17px;line-height:1.55}
+.topbar{position:sticky;top:0;z-index:50;flex:0 0 78px;background:var(--bg);backdrop-filter:blur(12px);}
+.brand-copy strong{font-size:18px}
+.brand-copy small{font-size:13px;line-height:1.35}
+.icon-button{width:44px;height:44px;font-size:20px}
+.main-view{max-width:760px}
+.role-copy strong{font-size:19px}
+.role-copy small{font-size:14px}
+.btn,.text-link{font-size:16px;min-height:44px}
+.field label{font-size:15px}
+.field input,.field select,.field textarea{font-size:17px;min-height:48px;padding:12px 14px}
+.form-card>p,.module-detail>p,.dashboard-head p,.assigned p,.today-grid p,.feature-card p,.detail-row small,.module-card small,.empty,.demo-note{font-size:15px;line-height:1.65}
+.module-card strong{font-size:16px;line-height:1.45}
+.section-head h2{font-size:21px}
+.section-head p,.pill,.stat-card span{font-size:14px}
+.stat-card strong{font-size:28px}
+.calendar-grid>b,.day{font-size:15px;min-height:42px}
+.bottom-nav button{font-size:21px}
+.bottom-nav small{font-size:13px}
+.footer-link{font-size:12px}
+#footerInspired{font-size:11px}
+@media(max-width:520px){
+ .topbar{height:68px;flex-basis:68px}
+ .brand-copy strong{font-size:16px}
+ .brand-copy small{font-size:11px}
+ .icon-button{width:40px;height:40px}
+ .role-copy strong{font-size:18px}
+ .role-copy small{font-size:13px}
+ .btn,.text-link{font-size:15px}
+ .module-card strong{font-size:15px}
+ .module-card small,.detail-row small,.empty,.demo-note,.form-card>p,.module-detail>p{font-size:14px}
+ .field label{font-size:14px}
+ .field input,.field select,.field textarea{font-size:16px}
+ .footer{flex:0 0 auto}
+}
