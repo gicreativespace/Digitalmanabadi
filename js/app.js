@@ -110,7 +110,7 @@ function welcome(){
   <h1>${T("డిజిటల్ మన బడి","Digital Mana Badi")}</h1>
   <div class="welcome-platform">SCHOOL MANAGEMENT PLATFORM</div>
   <p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
-  <p class="welcome-description">${T("విద్యతో వెలుగులు… ఆశయాలతో అభివృద్ధి… స్ఫూర్తితో సరికొత్త భవిష్యత్తు!","Illuminating lives through education… advancing through aspirations… inspiring a brighter future!") }</p>
+  <p class="welcome-description"><span class="welcome-line">${T("విద్యతో వెలుగులు… ఆశయాలతో అభివృద్ధి…","Illuminating lives through education… advancing through aspirations…")}</span> <span class="welcome-line">${T("స్ఫూర్తితో సరికొత్త భవిష్యత్తు!","inspiring a brighter future!")}</span></p>
   <p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
  </section>
  <section class="role-stack" aria-label="Select your role">
