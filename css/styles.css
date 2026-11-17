@@ -491,3 +491,6 @@ body{font-size:18px;line-height:1.65}
 @media(hover:hover) and (pointer:fine){
  .role-card:hover{transform:translateY(-2px);border-color:var(--gold);box-shadow:0 12px 26px rgba(31,73,48,.12)}
 }
+
+/* Ensure welcome role cards remain genuine touch targets on mobile browsers. */
+.role-card{position:relative;z-index:2;pointer-events:auto;touch-action:manipulation;-webkit-tap-highlight-color:rgba(52,120,78,.18)}
