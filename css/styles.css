@@ -529,7 +529,7 @@ body{font-size:18px;line-height:1.65}
 }
 @media(max-width:360px){
  .main-view .role-copy strong{font-size:15px}
- .main-view .role-copy small{font-size:12px!important}
+  .main-view .role-copy small{font-size:13px!important}
 }
 
 /* GI Super Admin: clearer hierarchy, touch-friendly forms, responsive record cards */
