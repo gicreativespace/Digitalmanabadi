@@ -102,3 +102,10 @@ This audit and migration are source-level changes. A successful GitHub commit or
 - Kept `js/shared/module-screens.js` as a compatibility re-export; core imports the new module path.
 - Service worker cache advanced to v53; core app URL advanced to `20261117-43`.
 - These remain frontend preview modules; no live data writes or authentication features were added.
+
+
+## Stage 7 — footer and navigation controllers
+- Extracted the existing GI Creative Space popup, footer tap/850ms long-press behavior, and footer setup into `js/shared/footer.js`.
+- Extracted the existing authenticated bottom-navigation setup and active-state updates into `js/shared/navigation.js`.
+- Core retains thin delegates; the footer copy, links, gesture duration, and Super Admin entry behavior are unchanged.
+- Service worker cache advanced to v54; core app URL advanced to `20261117-44`.
