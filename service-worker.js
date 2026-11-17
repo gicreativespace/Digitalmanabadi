@@ -1,5 +1,5 @@
-const CACHE_NAME = "digital-mana-badi-preview-v46";
-const APP_SHELL = ["./", "./index.html", "./css/styles.css", "./css/social-ribbon.css", "./js/app.js", "./js/social-ribbon.js", "./js/config.js", "./js/firebase-client.js", "./js/admin-portal.js", "./manifest.webmanifest"];
+const CACHE_NAME = "digital-mana-badi-preview-v47";
+const APP_SHELL = ["./", "./index.html", "./css/styles.css", "./css/social-ribbon.css", "./js/app.js", "./js/social-ribbon.js", "./js/config.js", "./js/firebase-client.js", "./js/admin-portal.js", "./manifest.webmanifest", "./assets/branding/digital-mana-badi-logo.png", "./assets/app-icons/icon-192.png", "./assets/app-icons/icon-512.png", "./assets/app-icons/favicon-32.png", "./assets/app-icons/favicon.ico"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
   self.skipWaiting();
