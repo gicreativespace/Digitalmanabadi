@@ -94,15 +94,28 @@ document.querySelector("#languageToggle").onclick=toggleLanguage;
 document.querySelector("#themeToggle").onclick=toggleTheme;
 document.querySelector("#brandHome").onclick=()=>{state.view=state.authenticated?"dashboard":state.role?"login":"welcome";render()};
 function welcome(){
- main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("డిజిటల్ మన బడి","Digital Mana Badi")}</h1><p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p><h2 class="welcome-org">Welcome to Godavari Creative Space</h2><p>${T("ఆలోచనలు, సృజనాత్మకత, సాంకేతికతతో మన పాఠశాలలను మరింత ముందుకు తీసుకెళ్దాం.","Ideas, creativity and technology coming together to make a difference.")}</p><p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
- <section class="role-stack">
- ${roleCard("school","హెడ్ మాస్టర్","Head Master","hm","green")}
- ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
- ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
+ main.innerHTML=`<section class="welcome-panel">
+  <div class="welcome-kicker">${T("విద్యాభివృద్ధికి అంకితం","A TRIBUTE TO EDUCATION")}</div>
+  <h2 class="welcome-intro">${T("స్వాగతం","Welcome to")}</h2>
+  <div class="welcome-honourees" aria-label="BVR, CVPMR and DNR">
+   <h2>${T("బి.వి. రాజు","B. V. Raju")}</h2>
+   <h2>${T("సి.వి.పి. మూర్తి రాజు","C. V. P. Murthy Raju")}</h2>
+   <h2>${T("దంతులూరి నారాయణ రాజు","Dantuluri Narayana Raju")}</h2>
+  </div>
+  <div class="welcome-divider" aria-hidden="true"></div>
+  <h1>${T("డిజిటల్ మన బడి","Digital Mana Badi")}</h1>
+  <div class="welcome-platform">SCHOOL MANAGEMENT PLATFORM</div>
+  <p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
+  <p class="welcome-description">${T("ఆలోచనలు, సృజనాత్మకత, సాంకేతికత కలసి మార్పును తీసుకువస్తాయి.","Ideas, creativity and technology coming together to make a difference.")}</p>
+  <p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
+ </section>
+ <section class="role-stack" aria-label="Select your role">
+  ${roleCard("school","హెడ్ మాస్టర్","Head Master","hm","green")}
+  ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
+  ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
  </section>`;
  main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.authenticated=false;localStorage.setItem("gim_role",state.role);localStorage.removeItem("gim_authenticated");state.view="login";render()});
 }
-function roleCard(ic,te,en,role,tone){const quote={hm:"A great school begins with great leadership.",teacher:"A teacher inspires a thousand possibilities.",parent:"Every child’s journey begins with family support."}[role];return `<button class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${quote}</small></span><span class="role-arrow">›</span></button>`}
 function login(){
  const role=roleNames[state.role], parent=state.role==="parent";
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="backWelcome">← ${T("వెనక్కి","Back")}</button><span class="pill">${T(role[0],role[1])}</span></div>
@@ -221,8 +234,8 @@ function setupFooter(){
 function toast(msg){const el=document.createElement("div");el.className="toast";el.textContent=translateValue(msg);document.body.append(el);setTimeout(()=>el.remove(),2400)}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function render(){
- document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;
- document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;
+ document.querySelector("#appName").textContent="BVR - CVPMR - DNR";
+ document.querySelector("#tagline").textContent="DIGITAL MANA BADI";
  const theme=document.querySelector("#themeToggle");theme.textContent=state.theme==="light"?"☾":"☀";
  document.querySelector("#languageToggle").textContent=state.lang==="te"?"అ":"A";
  document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
