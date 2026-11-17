@@ -396,3 +396,31 @@ body{font-size:18px;line-height:1.65}
 /* Mobile welcome inspiration: show the Telugu message in two balanced centered lines */
 .welcome-description .welcome-line{display:inline}
 @media(max-width:520px){.welcome-description .welcome-line{display:block}.welcome-description .welcome-line+ .welcome-line{margin-top:2px}}
+
+/* Alumni / Donor and School Development — additive styles; existing home visual language retained */
+@media(min-width:701px){
+  .role-stack{grid-template-columns:repeat(4,minmax(0,1fr));max-width:980px}
+  .role-card{min-height:156px;padding:15px 10px}
+  .role-copy strong{font-size:16px}
+  .role-copy small{font-size:11px}
+}
+@media(max-width:700px){.role-stack{grid-template-columns:1fr}}
+.role-community{border-color:var(--gold);background:linear-gradient(145deg,var(--surface),#fffaf0)}
+.community-access-actions{display:grid;gap:12px;margin-top:18px}
+.community-panel{margin-top:20px;padding:20px;border:1px solid var(--border);border-radius:18px;background:var(--surface2)}
+.community-panel h3{margin:8px 0 14px;color:var(--deep);font-size:19px}
+.community-record{margin:10px 0;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface)}
+.community-record strong{display:block;color:var(--deep);font-size:16px}
+.community-record p{margin:5px 0;color:var(--muted);font-size:14px;line-height:1.55}
+.community-record small{color:var(--green);font-weight:750}
+.community-actions{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 14px}
+.community-actions .btn{flex:1;min-width:120px}
+.community-panel .field{margin:12px 0}
+.community-panel .field input,.community-panel .field textarea{width:100%}
+@media(max-width:520px){
+ .community-panel{padding:14px}
+ .community-panel h3{font-size:17px}
+ .community-record{padding:12px}
+ .community-actions{flex-direction:column}
+ .community-actions .btn{width:100%}
+}
