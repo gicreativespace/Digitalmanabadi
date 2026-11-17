@@ -339,3 +339,55 @@ body{font-size:18px;line-height:1.65}
 @keyframes gcsWelcomeIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 .calendar-month-nav{display:flex;align-items:center;justify-content:space-between;gap:10px}.calendar-month-nav strong{flex:1;text-align:center;text-transform:capitalize;font-size:18px;color:var(--deep)}.calendar-month-nav .btn{min-width:42px;min-height:40px;padding:5px 12px;font-size:22px;line-height:1}.calendar-grid .calendar-empty{min-height:42px}
 @media(max-width:520px){.gcs-welcome-overlay{padding:12px}.gcs-welcome-card{max-height:calc(100dvh - 24px);padding:24px 17px 20px;border-radius:22px}.gcs-brand{margin-bottom:17px}.gcs-logo{width:54px;height:54px;font-size:23px}.gcs-brand-name{font-size:10px;letter-spacing:.09em}.gcs-close{right:10px;top:10px;width:38px;height:38px}.gcs-services{padding:18px 13px;margin:20px auto 14px}.gcs-services p{font-size:13px}.gcs-signoff{font-size:12px}.calendar-month-nav strong{font-size:16px}}
+
+/* Mobile welcome: keep the signature visible and center every welcome quote */
+.welcome-panel .welcome-tagline,
+.welcome-panel .welcome-description,
+.role-copy small{ text-align:center; }
+@media(max-width:520px){
+  .footer{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    transform:none!important;
+    width:100%!important;
+    max-width:none!important;
+    min-height:60px;
+    height:calc(60px + env(safe-area-inset-bottom, 0px))!important;
+    padding:6px 12px calc(6px + env(safe-area-inset-bottom, 0px))!important;
+    margin:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-items:center!important;
+    gap:3px!important;
+    background:var(--bg)!important;
+    border-top:1px solid var(--border)!important;
+    box-shadow:0 -4px 16px rgba(25,77,49,.07);
+    z-index:120!important;
+  }
+  .footer-link{display:block!important;width:100%!important;text-align:center!important}
+  #footerSignature,#footerInspired{white-space:normal!important;line-height:1.25!important}
+  .main-view{padding-bottom:calc(76px + env(safe-area-inset-bottom, 0px))!important}
+  body.has-authenticated-role .main-view{padding-bottom:calc(142px + env(safe-area-inset-bottom, 0px))!important}
+  .welcome-panel .welcome-tagline{
+    width:100%!important;
+    margin-left:0!important;
+    transform:none!important;
+    text-align:center!important;
+  }
+  .welcome-panel .welcome-description{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 auto!important;
+    transform:none!important;
+    text-align:center!important;
+    white-space:normal!important;
+    letter-spacing:normal!important;
+    line-height:1.45!important;
+  }
+  .role-card{display:flex;align-items:center}
+  .role-copy{align-items:center!important;justify-content:center!important;text-align:center!important;flex:1;min-width:0}
+  .role-copy strong,.role-copy small{width:100%;text-align:center!important}
+}
