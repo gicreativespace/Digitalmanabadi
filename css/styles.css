@@ -327,7 +327,7 @@ body{font-size:18px;line-height:1.65}
 }
 
 /* Godavari Creative Space premium full-screen welcome */
-.gcs-welcome-overlay{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;overflow-y:auto;padding:22px;background:rgba(25,61,39,.22);backdrop-filter:blur(8px)}
+.gcs-welcome-overlay{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;overflow-y:auto;padding:22px;background:var(--bg)}
 .gcs-welcome-card{position:relative;width:min(100%,680px);max-height:calc(100dvh - 36px);overflow-y:auto;padding:clamp(24px,5vw,46px);border:1px solid var(--gold);border-radius:28px;background:linear-gradient(145deg,var(--bg),var(--surface) 58%,var(--surface2));box-shadow:0 24px 80px rgba(25,77,49,.22);text-align:center;color:var(--text);animation:gcsWelcomeIn .38s ease-out}
 .gcs-close{position:absolute;right:16px;top:14px;width:42px;height:42px;border:1px solid var(--border);border-radius:50%;background:var(--surface);color:var(--deep);font-size:28px;line-height:1;display:grid;place-items:center;box-shadow:0 5px 16px rgba(25,77,49,.09)}
 .gcs-brand{display:flex;align-items:center;justify-content:center;gap:11px;margin:2px auto 22px}.gcs-logo{width:64px;height:64px;display:grid;place-items:center;border:2px solid var(--gold);border-radius:50%;background:var(--deep);color:#fff;font-size:27px;font-weight:900;letter-spacing:-.06em;box-shadow:0 7px 20px rgba(25,77,49,.16)}
