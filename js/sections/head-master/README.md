@@ -1,3 +1,9 @@
 # Head Master section
 
-Own the Head Master login handoff, school dashboard, school-scoped management and approval screens. Use the exact role label **Head Master**. The current Firebase-backed Head Master authentication helper is shared with the Super Admin portal in `../super-admin/admin-portal.js`; extract it here only after its dependencies and security checks are preserved. Current dashboard/module rendering remains in `js/core/app.js` during Stage 1.
+Own the Head Master dashboard, school-level administration and approvals. Use the exact role label **Head Master**.
+
+- `dashboard.js` owns the Head Master-specific dashboard summary markup.
+- The current Firebase-backed Head Master authentication helper remains in `../super-admin/admin-portal.js` so its existing Firebase and Firestore checks are preserved.
+- Remaining login handoff, module navigation and school-management rendering are still coordinated by `js/core/app.js`.
+
+Extract additional Head Master screens only after their shared state, role permissions and Firebase dependencies are mapped and tested.

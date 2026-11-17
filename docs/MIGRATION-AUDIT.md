@@ -2,7 +2,7 @@
 
 **Audit date:** 17 November 2026  
 **Source:** `main` at `17fd0b179b760bc41dc2cbdb8f39869a229d5c85`  
-**Implementation branch:** `migration/repository-restructure`
+**Stage 1 implementation:** `migration/repository-restructure` (merged to `main` in PR #2)\n**Stage 2 implementation branch:** `migration/stage-2-role-sections`
 
 ## Confirmed current application structure
 
@@ -25,7 +25,7 @@
 4. The current application itself displays a preview notice for features that are not connected to Firebase. This migration preserves that distinction.
 5. Firebase client configuration is public web-app configuration. No service-account key or server credential is added to the browser.
 6. Firestore rules are deliberately not broadened in this structural migration. The default deny rule remains intact.
-7. The current role/module screens remain in the core application controller for now. They will be extracted into role folders and shared modules in subsequent tested steps, rather than risk breaking their shared state and event handlers in a single large rewrite.
+7. Role-specific screens were initially in the core application controller. Stage 2 has now moved the Parent linking workflow and Alumni/Sponsor registration/community preview workflows into their role folders, while preserving their injected shared dependencies and existing localStorage data shape.
 
 ## First migration stage
 
@@ -36,6 +36,15 @@
 - Move the social ribbon component into `js/shared/`.
 - Keep the former file paths as compatibility shims so older links/imports do not fail.
 - Update the PWA shell cache to include the new paths and bump its cache version.
+
+## Second migration stage — role section extraction
+
+- Added Head Master and Teacher dashboard-summary modules under their respective role folders.
+- Added Parent dashboard summary and moved the Parent–Student linking workflow into `js/sections/parent/`.
+- Moved Alumni/Sponsor registration, local preview storage helpers, community module markup and action handlers into `js/sections/alumni-sponsor/alumni-sponsor-section.js`.
+- Updated the core controller to call these role-owned sections through explicit dependency injection.
+- Updated the PWA shell cache to v49 and included all newly imported role modules.
+- Kept shared login routing, the common module renderer and cross-role feature modules in the core controller for later staged extraction.
 
 ## Deliberately unchanged
 
