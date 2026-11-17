@@ -142,28 +142,29 @@ document.querySelector("#languageToggle").onclick=toggleLanguage;
 document.querySelector("#themeToggle").onclick=toggleTheme;
 document.querySelector("#brandHome").onclick=()=>{state.view=state.authenticated?"dashboard":state.role?"login":"welcome";render()};
 function welcome(){
- main.innerHTML=`<section class="welcome-panel" aria-label="Digital Mana Badi welcome">
-  <h2 class="welcome-intro">${T("స్వాగతం","Welcome to")}</h2>
-  <div class="welcome-honourees" aria-label="BVR, CVPMR and DNR">
-   <h2>${T("బి.వి. రాజు · సి.వి.పి. మూర్తి రాజు","B. V. Raju · C. V. P. Murthy Raju")}</h2>
-   <h2>${T("దంతులూరి నారాయణ రాజు","Dantuluri Narayana Raju")}</h2>
+ main.innerHTML=\`<section class="welcome-panel" aria-label="Digital Mana Badi welcome">
+  <h2 class="welcome-intro">\${T("స్వాగతం","Welcome to")}</h2>
+  <div class="welcome-honourees" aria-label="B. V. Raju, C. V. P. Murthy Raju and D. N. Raju">
+   <h2>\${T("బి.వి. రాజు","B. V. Raju")}</h2>
+   <h2>\${T("సి.వి.పి. మూర్తి రాజు","C. V. P. Murthy Raju")}</h2>
+   <h2>\${T("దంతులూరి నారాయణ రాజు","D. N. Raju")}</h2>
   </div>
   <div class="welcome-divider" aria-hidden="true"></div>
-  <h1>${T("డిజిటల్ మన బడి","Digital Mana Badi")}</h1>
+  <h1>\${T("డిజిటల్ మన బడి","DIGITAL MANA BADI")}</h1>
   <div class="welcome-platform">SCHOOL MANAGEMENT PLATFORM</div>
-  <p class="welcome-tagline">${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
+  <p class="welcome-tagline">\${T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</p>
   <div class="welcome-school">
-   <strong>${T("మన పాఠశాల పేరు","YOUR SCHOOL NAME")}</strong>
-   <span>${T("పాఠశాల ప్రాంతం · జిల్లా","School Location · District")}</span>
+   <strong>MPMP SCHOOL</strong>
+   <span>DAGGULURU</span>
   </div>
-  <p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
+  <p class="role-prompt">\${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
  </section>
  <section class="role-stack" aria-label="Select your role">
-  ${roleCard("school","ప్రధానోపాధ్యాయులు","Head Master","hm","green")}
-  ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
-  ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
-  ${roleCard("heart-handshake","పూర్వ విద్యార్థి / స్పాన్సర్","Alumni / Sponsor","community","green")}
- </section>`;
+  \${roleCard("school","ప్రధానోపాధ్యాయులు","Head Master","hm","green")}
+  \${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
+  \${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
+  \${roleCard("heart-handshake","పూర్వ విద్యార్థి / స్పాన్సర్","Alumni / Sponsor","community","green")}
+ </section>\`;
  /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
  main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
 }
@@ -400,8 +401,9 @@ function setupFooter(){
 function toast(msg){const el=document.createElement("div");el.className="toast";el.textContent=translateValue(msg);document.body.append(el);setTimeout(()=>el.remove(),2400)}
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function render(){
- document.querySelector("#appName").textContent="BVR - CVPMR - DNR";
+ document.querySelector("#appName").textContent="BVR · COVMR · DNR";
  document.querySelector("#tagline").textContent="DIGITAL MANA BADI";
+ document.querySelector("#brandSchool").textContent="MPMP School · Dagguluru";
  const theme=document.querySelector("#themeToggle");theme.textContent=state.theme==="light"?"☾":"☀";
  document.querySelector("#languageToggle").textContent=state.lang==="te"?"అ":"A";
  document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
