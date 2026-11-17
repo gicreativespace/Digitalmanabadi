@@ -273,3 +273,55 @@ body{font-size:18px;line-height:1.65}
 [data-theme=dark] .field input,[data-theme=dark] .field select,[data-theme=dark] .field textarea{background:#f5faf6;border-color:var(--border);color:var(--text)}
 [data-theme=dark] .bottom-nav{background:var(--surface);border-color:var(--border)}
 [data-theme=dark] .empty,[data-theme=dark] .demo-note{background:#d2e5d7;color:#345640}
+
+
+/* Updated BVR-CVPMR-DNR welcome identity */
+.brand-copy{gap:1px}
+.brand-copy strong{font-size:13px!important;letter-spacing:.075em;color:var(--gold)}
+.brand-copy small{font-size:17px!important;font-weight:850;letter-spacing:.015em;color:var(--deep)}
+.welcome-panel{margin:8px 0 20px;text-align:center}
+.welcome-kicker{font-size:11px;letter-spacing:.16em;color:var(--green);font-weight:850}
+.welcome-intro{margin:8px 0 10px;color:var(--deep);font-size:22px}
+.welcome-honourees{display:grid;gap:5px;margin:0 auto;max-width:650px}
+.welcome-honourees h2{margin:0;color:var(--deep);font-size:clamp(19px,3vw,25px);line-height:1.45;font-weight:800}
+.welcome-divider{width:76px;height:2px;margin:15px auto;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.welcome-panel h1{font-size:clamp(31px,5vw,43px);line-height:1.15;margin:8px 0 4px;color:var(--deep);font-weight:900}
+.welcome-platform{font-size:13px;font-weight:850;letter-spacing:.13em;color:var(--green);margin:5px 0 8px}
+.welcome-panel .welcome-tagline{font-size:21px;font-weight:800;color:var(--gold);margin:5px 0 7px}
+.welcome-description{max-width:610px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.55}
+.role-prompt{margin:19px 0 12px!important;font-size:16px!important;font-weight:850;letter-spacing:.08em;color:var(--deep)!important}
+.role-stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;max-width:760px}
+.role-card{min-height:166px;padding:17px 13px;flex-direction:column;justify-content:center;align-items:center;gap:10px;text-align:center;border-radius:19px}
+.role-icon{width:48px;height:48px}
+.role-copy{align-items:center;gap:6px}
+.role-copy strong{font-size:17px}
+.role-copy small{font-size:12px;line-height:1.4;max-width:190px}
+.role-arrow{display:none}
+@media(max-width:600px){
+ .brand-copy strong{font-size:11px!important}
+ .brand-copy small{font-size:14px!important}
+ .welcome-panel{margin:4px 0 14px}
+ .welcome-kicker{font-size:9px}
+ .welcome-intro{font-size:19px;margin:5px 0 7px}
+ .welcome-honourees{gap:3px}
+ .welcome-honourees h2{font-size:clamp(17px,4.8vw,21px)}
+ .welcome-divider{margin:10px auto}
+ .welcome-panel h1{font-size:31px}
+ .welcome-platform{font-size:10px;letter-spacing:.1em}
+ .welcome-panel .welcome-tagline{font-size:18px}
+ .welcome-description{font-size:13px}
+ .role-prompt{margin:13px 0 9px!important;font-size:14px!important}
+ .role-stack{grid-template-columns:1fr;gap:8px}
+ .role-card{min-height:76px;padding:10px 13px;flex-direction:row;justify-content:flex-start;text-align:left;gap:12px}
+ .role-copy{align-items:flex-start;gap:3px}
+ .role-copy strong{font-size:16px}
+ .role-copy small{font-size:11px;max-width:none}
+ .role-arrow{display:block;margin-left:auto;font-size:24px}
+}
+@media(max-height:760px) and (min-width:601px){
+ .welcome-panel{margin:2px 0 10px}
+ .welcome-honourees h2{font-size:20px}
+ .welcome-divider{margin:9px auto}
+ .role-card{min-height:135px}
+ .role-prompt{margin:12px 0 8px!important}
+}
