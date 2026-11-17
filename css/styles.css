@@ -758,7 +758,7 @@ body{font-size:18px;line-height:1.65}
  .role-icon{width:52px;height:52px;font-size:28px}
  .role-copy strong{font-size:clamp(17px,1.5vw,20px)!important}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact){
-  width:min(100%,760px);min-height:116px;box-sizing:border-box;
+  width:min(calc(100% - 24px),700px);min-height:116px;box-sizing:border-box;
   margin:clamp(12px,1.8vh,20px) auto 0;padding:13px 14px;
  }
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{font-size:12px!important;margin-bottom:9px!important}
@@ -799,7 +799,7 @@ body{font-size:18px;line-height:1.65}
  .role-copy strong{font-size:clamp(14px,4vw,16px)!important;line-height:1.25!important}
  .role-card[data-role="community"] .role-copy strong{font-size:clamp(13px,3.65vw,15px)!important}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact){
-  flex:none;width:100%;min-height:120px;box-sizing:border-box;
+  flex:none;width:calc(100% - 14px);min-height:120px;box-sizing:border-box;
   margin:clamp(10px,1.6vh,15px) auto 0;padding:12px 8px 13px;
   border-radius:17px;display:flex;flex-direction:column;justify-content:center;
  }
@@ -820,7 +820,7 @@ body{font-size:18px;line-height:1.65}
  .role-icon{width:42px;height:42px;font-size:25px}
  .role-copy strong{font-size:clamp(13px,3.9vw,15px)!important}
  .role-card[data-role="community"] .role-copy strong{font-size:clamp(12px,3.5vw,13.5px)!important}
- .main-view:has(.welcome-panel) .social-ribbon:not(.compact){min-height:108px;padding:10px 5px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){width:calc(100% - 10px);min-height:108px;padding:10px 5px}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:23px;height:23px}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8.5px!important}
 }
