@@ -1,0 +1,3 @@
+export function getHeadMasterLoginView({T}) {
+ return {kind:"credentials",description:T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account credentials."),formMarkup:'<div class="field"><label>Official School Email</label><input id="loginId" type="email" autocomplete="username" placeholder="Enter official school email"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Firebase Authenticationతో Head Master Email ధృవీకరణ.</div>'};
+}

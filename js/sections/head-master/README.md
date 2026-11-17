@@ -7,3 +7,7 @@ Own the Head Master dashboard, school-level administration and approvals. Use th
 - Remaining login handoff, module navigation and school-management rendering are still coordinated by `js/core/app.js`.
 
 Extract additional Head Master screens only after their shared state, role permissions and Firebase dependencies are mapped and tested.
+
+
+### Login screen
+Head Master-specific login form markup is owned by `login.js`; shared form orchestration is in `js/shared/login-screen.js`.

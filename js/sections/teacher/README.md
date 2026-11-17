@@ -7,3 +7,7 @@ Own Teacher login, assigned classes, attendance, daily diary, homework and schoo
 - Teacher authentication and school data are still Preview Mode; do not imply live Firebase authentication or data access.
 
 Extract further Teacher screens only after the trusted mobile/password authentication design and school-scoped authorization are implemented and tested.
+
+
+### Login screen
+Teacher-specific login form markup is owned by `login.js`; the current Teacher login remains explicitly Preview Mode until trusted mobile authentication is implemented.
