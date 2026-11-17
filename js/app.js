@@ -58,21 +58,19 @@ const modules={
 const main=document.querySelector("#mainView");
 document.documentElement.dataset.theme=state.theme;
 const iconSvg=(name)=>({school:"▦",presentation:"▤",users:"♧", "calendar-check":"▣","notebook-pen":"✎","book-open":"▤",megaphone:"◖", "calendar-days":"▦",utensils:"♨",sun:"☼","book-heart":"♡",quote:"❝",globe:"◎",palette:"▧","chart-no-axes-column":"▥",settings:"⚙","graduation-cap":"⌂",bell:"♢",user:"○",shield:"⬡"}[name]||"•");
-function headerMenu(kind){
- document.querySelectorAll(".header-menu").forEach(x=>x.remove());
- const anchor=document.querySelector(kind==="language"?"#languageToggle":"#themeToggle");
- const menu=document.createElement("div");menu.className="header-menu";
- const opts=kind==="language"?[["te","తెలుగు"],["en","English"]]:[["light","Light"],["dark","Dark"]];
- menu.innerHTML=opts.map(([v,l])=>'<button class="menu-option '+((kind==="language"?state.lang:state.theme)===v?"active":"")+'" data-v="'+v+'">'+l+'</button>').join("");
- anchor.parentElement.append(menu);
- menu.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{
-  if(kind==="language"){state.lang=b.dataset.v;localStorage.setItem("gim_lang",state.lang);render()}
-  else{state.theme=b.dataset.v;localStorage.setItem("gim_theme",state.theme);document.documentElement.dataset.theme=state.theme;render()}
- });
+function toggleLanguage(){
+ state.lang=state.lang==="te"?"en":"te";
+ localStorage.setItem("gim_lang",state.lang);
+ render();
 }
-document.querySelector("#languageToggle").onclick=()=>headerMenu("language");
-document.querySelector("#themeToggle").onclick=()=>headerMenu("theme");
-document.addEventListener("click",e=>{if(!e.target.closest(".top-actions"))document.querySelectorAll(".header-menu").forEach(x=>x.remove())});
+function toggleTheme(){
+ state.theme=state.theme==="light"?"dark":"light";
+ localStorage.setItem("gim_theme",state.theme);
+ document.documentElement.dataset.theme=state.theme;
+ render();
+}
+document.querySelector("#languageToggle").onclick=toggleLanguage;
+document.querySelector("#themeToggle").onclick=toggleTheme;
 document.querySelector("#brandHome").onclick=()=>{state.view=state.role?"dashboard":"welcome";render()};
 function welcome(){
  main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("స్వాగతం","Welcome")}</h1><p>${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
@@ -180,8 +178,8 @@ function profilePage(){
 function settingsPage(){
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="settingsBack">← Dashboard</button></div><section class="card module-detail"><h2>Settings</h2><div class="detail-list"><div class="detail-row"><div><strong>Language</strong><small>తెలుగు / English</small></div><button class="btn secondary" id="settingsLang">Change</button></div><div class="detail-row"><div><strong>Theme</strong><small>Light / Dark</small></div><button class="btn secondary" id="settingsTheme">Change</button></div><div class="detail-row"><div><strong>Switch Role</strong><small>Welcome Screen‌కు తిరిగి వెళ్లండి</small></div><button class="btn secondary" id="switchRole">Switch</button></div><div class="detail-row"><div><strong>Logout</strong><small>ప్రస్తుత Session ముగించండి</small></div><button class="btn danger" id="logout">Logout</button></div></div></section>`;
  document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
- document.querySelector("#settingsLang").onclick=()=>headerMenu("language");
- document.querySelector("#settingsTheme").onclick=()=>headerMenu("theme");
+ document.querySelector("#settingsLang").onclick=toggleLanguage;
+ document.querySelector("#settingsTheme").onclick=toggleTheme;
  document.querySelector("#switchRole").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
  document.querySelector("#logout").onclick=()=>{state.role=null;state.view="login";render()};
 }
@@ -206,6 +204,9 @@ function render(){
  document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;
  document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;
  const theme=document.querySelector("#themeToggle");theme.textContent=state.theme==="light"?"☾":"☀";
+ document.querySelector("#languageToggle").textContent=state.lang==="te"?"అ":"A";
+ document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
+ theme.setAttribute("aria-label",state.theme==="light"?"Switch to dark theme":"Switch to light theme");
  if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="link")linking();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
 }
 render();setupFooter();
