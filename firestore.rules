@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function signedIn(){return request.auth != null;}
+  function adminPath(){return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);}
+  function isSuperAdmin(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="GI_SUPER_ADMIN" && get(adminPath()).data.status=="active";}
+  function hmPath(){return /databases/$(database)/documents/headMasters/$(request.auth.uid);}
+  function isActiveHeadMasterFor(schoolId){return signedIn() && exists(hmPath()) && get(hmPath()).data.role=="HEAD_MASTER" && get(hmPath()).data.status=="active" && get(hmPath()).data.schoolId==schoolId;}
+  match /platformAdmins/{adminUid}{allow get: if signedIn() && request.auth.uid==adminUid;allow list,create,update,delete: if false;}
+  match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
+  match /headMasters/{headMasterUid}{allow read: if isSuperAdmin() || (signedIn() && request.auth.uid==headMasterUid);allow write: if isSuperAdmin();}
+  match /adminAudit/{auditId}{allow read,write: if isSuperAdmin();}
+  match /{document=**}{allow read,write: if false;}
+ }
+}
