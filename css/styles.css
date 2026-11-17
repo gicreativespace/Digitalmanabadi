@@ -391,3 +391,8 @@ body{font-size:18px;line-height:1.65}
   .role-copy{align-items:center!important;justify-content:center!important;text-align:center!important;flex:1;min-width:0}
   .role-copy strong,.role-copy small{width:100%;text-align:center!important}
 }
+
+
+/* Mobile welcome inspiration: show the Telugu message in two balanced centered lines */
+.welcome-description .welcome-line{display:inline}
+@media(max-width:520px){.welcome-description .welcome-line{display:block}.welcome-description .welcome-line+ .welcome-line{margin-top:2px}}
