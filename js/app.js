@@ -7,9 +7,19 @@ const state = {
   selectedDate: 17, linkedStudent: null, parentLinked: false
 };
 const T=(te,en)=>state.lang==="te"?te:en;
-const roleNames={hm:["హెడ్మాస్టర్","Headmaster"],teacher:["టీచర్","Teacher"],parent:["పేరెంట్","Parent"]};
+const teluguWords=[
+ ["School Settings","పాఠశాల వివరాలు"],["Mid-Day Meal","మధ్యాహ్న భోజనం"],["Today Special","ఈరోజు ప్రత్యేకం"],["GI Knowledge World","మన విజ్ఞాన ప్రపంచం"],["Poster Studio","పోస్టర్ తయారీ"],["Great People","గొప్ప వ్యక్తులు"],["Great Quotes","గొప్ప మాటలు"],["Events & Calendar","కార్యక్రమాలు మరియు క్యాలెండర్"],["Daily Diary","రోజువారీ డైరీ"],["Notice Board","నోటీసు బోర్డు"],["Parent–Student Linking","తల్లిదండ్రులు – విద్యార్థి అనుసంధానం"],["Parent Linking","తల్లిదండ్రుల అనుసంధానం"],["Student ID","విద్యార్థి గుర్తింపు సంఖ్య"],["Roll Number","క్రమ సంఖ్య"],["Date of Birth","పుట్టిన తేదీ"],["Password","రహస్య సంకేతం"],["Confirm","నిర్ధారించు"],["Dashboard","ప్రధాన పేజీ"],["Headmaster","ప్రధానోపాధ్యాయులు"],["Teacher","ఉపాధ్యాయుడు"],["Parent","తల్లిదండ్రులు"],["Attendance","హాజరు"],["Teachers","ఉపాధ్యాయులు"],["Students","విద్యార్థులు"],["Homework","ఇంటి పని"],["Notices","నోటీసులు"],["Reports","నివేదికలు"],["Profile","వ్యక్తిగత వివరాలు"],["Settings","అమరికలు"],["Calendar","క్యాలెండర్"],["Login","ప్రవేశం"],["Logout","నిష్క్రమణ"],["Switch Role","పాత్ర మార్చు"],["Role","పాత్ర"],["Home","ప్రధానం"],["Back","వెనక్కి"],["Change","మార్చు"],["Switch","మార్చు"],["Create Notice","నోటీసు రాయండి"],["Approve","ఆమోదించు"],["Reject","తిరస్కరించు"],["Planned Menu","ముందుగా నిర్ణయించిన భోజనం"],["Actually Served","వడ్డించిన భోజనం"],["Class","తరగతి"],["Student","విద్యార్థి"],["Event","కార్యక్రమం"],["View Only","చూడటానికి మాత్రమే"],["Preview Mode","ముందస్తు వీక్షణ"],["Poster Preview","పోస్టర్ నమూనా"],["Edit Design","రూపకల్పన మార్చు"],["Blog Link","బ్లాగ్ లింక్"],["Personal Information","వ్యక్తిగత వివరాలు"],["Role & Access","పాత్ర మరియు అనుమతులు"],["School Information","పాఠశాల వివరాలు"],["Secure Login","సురక్షిత ప్రవేశం"],["Admin ID","నిర్వాహక గుర్తింపు సంఖ్య"],["Enter your Login ID","మీ ప్రవేశ గుర్తింపు సంఖ్య నమోదు చేయండి"],["Please enter both fields.","రెండు వివరాలూ నమోదు చేయండి."],["Please select your role","దయచేసి మీ పాత్రను ఎంచుకోండి"]
+];
+function applyTeluguWords(){
+ if(state.lang!=="te")return;
+ const replaceText=(value)=>{let out=value;for(const [en,te] of teluguWords){const escaped=en.replace(/[.*+?^${}()|[\]\\]/g,"\\const T=(te,en)=>state.lang==="te"?te:en;");out=out.replace(new RegExp(escaped,"gi"),te)}return out};
+ const walk=(node)=>{for(const child of [...node.childNodes]){if(child.nodeType===3)child.nodeValue=replaceText(child.nodeValue);else if(child.nodeType===1){for(const attr of ["placeholder","title","aria-label"])if(child.hasAttribute(attr))child.setAttribute(attr,replaceText(child.getAttribute(attr)));walk(child)}}};
+ walk(main);
+}
+
+const roleNames={hm:["ప్రధానోపాధ్యాయులు","Headmaster"],teacher:["ఉపాధ్యాయుడు","Teacher"],parent:["తల్లిదండ్రులు","Parent"]};
 const roleMeta={
- hm:{tone:"green",icon:"school",title:"హెడ్మాస్టర్ డాష్‌బోర్డ్",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
+ hm:{tone:"green",icon:"school",title:"ప్రధానోపాధ్యాయుల ప్రధాన పేజీ",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
  teacher:{tone:"gold",icon:"presentation",title:"టీచర్ డాష్‌బోర్డ్",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
  parent:{tone:"blue",icon:"users",title:"పేరెంట్ డాష్‌బోర్డ్",sub:"మీ పిల్లల పాఠశాల సమాచారం"}
 };
