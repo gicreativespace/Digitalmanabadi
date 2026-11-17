@@ -1,0 +1,32 @@
+/* Social Media Ribbon — additive component only */
+.social-ribbon{width:min(100%,680px);margin:clamp(8px,1.4vh,14px) auto 10px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 22%,var(--gold));border-radius:18px;background:linear-gradient(135deg,var(--surface),var(--surface2));box-shadow:0 8px 22px rgba(31,73,48,.08);transition:opacity .22s ease,transform .22s ease}
+.social-ribbon[hidden]{display:none!important}
+.social-ribbon-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;color:var(--deep);font-size:11px;font-weight:850;letter-spacing:.11em}
+.social-ribbon-links{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+.social-ribbon-link{display:flex;min-width:0;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:3px 1px;border:0;border-radius:12px;background:transparent;color:var(--text);text-decoration:none;transition:background .18s ease,transform .18s ease}
+.social-ribbon-link:hover{background:var(--surface);transform:translateY(-2px)}
+.social-ribbon-link:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.social-ribbon-link img{display:block;width:25px;height:25px;object-fit:contain}
+.social-ribbon-link .social-name{font-size:10px;line-height:1.2;font-weight:650;color:var(--muted);text-align:center;white-space:nowrap}
+.social-ribbon.compact{width:min(100%,420px);padding:7px 12px;margin:16px auto 10px;border-radius:999px}
+.social-ribbon.compact .social-ribbon-head{display:none}
+.social-ribbon.compact .social-ribbon-links{gap:8px}
+.social-ribbon.compact .social-ribbon-link{padding:2px}
+.social-ribbon.compact .social-ribbon-link img{width:22px;height:22px}
+.social-ribbon.compact .social-name{display:none}
+.social-ribbon.social-auto-hidden{opacity:0;transform:translateY(12px);pointer-events:none}
+.social-ribbon.social-auto-visible{opacity:1;transform:translateY(0)}
+@media(max-width:700px){
+ .social-ribbon{padding:8px 9px;margin:8px auto 8px;border-radius:15px}
+ .social-ribbon-head{font-size:9px;margin-bottom:6px}
+ .social-ribbon-link img{width:23px;height:23px}
+ .social-ribbon-link .social-name{font-size:9px}
+ .social-ribbon.compact{padding:6px 10px}
+}
+@media(max-width:360px){.social-ribbon-link img{width:21px;height:21px}.social-ribbon-link .social-name{font-size:8px}}
+/* Welcome screen: ribbon sits directly below the four role cards, above the footer signature */
+.main-view:has(.welcome-panel) .social-ribbon{flex:none;margin-top:clamp(7px,1.1vh,12px);margin-bottom:0}
+@media(max-height:700px){.main-view:has(.welcome-panel) .social-ribbon{margin-top:5px;padding-top:6px;padding-bottom:6px}.main-view:has(.welcome-panel) .social-ribbon-link img{width:20px;height:20px}}
+/* Other screens: compact, unobtrusive ribbon at the end of page content */
+.main-view:not(:has(.welcome-panel)) .social-ribbon{position:sticky;bottom:8px;z-index:8;backdrop-filter:blur(12px)}
+@media(prefers-reduced-motion:reduce){.social-ribbon,.social-ribbon-link{transition:none}}
