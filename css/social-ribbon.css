@@ -169,3 +169,24 @@
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:17px;height:17px}
  .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8px!important}
 }
+
+
+/* Welcome Screen — slightly larger social icons for a more premium finish. */
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+ width:32px!important;height:32px!important;
+}
+@media(max-width:700px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+  width:28px!important;height:28px!important;
+ }
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+  width:25px!important;height:25px!important;
+ }
+}
+@media(max-height:700px) and (max-width:700px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+  width:24px!important;height:24px!important;
+ }
+}
