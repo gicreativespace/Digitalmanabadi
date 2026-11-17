@@ -869,3 +869,4 @@ body{font-size:18px;line-height:1.65}
   font-size:clamp(13px,3.6vw,14px)!important;
  }
 }
+\n\n/* Official Digital Mana Badi logo in the app header. */\n.brand-mark{background-color:#fff;background-image:url('../assets/branding/digital-mana-badi-logo.png');background-position:center;background-repeat:no-repeat;background-size:contain;}\n
