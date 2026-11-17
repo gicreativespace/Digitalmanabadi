@@ -1,21 +1,21 @@
-# Digital Mana Badi — Repository Structure & Migration Status
+# Digital Mana Badi — Repository Structure
 
-**Architecture:** One master repository, one active school configuration, role-wise sections and shared modules.  
-**Current implementation:** Stage 1 structural migration.  
-**Production branch:** `main` (kept unchanged during this work).
+**Architecture:** One master repository, one active school configuration file, five role-owned sections, and shared feature modules.
+**Migration status:** Structural migration Stages 1–7 merged into `main`.
+**Verified main commit at this documentation update:** `b3ebfdc4f3979b8dff19f0f6f7bfadcb83cf88ef`.
 
 ## Current repository tree
 
 ```text
 Digitalmanabadi/
-├── config/
-│   └── school-config.js
 ├── assets/
 │   ├── app-icons/
 │   └── branding/
+├── config/
+│   └── school-config.js
 ├── css/
-│   ├── styles.css
-│   └── social-ribbon.css
+│   ├── social-ribbon.css
+│   └── styles.css
 ├── docs/
 │   ├── FIRESTORE-ADMIN-SETUP.md
 │   ├── LOGIN-ARCHITECTURE.md
@@ -25,6 +25,12 @@ Digitalmanabadi/
 │   ├── core/
 │   │   └── app.js
 │   ├── shared/
+│   │   ├── account-screens.js
+│   │   ├── dashboard-screen.js
+│   │   ├── footer.js
+│   │   ├── login-screen.js
+│   │   ├── module-screens.js        # compatibility re-export
+│   │   ├── navigation.js
 │   │   ├── role-config.js
 │   │   ├── social-ribbon.js
 │   │   └── translations.js
@@ -32,56 +38,99 @@ Digitalmanabadi/
 │   │   ├── super-admin/
 │   │   │   └── admin-portal.js
 │   │   ├── head-master/
+│   │   │   ├── dashboard.js
+│   │   │   └── login.js
 │   │   ├── teacher/
+│   │   │   ├── dashboard.js
+│   │   │   └── login.js
 │   │   ├── parent/
+│   │   │   ├── dashboard.js
+│   │   │   ├── login.js
+│   │   │   └── parent-section.js
 │   │   └── alumni-sponsor/
+│   │       ├── alumni-sponsor-section.js
+│   │       ├── dashboard.js
+│   │       └── login.js
 │   ├── modules/
+│   │   ├── calendar.js
+│   │   ├── mid-day-meal.js
+│   │   ├── module-page.js
+│   │   ├── poster-studio.js
 │   │   └── README.md
-│   ├── admin-portal.js
-│   ├── app.js
-│   ├── config.js
+│   ├── admin-portal.js              # compatibility shim
+│   ├── app.js                       # compatibility shim
+│   ├── config.js                    # compatibility shim
 │   ├── firebase-client.js
-│   └── social-ribbon.js
+│   └── social-ribbon.js             # compatibility shim
 ├── firestore.rules
 ├── index.html
 ├── manifest.webmanifest
 └── service-worker.js
 ```
 
-The files at the old `js/` paths are compatibility shims retained intentionally. Do not delete them until all older references and deployed caches are confirmed clear.
+## Ownership boundaries
 
-## Configuration
+### Core
+- `js/core/app.js` owns application bootstrap, top-level state, welcome screen, global rendering and routing.
+- It composes shared screens and role-owned section adapters through explicit dependency injection.
+- It should not accumulate role-specific feature implementations again.
 
-All school-specific settings and the public Firebase Web App configuration are in `config/school-config.js`. There is only one active school config file; do not create separate files for individual schools.
-
-Only public Firebase web configuration belongs in the browser. Never place service-account credentials, private keys, passwords or admin secrets in this file.
-
-## Core and shared code
-
-- `js/core/app.js`: current application controller. The controller is kept intact during Stage 1 because its render functions share state, event handlers and helpers.
+### Shared UI and services
+- `js/shared/login-screen.js`: common login orchestration.
+- `js/shared/dashboard-screen.js`: common dashboard shell and role module navigation.
+- `js/shared/account-screens.js`: shared Profile and Settings screens.
+- `js/shared/footer.js`: GI Creative Space popup and existing footer gestures.
+- `js/shared/navigation.js`: authenticated bottom navigation.
+- `js/shared/role-config.js`: role names, metadata and module catalogues.
 - `js/shared/translations.js`: Telugu/English translation pairs.
-- `js/shared/role-config.js`: role names, role presentation metadata and role-specific module catalogues.
 - `js/shared/social-ribbon.js`: independent social ribbon component.
-- `js/sections/super-admin/admin-portal.js`: Firebase-backed Super Admin and Head Master portal functions.
 
-## Role section ownership
+### Role-owned sections
+- `super-admin/`: GI platform administration and Firebase-backed Super Admin / Head Master authentication helpers.
+- `head-master/`: Head Master login view and dashboard-specific content.
+- `teacher/`: Teacher login view and dashboard-specific content.
+- `parent/`: Parent login view, Parent–Student linking workflow and dashboard-specific content.
+- `alumni-sponsor/`: Alumni/Sponsor entry view, registration and community preview workflows.
 
-- `super-admin/`: secure platform administration.
-- `head-master/`: school-level administration and approvals.
-- `teacher/`: assigned teaching, attendance, diary and homework workflows.
-- `parent/`: linked-child and approved school information.
-- `alumni-sponsor/`: alumni and sponsor screens and permitted contribution/activity features.
+Role-specific screens belong in their role folder. Shared behavior must be implemented once under `js/shared/` or `js/modules/`, not copied across role folders.
 
-The latter four folders are reserved for the next extraction stage. Their screen logic still resides in the core controller at this stage; no empty duplicate modules are added.
+### Shared feature modules
+- `module-page.js`: shared module-page composition.
+- `calendar.js`: calendar preview.
+- `mid-day-meal.js`: Mid-Day Meal preview.
+- `poster-studio.js`: browser-local Poster Studio preview and download.
 
-## Shared feature modules
+These are UI/preview modules. They are not live school-data services.
 
-Common features should be implemented once under `js/modules/` and granted to roles through permissions. The current feature logic remains in the core controller until each module's dependencies are mapped and tested.
+## One-file school configuration
 
-## Migration safety rules
+`config/school-config.js` is the single active school configuration file. It contains:
+- App name and tagline
+- School name, code, address, location and academic year
+- School branding path
+- Preview-mode flag
+- Public Firebase Web App configuration
 
-1. Keep changes on a migration branch until source and browser checks pass.
-2. Preserve the original UI, colour system, content, local data keys and current interactions unless a separate product change is approved.
-3. Keep Firestore rules restrictive; never solve an access issue by opening all reads/writes.
-4. Do not represent preview-only login/data as production-ready.
-5. Remove compatibility shims only in a separately tested release after all references are updated.
+To point this master app at another school, update the single configuration file and use that school's separately provisioned Firebase project configuration. Do not create one configuration file per school in this repository. Never place service-account keys, private keys or admin credentials in browser code.
+
+Current configuration still has placeholder values that must be completed before a school-specific production release: school code, academic year and the GI Knowledge World URL. `demoMode` remains enabled.
+
+## Firebase and preview boundaries
+
+- GI Super Admin and Head Master sign-in use Firebase Authentication and Firestore profile/status checks.
+- Teacher, Parent and Alumni/Sponsor remain preview/local-browser flows. Their current screens do not provide production authentication or cross-device school data.
+- Parent linking and Alumni/Sponsor preview data remain browser-local.
+- Existing Firestore rules remain restrictive. Do not broaden access to make a preview feature appear live.
+- The approved secure mobile/password authentication, recovery, PIN/session policy, account lifecycle and school-isolation requirements are specified in `LOGIN-ARCHITECTURE.md`; they are not completed by this structural migration.
+
+## Compatibility shims
+
+The old `js/app.js`, `js/admin-portal.js`, `js/config.js` and `js/social-ribbon.js` paths remain as small compatibility shims. `js/shared/module-screens.js` is a compatibility re-export to the module implementation. Keep these until deployed caches and all external references are confirmed clear; remove them only in a separately tested change.
+
+## Migration and validation rules
+
+1. Keep future changes scoped and incremental; preserve existing functionality and local data shapes.
+2. Preserve the Welcome Screen, palette, footer behavior and social ribbon unless separately approved.
+3. Validate relative imports and service-worker cache paths after every file move.
+4. Browser, mobile, PWA and live Firebase testing must be recorded separately from source-level checks.
+5. Never describe preview flows as production authentication or production data access.

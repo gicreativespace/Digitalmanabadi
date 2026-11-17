@@ -1,111 +1,77 @@
 # Digital Mana Badi — Migration Audit
 
-**Audit date:** 17 November 2026  
-**Source:** `main` at `17fd0b179b760bc41dc2cbdb8f39869a229d5c85`  
-**Stage 1 implementation:** `migration/repository-restructure` (merged to `main` in PR #2)\n**Stage 2 implementation branch:** `migration/stage-2-role-sections`
+**Audit date:** 17 November 2026
+**Repository:** `gicreativespace/Digitalmanabadi`
+**Main commit after Stage 7:** `b3ebfdc4f3979b8dff19f0f6f7bfadcb83cf88ef`
+**Status:** Stages 1–7 structurally implemented and merged.
 
-## Confirmed current application structure
+## Migration history
 
-- `index.html`: application shell, header, main view, bottom navigation, footer and module entrypoints.
-- `js/app.js`: approximately 82 KB of application controller and screen logic before migration. It contains Welcome, login routing, role dashboards, module rendering, parent linking, Alumni/Sponsor preview, calendar, poster editor, profile, settings, footer interaction and navigation.
-- `js/admin-portal.js`: Firebase-backed GI Super Admin and Head Master portal functions.
-- `js/firebase-client.js`: Firebase Web SDK initialization and client configuration.
-- `js/config.js`: application name, school placeholders and preview-mode flag.
-- `js/social-ribbon.js`: independent social ribbon DOM component.
-- `css/styles.css`: main application styles and responsive layout.
-- `css/social-ribbon.css`: social ribbon styles.
-- `firestore.rules`: access is currently limited to platform admin, school, Head Master and admin audit paths; unmatched documents are denied.
-- `service-worker.js` and `manifest.webmanifest`: PWA shell caching and install metadata.
+| Stage | PR | Scope | Status |
+|---|---:|---|---|
+| 1 | #2 | Single school config, shared translations/role config, core entrypoint, Super Admin section, compatibility shims | Merged |
+| 2 | #3 | Head Master/Teacher dashboard intros, Parent linking, Alumni/Sponsor workflows | Merged |
+| 3 | #4 | Shared module screen renderer, calendar, Mid-Day Meal and Poster Studio helpers | Merged |
+| 4 | #5 | Shared login controller and role-owned login views | Merged |
+| 5 | #6 | Shared dashboard, Profile and Settings screens | Merged |
+| 6 | #7 | Feature modules organized under `js/modules/` | Merged |
+| 7 | #8 | Footer and bottom-navigation controllers | Merged |
 
-## Important runtime and data findings
+## Current ownership
 
-1. The Welcome Screen currently identifies the school as MPMP SCHOOL / DAGGULURU. These values are now sourced from the single school configuration file rather than duplicated in the screen markup.
-2. The Super Admin and Head Master sign-in paths use Firebase Authentication and Firestore profile/status checks.
-3. Teacher and Parent sign-in are still preview/local-browser flows; Parent linking and the Alumni/Sponsor portal also use browser-local preview data. They are not live school-data authentication or cross-device data flows.
-4. The current application itself displays a preview notice for features that are not connected to Firebase. This migration preserves that distinction.
-5. Firebase client configuration is public web-app configuration. No service-account key or server credential is added to the browser.
-6. Firestore rules are deliberately not broadened in this structural migration. The default deny rule remains intact.
-7. Role-specific screens were initially in the core application controller. Stage 2 has now moved the Parent linking workflow and Alumni/Sponsor registration/community preview workflows into their role folders, while preserving their injected shared dependencies and existing localStorage data shape.
+- `js/core/app.js`: application bootstrap, top-level state, Welcome Screen, routing and composition.
+- `js/shared/`: login orchestration, dashboard shell, account screens, footer, navigation, role configuration, translations and social ribbon.
+- `js/sections/super-admin/`: GI Super Admin portal and Firebase-backed Head Master authentication helpers.
+- `js/sections/head-master/`: Head Master login view and dashboard-specific content.
+- `js/sections/teacher/`: Teacher login view and dashboard-specific content.
+- `js/sections/parent/`: Parent login view, Parent–Student linking and dashboard-specific content.
+- `js/sections/alumni-sponsor/`: Alumni/Sponsor login view, registration and community preview workflows.
+- `js/modules/`: shared module page, calendar, Mid-Day Meal and Poster Studio preview modules.
+- `config/school-config.js`: single active school configuration and public Firebase Web App configuration.
 
-## First migration stage
+See `REPOSITORY-STRUCTURE.md` for the full current tree and ownership boundaries.
 
-- Move school and Firebase web configuration into `config/school-config.js`.
-- Move translation data and role/module metadata into reusable files under `js/shared/`.
-- Move the app controller into `js/core/app.js`.
-- Move the Super Admin portal into `js/sections/super-admin/`.
-- Move the social ribbon component into `js/shared/`.
-- Keep the former file paths as compatibility shims so older links/imports do not fail.
-- Update the PWA shell cache to include the new paths and bump its cache version.
+## Confirmed runtime/data boundaries
 
-## Second migration stage — role section extraction
+1. GI Super Admin and Head Master sign-in use Firebase Authentication and Firestore profile/status checks.
+2. Teacher login remains Preview Mode; non-empty credentials do not represent trusted authentication.
+3. Parent login/linking remains browser-local preview data; it is not verified against live school records and is not cross-device.
+4. Alumni/Sponsor registration and portal preview remain browser-local/preview workflows; approval and secure account activation are not live.
+5. The current app configuration still has `demoMode: true`, a blank School Code and Academic Year, and a placeholder GI Knowledge World URL.
+6. Firebase Web App configuration is public client configuration. No service-account key or server credential was added.
+7. Firestore rules were not opened up as part of this migration. Existing restrictive/default-deny behavior remains.
+8. Existing localStorage keys and preview data shapes were preserved through extraction, including `gim_community_preview`.
 
-- Added Head Master and Teacher dashboard-summary modules under their respective role folders.
-- Added Parent dashboard summary and moved the Parent–Student linking workflow into `js/sections/parent/`.
-- Moved Alumni/Sponsor registration, local preview storage helpers, community module markup and action handlers into `js/sections/alumni-sponsor/alumni-sponsor-section.js`.
-- Updated the core controller to call these role-owned sections through explicit dependency injection.
-- Updated the PWA shell cache to v49 and included all newly imported role modules.
-- Kept shared login routing, the common module renderer and cross-role feature modules in the core controller for later staged extraction.
+## Preserved UI and interactions
 
-## Deliberately unchanged
+- Welcome Screen design and role selection.
+- Existing CSS and color palette.
+- Footer text and one-tap popup.
+- Footer long-press entry remains 850ms and still routes to the authenticated GI Super Admin login screen.
+- Social ribbon placement and links; blank/unconfigured social URLs were not invented.
+- Existing bottom navigation behavior.
+- PWA manifest and branding assets.
 
-- Welcome Screen wording and layout, except that school name/location now read from configuration.
-- Existing CSS, colour palette, responsive styling and component dimensions.
-- Footer tap and 850 ms long-press behaviour.
-- Social ribbon links and placement; unconfigured social URLs remain empty.
-- Existing preview data storage keys and local data shape.
-- Firebase Authentication flow, Firestore data model and Firestore security rules.
-- Manifest icons and branding assets.
+## Source-level validation boundary
 
-## Next migration stages
+- Stage 1/2/3/4/5/6/7 changes were performed as incremental GitHub PRs and merged into `main`.
+- Relative import and service-worker cache path checks were performed during the earlier stages where recorded.
+- These changes are structural source edits. No browser runtime, mobile visual, PWA installation, live Firebase, security-rule integration, or deployed Pages test was performed by the assistant during this migration.
+- No deployment success is claimed. The GitHub Pages URL may update after the repository's configured publishing process completes.
 
-1. Extract Head Master, Teacher, Parent and Alumni/Sponsor screens into their respective folders with explicit dependencies on shared state/services.
-2. Extract common modules (attendance, homework, diary, notices, calendar, student records) only after mapping their current state and event-handler dependencies.
-3. Add/complete the one-file school settings workflow and role activation enforcement after trusted authorization rules are designed.
-4. Implement live Teacher/Parent/Alumni authentication and school data only after the approved secure Firebase/server-side design is ready.
-5. Run browser tests for every role, mobile layout, footer gestures, social ribbon, PWA installation/cache and deployment.
+## Not completed by the structural migration
 
-## Validation boundary
+The following approved product/security requirements remain separate implementation work:
+- Trusted Teacher and Parent mobile-number/password authentication.
+- Secure school-record-based Parent linking and password recovery.
+- Server-enforced failed-login attempt limits and 30-second lockout.
+- Single-active-device session coordination and revocation.
+- Device-local PIN setup, secure verifier storage and app resume lock.
+- Alumni and Donor/Sponsor approval-backed accounts and distinct role lifecycle.
+- Automatic Teacher/Parent platform ID allocation through trusted atomic server logic.
+- Full school-scoped Firestore data model and security-rule tests.
+- Central GI Super Admin school configuration and role activation enforcement for all existing accounts.
+- Dynamic role/time/language welcome greetings and quotes.
+- Production setup values: unique School Code, Academic Year, school-specific Firebase project configuration, and real GI Knowledge World URL.
 
-This audit and migration are source-level changes. A successful GitHub commit or static syntax check does not prove that the deployed app has been visually tested or that live Firebase authentication/data features are production-ready.
-
-
-## Stage 3 — shared module screens extraction
-- Extracted the shared module-page renderer and its calendar, Mid-Day Meal, and Poster Studio helpers from the core controller into `js/shared/module-screens.js`.
-- The shared screen factory receives the existing app state, translations, school configuration, rendering callback, and Alumni/Sponsor section adapter; role-specific workflows remain in their role folders.
-- Core controller now imports and initializes the shared screen factory. Existing module names, markup, event handlers, and local preview behavior are retained.
-- Service worker cache advanced to v50 and includes the new shared module file; core module URL advanced to `20261117-40`.
-- No CSS, Welcome Screen, footer, social ribbon, Firebase configuration, or Firestore rules changed.
-- Validation performed: source transformation anchors and service-worker cache entry updated. Browser runtime testing remains required.
-
-
-## Stage 4 — role-owned login screen extraction
-- Moved the shared login-screen controller into `js/shared/login-screen.js`.
-- Added role-owned login view modules for Head Master, Teacher, Parent, and Alumni/Sponsor under their respective `js/sections/<role>/login.js` folders.
-- The shared login controller composes role-owned form markup while retaining existing navigation, validation, Head Master Firebase sign-in call, Parent preview checks, and clearly labelled Alumni/Sponsor preview action.
-- Super Admin login remains in its existing dedicated Super Admin portal module.
-- Service worker cache advanced to v51; core app URL advanced to `20261117-41`.
-- No authentication model or backend behavior was newly enabled. Teacher, Parent, and Alumni/Sponsor remain preview flows; existing security prerequisites remain outstanding.
-
-
-## Stage 5 — shared dashboard and account screens
-- Extracted the shared role dashboard renderer and common knowledge highlight into `js/shared/dashboard-screen.js`.
-- Extracted shared Profile and Settings screen renderers into `js/shared/account-screens.js`.
-- Core now delegates dashboard, profile, and settings rendering to the shared screen factories. Role-specific dashboard introductions remain in each role section.
-- Existing Super Admin dashboard handoff, module navigation, role switching, settings actions, and logout callbacks are retained.
-- Service worker cache advanced to v52; core app URL advanced to `20261117-42`.
-- No role permissions, authentication model, UI styling, Welcome Screen, footer, or social ribbon changed.
-
-
-## Stage 6 — shared feature modules organization
-- Moved the module-page orchestration into `js/modules/module-page.js`.
-- Split calendar, Mid-Day Meal preview, and Poster Studio preview helpers into `js/modules/calendar.js`, `js/modules/mid-day-meal.js`, and `js/modules/poster-studio.js`.
-- Kept `js/shared/module-screens.js` as a compatibility re-export; core imports the new module path.
-- Service worker cache advanced to v53; core app URL advanced to `20261117-43`.
-- These remain frontend preview modules; no live data writes or authentication features were added.
-
-
-## Stage 7 — footer and navigation controllers
-- Extracted the existing GI Creative Space popup, footer tap/850ms long-press behavior, and footer setup into `js/shared/footer.js`.
-- Extracted the existing authenticated bottom-navigation setup and active-state updates into `js/shared/navigation.js`.
-- Core retains thin delegates; the footer copy, links, gesture duration, and Super Admin entry behavior are unchanged.
-- Service worker cache advanced to v54; core app URL advanced to `20261117-44`.
+Do not implement these security-sensitive items as frontend-only checks. Follow `LOGIN-ARCHITECTURE.md` and obtain the necessary trusted backend design/approval before enabling them.

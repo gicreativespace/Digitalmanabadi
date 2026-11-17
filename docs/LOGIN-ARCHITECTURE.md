@@ -5,8 +5,8 @@ Last updated: 2026-11-17
 
 ## 1. Scope and implementation guardrails
 - Preserve approved UI, modules, navigation, footer, social ribbon, and existing functionality. Login/security work is additive except that authentication bypasses must be removed.
-- The current site is a frontend preview. Firebase Authentication and Firestore are not connected. No localStorage flag or frontend-only check may be represented as real authentication or authorization.
-- Use only the role label "Head Master"; never use "Principal".
+- The app is a mixed state: GI Super Admin and Head Master sign-in use Firebase Authentication and Firestore profile/status checks. Teacher, Parent and Alumni/Sponsor remain frontend preview flows. No localStorage flag or frontend-only check may be represented as real authentication or authorization.
+- Use the exact role label "Head Master" consistently throughout the app and its documentation.
 - Prefer Firebase Spark/free-tier-compatible services. Do not introduce paid services, Cloud Functions, external APIs, or unnecessary Firestore reads/writes without explicit approval.
 - Enforce access with trusted authentication and Firestore Security Rules; hiding UI controls is not security.
 
@@ -125,7 +125,16 @@ Likewise, secure school-record-based password recovery requires a trusted verifi
 9. Integrate central platform configuration and GI Super Admin settings in the previously agreed sequence.
 
 ## 11. Current repository state / known issue
-At the time this specification was added, the app is still a frontend preview and Firebase is not integrated. The current login handler in js/app.js contains a demo-mode path that authenticates empty credentials, and the generic path accepts any non-empty ID/password for non-Parent roles. The Community "Open Portal Preview" action also sets the authenticated flag. These are preview shortcuts, not authentication. They must be removed or isolated behind an unmistakable preview-only mode before live authentication is enabled.
+The structural login extraction is complete. Shared login orchestration is in `js/shared/login-screen.js`; role-owned login views are in `js/sections/head-master/login.js`, `teacher/login.js`, `parent/login.js`, and `alumni-sponsor/login.js`. GI Super Admin and Head Master authentication helpers remain in `js/sections/super-admin/admin-portal.js`.
+
+Current behavior remains mixed:
+- GI Super Admin and Head Master use Firebase Authentication with Firestore profile/status checks.
+- Teacher accepts preview credentials only; this is not trusted authentication.
+- Parent linking and login use browser-local preview data.
+- Alumni/Sponsor has a clearly labelled Portal Preview action; registration approval and secure sign-in are not live.
+- The preview shortcuts and localStorage flags are not proof of identity or authorization. They must not be used to protect real school data.
+
+Before production access is enabled, complete the trusted authentication, school isolation, session/recovery and Firestore Security Rules requirements in this document. The current app configuration still has `demoMode: true`.
 
 
 ## 12. Automatic Digital Mana Badi Login IDs — Teacher and Parent
