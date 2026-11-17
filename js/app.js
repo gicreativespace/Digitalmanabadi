@@ -55,49 +55,44 @@ const t = (te,en) => state.lang === "te" ? te : en;
 const main = document.querySelector("#mainView");
 document.documentElement.dataset.theme = state.theme;
 
-document.querySelector("#themeToggle").addEventListener("click", () => {
-  state.theme = state.theme === "light" ? "dark" : "light";
-  document.documentElement.dataset.theme = state.theme;
-  localStorage.setItem("gim_theme", state.theme);
-  document.querySelector("#themeToggle").textContent = state.theme === "light" ? "☾" : "☀";
-});
-document.querySelector("#languageToggle").addEventListener("click", () => {
-  state.lang = state.lang === "te" ? "en" : "te";
-  localStorage.setItem("gim_lang", state.lang);
-  document.querySelector("#languageToggle").textContent = state.lang === "te" ? "EN" : "తె";
-  render();
-});
+function closeHeaderMenus(){document.querySelectorAll('.header-menu').forEach(x=>x.remove())}
+function showHeaderMenu(kind){
+  closeHeaderMenus();
+  const anchor=document.querySelector(kind==='language'?'#languageToggle':'#themeToggle');
+  const menu=document.createElement('div');menu.className='header-menu';
+  const options=kind==='language'?[['te','తెలుగు'],['en','English']]:[['light',t('లైట్','Light')],['dark',t('డార్క్','Dark')]];
+  menu.innerHTML=options.map(o=>'<button type="button" class="menu-option '+(((kind==='language'?state.lang:state.theme)===o[0])?'active':'')+'" data-value="'+o[0]+'">'+o[1]+'</button>').join('');
+  anchor.parentElement.append(menu);
+  menu.querySelectorAll('[data-value]').forEach(b=>b.addEventListener('click',()=>{if(kind==='language'){state.lang=b.dataset.value;localStorage.setItem('gim_lang',state.lang);render()}else{state.theme=b.dataset.value;localStorage.setItem('gim_theme',state.theme);document.documentElement.dataset.theme=state.theme;updateHeaderIcons()}closeHeaderMenus()}));
+}
+function updateHeaderIcons(){document.querySelector('#themeToggle').textContent=state.theme==='light'?'☾':'☀';document.querySelector('#languageToggle').textContent='文'}
+document.querySelector('#themeToggle').addEventListener('click',()=>showHeaderMenu('theme'));
+document.querySelector('#languageToggle').addEventListener('click',()=>showHeaderMenu('language'));
+document.addEventListener('click',e=>{if(!e.target.closest('.top-actions'))closeHeaderMenus()});
 document.querySelector("#brandHome").addEventListener("click", () => {
   state.view = state.role ? "dashboard" : "welcome"; render();
 });
 document.querySelector("#themeToggle").textContent = state.theme === "light" ? "☾" : "☀";
-document.querySelector("#languageToggle").textContent = state.lang === "te" ? "EN" : "తె";
+document.querySelector("#languageToggle").textContent = "文";
 
 function renderWelcome() {
   main.innerHTML = `
-    <section class="hero">
-      <div class="eyebrow">GI SCHOOL MANAGEMENT PLATFORM</div>
-      <h1>${t("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")}</h1>
-      <p>${t("విద్యార్థులు, ఉపాధ్యాయులు, తల్లిదండ్రులు, పాఠశాల యాజమాన్యాన్ని ఒకే డిజిటల్ వేదికపైకి తీసుకువచ్చే మన ప్రయత్నం.","A simple digital platform connecting students, teachers, parents and school leadership.")}</p>
+    <section class="welcome-panel">
+      <div class="welcome-kicker">${t("GI స్కూల్ మేనేజ్‌మెంట్ ప్లాట్‌ఫామ్","GI SCHOOL MANAGEMENT PLATFORM")}</div>
+      <h1>${t("స్వాగతం","Welcome")}</h1>
+      <p>${t("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p>
     </section>
-    <div class="section-head"><div><h2>${t("మీ లాగిన్ ఎంచుకోండి","Choose your login")}</h2><p>${t("కొనసాగడానికి మీ పాత్రను ఎంచుకోండి.","Select your role to continue.")}</p></div><span class="pill">● ${t("డెమో ప్రోటోటైప్","Demo prototype")}</span></div>
-    <section class="grid">
-      ${roleCard("🏫","ప్రిన్సిపాల్ / HM","Principal / HM","hm")}
-      ${roleCard("👩‍🏫","టీచర్","Teacher","teacher")}
-      ${roleCard("🎒","విద్యార్థి","Student","student")}
-      ${roleCard("👨‍👩‍👧","పేరెంట్","Parent","parent")}
-    </section>
-    <div class="card-row">
-      <article class="feature-card blue"><div class="card-icon">🌍</div><h3>మన విజ్ఞాన ప్రపంచం</h3><p>చరిత్ర, విజ్ఞానం, సాంకేతికం, కొత్త సంగతులు.</p><a href="${APP_CONFIG.knowledgeBlogUrl}" target="_blank" rel="noopener">బ్లాగ్‌ను సందర్శించండి ↗</a></article>
-      <article class="feature-card"><div class="card-icon">✨</div><h3>ఈరోజు విశేషం</h3><p>పుట్టినరోజులు, ప్రత్యేక రోజులు, పాఠశాల కార్యక్రమాలు.</p><button class="btn ghost" data-action="today">వివరాలు చూడండి →</button></article>
-    </div>`;
-  main.querySelectorAll("[data-role]").forEach(b => b.addEventListener("click", () => {
-    state.role = b.dataset.role; state.view = "login"; render();
-  }));
-  main.querySelector('[data-action="today"]').addEventListener("click", () => { state.view="today"; render(); });
+    <section class="role-stack" aria-label="${t("పాత్ర ఎంపిక","Choose your role")}">
+      ${roleCard("♙","ప్రిన్సిపాల్","Principal","hm","green")}
+      ${roleCard("✎","టీచర్","Teacher","teacher","gold")}
+      ${roleCard("♧","పేరెంట్","Parent","parent","blue")}
+    </section>`;
+  main.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{state.role=b.dataset.role;state.view='login';render()}));
 }
-function roleCard(icon,te,en,role){return `<article class="role-card"><div class="role-icon">${icon}</div><div><h3>${t(te,en)}</h3><p>${t("సురక్షిత లాగిన్ ద్వారా కొనసాగండి.","Continue with demo sign-in.")}</p></div><button class="btn" data-role="${role}">${t("కొనసాగండి","Continue")} →</button></article>`}
-
+function roleCard(icon,te,en,role,tone){
+  const desc={hm:['పాఠశాల నిర్వహణ','School administration'],teacher:['బోధన & తరగతి నిర్వహణ','Teaching & class management'],parent:['మీ పిల్లల పాఠశాల సమాచారం',"Your child's school updates"]}[role];
+  return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon" aria-hidden="true">${icon}</span><span class="role-copy"><strong>${t(te,en)}</strong><small>${t(desc[0],desc[1])}</small></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
+}
 function renderLogin() {
   const labels = {hm:["ప్రిన్సిపాల్ / HM","Principal / HM"],teacher:["టీచర్","Teacher"],student:["విద్యార్థి","Student"],parent:["పేరెంట్","Parent"]};
   const name = labels[state.role] || labels.hm;
@@ -158,6 +153,28 @@ function renderToday(){main.innerHTML=`<div class="backline"><button class="btn 
 function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function escapeAttr(s=""){return escapeHtml(s)}
 function showToast(msg){const el=document.createElement("div");el.className="toast";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),2400)}
-function render(){document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;if(state.view==="welcome")renderWelcome();else if(state.view==="login")renderLogin();else if(state.view==="dashboard")renderDashboard();else if(state.view==="today")renderToday()}
+function openFooterContact(){
+  const old=document.querySelector('#footerContact');if(old)old.remove();
+  const modal=document.createElement('div');modal.id='footerContact';modal.className='modal-backdrop';
+  modal.innerHTML='<section class="contact-popover" role="dialog" aria-modal="true"><button type="button" class="modal-close" aria-label="Close">×</button><h2>For Your Digital Needs</h2><p>Contact</p><a class="whatsapp-link" href="https://wa.me/918985361991" target="_blank" rel="noopener" aria-label="WhatsApp">◉</a></section>';
+  document.body.append(modal);modal.querySelector('.modal-close').onclick=()=>modal.remove();
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove()});
+}
+function renderSuperAdminLogin(){
+  state.view='superadmin';
+  main.innerHTML='<div class="backline"><button class="btn secondary" id="superBack">← '+t('వెనక్కి','Back')+'</button></div><section class="form-card"><h2>GI Super Admin</h2><p>'+t('సురక్షిత నిర్వాహక ప్రవేశం','Secure administrator access')+'</p><div class="field"><label>Admin ID</label><input autocomplete="username" placeholder="Admin ID"></div><div class="field"><label>Password</label><input type="password" autocomplete="current-password" placeholder="••••••••"></div><button class="btn" style="width:100%" id="superAdminContinue">'+t('కొనసాగండి','Continue')+'</button><p class="secure-note">'+t('Authentication ఇంకా అనుసంధానం కాలేదు.','Authentication is not connected yet.')+'</p></section>';
+  document.querySelector('#superBack').onclick=()=>{state.view='welcome';render()};
+  document.querySelector('#superAdminContinue').onclick=()=>showToast(t('Authentication ఇంకా సిద్ధంగా లేదు.','Authentication is not configured yet.'));
+}
+function setupFooterActions(){
+  const signature=document.querySelector('#footerSignature'),inspired=document.querySelector('#footerInspired');
+  [signature,inspired].forEach(el=>el.addEventListener('click',openFooterContact));
+  let timer=null,longPressed=false;
+  signature.addEventListener('pointerdown',()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;renderSuperAdminLogin()},850)});
+  ['pointerup','pointerleave','pointercancel'].forEach(ev=>signature.addEventListener(ev,()=>{if(timer)clearTimeout(timer)}));
+  signature.addEventListener('click',e=>{if(longPressed){e.preventDefault();e.stopImmediatePropagation();longPressed=false}});
+}
+function render(){document.querySelector("#appName").textContent=state.lang==="te"?APP_CONFIG.appNameTe:APP_CONFIG.appNameEn;document.querySelector("#tagline").textContent=state.lang==="te"?APP_CONFIG.taglineTe:APP_CONFIG.taglineEn;if(state.view==="welcome")renderWelcome();else if(state.view==="login")renderLogin();else if(state.view==="dashboard")renderDashboard();else if(state.view==="today")renderToday();else if(state.view==="superadmin")renderSuperAdminLogin()}
 render();
+setupFooterActions();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")) window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
