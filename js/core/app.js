@@ -115,7 +115,7 @@ function welcome(){
 function roleCard(ic,te,en,role,tone){
  return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
 }
-const login = loginScreen.render;
+function login(){loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
 function linking(){parentSection.renderLinking();}
 function dashboard(){
