@@ -1,4 +1,4 @@
-const CACHE_NAME = "digital-mana-badi-preview-v32";
+const CACHE_NAME = "digital-mana-badi-preview-v33";
 const APP_SHELL = ["./", "./index.html", "./css/styles.css", "./css/social-ribbon.css", "./js/app.js", "./js/social-ribbon.js", "./js/config.js", "./manifest.webmanifest"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
