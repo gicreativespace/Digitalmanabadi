@@ -628,3 +628,11 @@ body{font-size:18px;line-height:1.65}
  .admin-record-controls{align-items:flex-start;flex-direction:column}
  .admin-toggle{width:100%}
 }
+
+/* Header text follows the same comfortable reading scale. */
+.topbar .brand-copy strong{font-size:18px}
+.topbar .brand-copy small{font-size:14px!important;line-height:1.35}
+@media(max-width:700px){
+ .topbar .brand-copy strong{font-size:16px}
+ .topbar .brand-copy small{font-size:13px!important}
+}
