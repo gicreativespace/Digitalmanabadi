@@ -6,7 +6,7 @@ Last updated: 2026-11-17
 ## 1. Scope and implementation guardrails
 - Preserve approved UI, modules, navigation, footer, social ribbon, and existing functionality. Login/security work is additive except that authentication bypasses must be removed.
 - The app is a mixed state: GI Super Admin and Head Master sign-in use Firebase Authentication and Firestore profile/status checks. Teacher, Parent and Alumni/Sponsor remain frontend preview flows. No localStorage flag or frontend-only check may be represented as real authentication or authorization.
-- Use only the role label "Head Master"; never use "Principal".
+- Use the exact role label "Head Master" consistently throughout the app and its documentation.
 - Prefer Firebase Spark/free-tier-compatible services. Do not introduce paid services, Cloud Functions, external APIs, or unnecessary Firestore reads/writes without explicit approval.
 - Enforce access with trusted authentication and Firestore Security Rules; hiding UI controls is not security.
 
