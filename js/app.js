@@ -1,15 +1,15 @@
 import { APP_CONFIG } from "./config.js";
 
 const state = {
-  role: null, view: "welcome", module: null,
+  role: localStorage.getItem("gim_role") || null, view: localStorage.getItem("gim_role") ? "dashboard" : "welcome", module: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
   selectedDate: 17, linkedStudent: null, parentLinked: false
 };
 const T=(te,en)=>state.lang==="te"?te:en;
-const roleNames={hm:["ప్రిన్సిపాల్","Headmaster / Principal"],teacher:["టీచర్","Teacher"],parent:["పేరెంట్","Parent"]};
+const roleNames={hm:["హెడ్మాస్టర్","Headmaster"],teacher:["టీచర్","Teacher"],parent:["పేరెంట్","Parent"]};
 const roleMeta={
- hm:{tone:"green",icon:"school",title:"ప్రిన్సిపాల్ డాష్‌బోర్డ్",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
+ hm:{tone:"green",icon:"school",title:"హెడ్మాస్టర్ డాష్‌బోర్డ్",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
  teacher:{tone:"gold",icon:"presentation",title:"టీచర్ డాష్‌బోర్డ్",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
  parent:{tone:"blue",icon:"users",title:"పేరెంట్ డాష్‌బోర్డ్",sub:"మీ పిల్లల పాఠశాల సమాచారం"}
 };
@@ -77,11 +77,11 @@ document.querySelector("#brandHome").onclick=()=>{state.view=state.role?"dashboa
 function welcome(){
  main.innerHTML=`<section class="welcome-panel"><div class="welcome-emblem" aria-label="ప్రభుత్వ చిహ్నం త్వరలో జోడించబడుతుంది"></div><div class="welcome-kicker">GI SCHOOL MANAGEMENT PLATFORM</div><h1>${T("స్వాగతం","Welcome")}</h1><p>${T("మీ పాత్రను ఎంచుకోండి","Please select your role")}</p></section>
  <section class="role-stack">
- ${roleCard("school","ప్రిన్సిపాల్","Headmaster / Principal","hm","green")}
+ ${roleCard("school","హెడ్మాస్టర్","Headmaster","hm","green")}
  ${roleCard("presentation","టీచర్","Teacher","teacher","gold")}
  ${roleCard("users","పేరెంట్","Parent","parent","blue")}
  </section>`;
- main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;state.view="login";render()});
+ main.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{state.role=b.dataset.role;localStorage.setItem("gim_role",state.role);state.view="login";render()});
 }
 function roleCard(ic,te,en,role,tone){return `<button class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong><small>${roleNames[role][1]}</small></span><span class="role-arrow">›</span></button>`}
 function login(){
@@ -91,7 +91,7 @@ function login(){
  ${parent?'<div class="field"><label>Student ID</label><input id="loginId" placeholder="Student ID"></div><div class="field"><label>Parent PIN</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN"></div><button class="btn full" id="loginGo">Login</button><div class="link-row"><button class="text-link" id="startLink">మొదటిసారి? పిల్లలను లింక్ చేయండి</button></div>':
  '<div class="field"><label>'+T("Login ID","Login ID")+'</label><input id="loginId" placeholder="'+T("మీ Login ID","Enter your Login ID")+'"></div><div class="field"><label>'+T("Password / PIN","Password / PIN")+'</label><input id="loginPin" type="password" placeholder="••••••••"></div><button class="btn full" id="loginGo">'+T("Login","Login")+'</button><div class="demo-note">Preview Mode — Firebase Authentication ఇంకా అనుసంధానం కాలేదు.</div>'}
  </section>`;
- document.querySelector("#backWelcome").onclick=()=>{state.role=null;state.view="welcome";render()};
+ document.querySelector("#backWelcome").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
  if(parent)document.querySelector("#startLink").onclick=()=>{state.view="link";render()};
  document.querySelector("#loginGo").onclick=()=>{
   const id=document.querySelector("#loginId").value.trim(),pin=document.querySelector("#loginPin").value.trim();
@@ -123,7 +123,7 @@ function linking(){
 }
 function dashboard(){
  const meta=roleMeta[state.role],list=modules[state.role]||[];
- main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.title,meta.title)}</h1><p>${T(meta.sub,meta.sub)}</p></div><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div>
+ main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.title,meta.title)}</h1><p>${T(meta.sub,meta.sub)}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
  ${state.role==="hm"?'<section class="stats-grid"><article class="stat-card"><strong>—</strong><span>విద్యార్థులు</span></article><article class="stat-card"><strong>—</strong><span>ఉపాధ్యాయులు</span></article><article class="stat-card"><strong>—</strong><span>ఈరోజు హాజరు</span></article><article class="stat-card"><strong>—</strong><span>పెండింగ్ ఆమోదాలు</span></article></section>':""}
  ${state.role==="teacher"?'<section class="card assigned"><h3>నా తరగతులు</h3><p>మీకు కేటాయించిన తరగతులు మాత్రమే కనిపిస్తాయి.</p><div class="chips"><span>Class 3</span><span>Class 5</span></div></section>':""}
  ${state.role==="parent"?'<section class="feature-card blue parent-student"><div class="card-icon">♙</div><div><h3>లింక్ చేసిన విద్యార్థి</h3><p>'+(state.linkedStudent?escapeHtml(state.linkedStudent.className+" • Roll "+state.linkedStudent.roll):"విద్యార్థి వివరాలు")+'</p></div></section>':""}
@@ -131,6 +131,7 @@ function dashboard(){
  ${commonHighlights()}
  <nav class="bottom-nav"><button class="active" id="navHome">⌂<small>Home</small></button><button id="navCalendar">▦<small>Calendar</small></button><button id="navProfile">◉<small>Profile</small></button><button id="navSettings">⚙<small>Settings</small></button></nav>`;
  main.querySelectorAll("[data-module]").forEach(b=>b.onclick=()=>{state.module=b.dataset.module;state.view="module";render()});
+ document.querySelector("#switchRoleHome").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
  document.querySelector("#profileBtn").onclick=()=>{state.view="profile";render()};
  document.querySelector("#navProfile").onclick=()=>{state.view="profile";render()};
  document.querySelector("#navSettings").onclick=()=>{state.view="settings";render()};
@@ -181,7 +182,7 @@ function settingsPage(){
  document.querySelector("#settingsBack").onclick=()=>{state.view="dashboard";render()};
  document.querySelector("#settingsLang").onclick=()=>headerMenu("language");
  document.querySelector("#settingsTheme").onclick=()=>headerMenu("theme");
- document.querySelector("#switchRole").onclick=()=>{state.role=null;state.view="welcome";render()};
+ document.querySelector("#switchRole").onclick=()=>{state.role=null;localStorage.removeItem("gim_role");state.view="welcome";render()};
  document.querySelector("#logout").onclick=()=>{state.role=null;state.view="login";render()};
 }
 function superAdmin(){
