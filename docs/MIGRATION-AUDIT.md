@@ -75,3 +75,7 @@ The following approved product/security requirements remain separate implementat
 - Production setup values: unique School Code, Academic Year, school-specific Firebase project configuration, and real GI Knowledge World URL.
 
 Do not implement these security-sensitive items as frontend-only checks. Follow `LOGIN-ARCHITECTURE.md` and obtain the necessary trusted backend design/approval before enabling them.
+
+
+## Stage 7 restoration verification
+The footer and navigation extraction files and core delegates are present on the final main tree. The GI Creative Space footer popup, one-tap behavior, 850ms long-press Super Admin entry, and bottom navigation remain unchanged. Service worker cache is v54 and the core app URL is `20261117-44`.
