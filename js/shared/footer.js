@@ -14,31 +14,32 @@ function contactPopup(){
 function setupFooter(){
  const footer=document.querySelector("#appFooter");
  if(!footer)return;
- let pressTimer=null,pressPointer=null,startX=0,startY=0,longPressTriggered=false;
- const clearPress=()=>{if(pressTimer!==null)clearTimeout(pressTimer);pressTimer=null;pressPointer=null};
- const hasSelection=()=>Boolean(window.getSelection?.().toString().trim());
+ let pressTimer=null,pressPointer=null,startX=0,startY=0,suppressNextClick=false;
+ const clearPress=()=>{
+  if(pressTimer!==null)clearTimeout(pressTimer);
+  pressTimer=null;pressPointer=null;
+ };
  footer.addEventListener("pointerdown",event=>{
   if(!event.target.closest(".footer-link"))return;
   if(event.pointerType==="mouse"&&event.button!==0)return;
-  clearPress();longPressTriggered=false;pressPointer=event.pointerId;startX=event.clientX;startY=event.clientY;
+  clearPress();suppressNextClick=false;
+  pressPointer=event.pointerId;startX=event.clientX;startY=event.clientY;
   pressTimer=setTimeout(()=>{
-   if(hasSelection())return;
-   longPressTriggered=true;
+   suppressNextClick=true;
    document.querySelector("#gcsWelcomePopup")?.remove();
    state.view="superadmin";render();
   },850);
  });
  footer.addEventListener("pointermove",event=>{
   if(pressPointer!==event.pointerId)return;
-  if(Math.hypot(event.clientX-startX,event.clientY-startY)>10)clearPress();
+  if(Math.hypot(event.clientX-startX,event.clientY-startY)>12)clearPress();
  });
  ["pointerup","pointercancel","pointerleave"].forEach(type=>footer.addEventListener(type,clearPress));
- footer.addEventListener("selectstart",clearPress);
- document.addEventListener("selectionchange",()=>{if(hasSelection())clearPress()});
+ footer.addEventListener("selectstart",event=>event.preventDefault());
+ footer.addEventListener("contextmenu",event=>event.preventDefault());
  footer.addEventListener("click",event=>{
   if(!event.target.closest(".footer-link"))return;
-  if(longPressTriggered){longPressTriggered=false;event.preventDefault();event.stopPropagation();return}
-  if(hasSelection())return;
+  if(suppressNextClick){suppressNextClick=false;event.preventDefault();event.stopPropagation();return}
   contactPopup();
  });
  document.addEventListener("keydown",event=>{
