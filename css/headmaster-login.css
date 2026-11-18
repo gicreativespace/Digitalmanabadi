@@ -1,0 +1,38 @@
+/* Head Master welcome + school photo: scoped to HM only */
+.role-login-layout[data-role="hm"]{display:block;max-width:620px;min-height:0}
+.role-login-layout[data-role="hm"] .role-login-visual{display:none}
+.role-login-layout[data-role="hm"] .role-login-panel{width:100%;padding:clamp(16px,3vw,28px);justify-content:flex-start;overflow:visible}
+.role-login-layout[data-role="hm"] .role-login-panel-heading{margin:0 0 10px;text-align:center}
+.role-login-layout[data-role="hm"] .hm-welcome-title{margin:0 0 5px;font-size:clamp(21px,4vw,27px);line-height:1.2;color:var(--deep);font-weight:850}
+.role-login-layout[data-role="hm"] .hm-welcome-quote{margin:0 auto 10px;max-width:520px;font-size:clamp(12px,2.5vw,14px);line-height:1.4;color:var(--muted)}
+.role-login-layout[data-role="hm"] .hm-school-photo{display:block;width:100%;height:clamp(112px,18vh,165px);object-fit:cover;object-position:center 52%;border-radius:12px;border:1px solid var(--border);box-shadow:0 5px 16px rgba(20,50,30,.10)}
+.role-login-layout[data-role="hm"] .hm-login-label{margin:10px 0 5px;text-align:left;font-size:16px;color:var(--text)}
+.role-login-layout[data-role="hm"] .role-login-panel .field{margin:8px 0;gap:5px}
+.role-login-layout[data-role="hm"] .role-login-panel .field input{min-height:44px}
+.role-login-layout[data-role="hm"] .role-login-submit{min-height:46px}
+@media(max-width:680px){
+ .app-shell:has(.role-login-layout[data-role="hm"]){height:100vh;height:100dvh;min-height:0;overflow:hidden}
+ .app-shell:has(.role-login-layout[data-role="hm"]) .main-view{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;padding:4px 0!important}
+ .app-shell:has(.role-login-layout[data-role="hm"]) .footer{display:none}
+ .role-login-layout[data-role="hm"]{flex:1 1 auto;min-height:0;margin:0!important;border-radius:15px;overflow:hidden}
+ .role-login-layout[data-role="hm"] .role-login-panel{height:100%;min-height:0;padding:clamp(9px,1.7vh,15px) 15px;overflow:hidden}
+ .role-login-layout[data-role="hm"] .role-login-panel-heading{margin-bottom:5px}
+ .role-login-layout[data-role="hm"] .hm-welcome-title{font-size:clamp(19px,5vw,23px);margin-bottom:3px}
+ .role-login-layout[data-role="hm"] .hm-welcome-quote{font-size:clamp(10px,2.8vw,12px);line-height:1.28;margin-bottom:7px}
+ .role-login-layout[data-role="hm"] .hm-school-photo{height:clamp(100px,16vh,136px);border-radius:9px}
+ .role-login-layout[data-role="hm"] .hm-login-label{margin:7px 0 3px;font-size:14px}
+ .role-login-layout[data-role="hm"] .role-login-panel .field{margin:6px 0;gap:4px}
+ .role-login-layout[data-role="hm"] .role-login-panel .field label{font-size:12px}
+ .role-login-layout[data-role="hm"] .role-login-panel .field input{min-height:39px;padding:8px 11px;font-size:14px}
+ .role-login-layout[data-role="hm"] .role-login-submit{min-height:41px;margin-top:3px;font-size:14px}
+ .role-login-layout[data-role="hm"] .role-login-panel .link-row{margin-top:2px}
+ .role-login-layout[data-role="hm"] .role-login-panel .text-link{min-height:29px;font-size:12px}
+ .role-login-layout[data-role="hm"] .role-login-alert{margin:0 0 5px;padding:6px 8px;font-size:11px}
+}
+@media(max-height:680px) and (max-width:680px){
+ .role-login-layout[data-role="hm"] .hm-school-photo{height:clamp(82px,13vh,105px)}
+ .role-login-layout[data-role="hm"] .hm-welcome-quote{margin-bottom:5px}
+ .role-login-layout[data-role="hm"] .role-login-panel .field{margin:4px 0}
+ .role-login-layout[data-role="hm"] .role-login-panel .field input{min-height:36px}
+ .role-login-layout[data-role="hm"] .role-login-submit{min-height:38px}
+}
