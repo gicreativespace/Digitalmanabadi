@@ -1060,3 +1060,23 @@ body{font-size:18px;line-height:1.65}
   font-size:7px!important;letter-spacing:-.05em!important;
  }
 }
+
+
+/* Alumni & Sponsors: match the other role-title size and wrap naturally to two lines. */
+.main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+ font-size:clamp(12px,1.25vw,16px)!important;
+ letter-spacing:0!important;
+ white-space:normal!important;
+ overflow-wrap:normal!important;
+ word-break:normal!important;
+ text-wrap:balance!important;
+ line-height:1.35!important;
+}
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  font-size:clamp(11px,3vw,14px)!important;
+  letter-spacing:0!important;
+  white-space:normal!important;
+  line-height:1.35!important;
+ }
+}
