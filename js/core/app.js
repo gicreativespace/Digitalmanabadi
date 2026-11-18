@@ -179,4 +179,3 @@ const navigationController = createNavigationController({state,render});
 
 setupFooter();setupBottomNavigation();updateBottomNavigation();
 showTributeSplash(render, 3000);
-if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
