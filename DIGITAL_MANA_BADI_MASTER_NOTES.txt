@@ -260,3 +260,17 @@ controller and related cache references only.
   entry. Existing popup content and authentication flow remain unchanged.
 - No unrelated modules, role cards, navigation or login code changed.
 - Cache version: v72. Browser visual/touch testing pending.
+
+
+PR #35 — Compact Welcome social ribbon without individual tiles
+----------------------------------------------------------------
+Approved design: one continuous ribbon with five evenly spaced official
+logos and labels; remove separate icon boxes, excess gaps and unused height.
+The ribbon retains its shared outer surface. Logos are equally sized and
+centered; only the currently pressed/focused logo receives a subtle highlight.
+Welcome ribbon heading is hidden to keep the strip compact. Other-screen
+compact auto-hide ribbon behavior and social-ribbon JavaScript are unchanged.
+Only css/social-ribbon.css, its index.html cache reference, service-worker.js
+cache version (v73), and this project note are in scope.
+No role, navigation, login, footer, authentication or social-link logic changed.
+Browser visual/touch testing was not performed.
