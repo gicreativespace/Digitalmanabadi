@@ -2,7 +2,7 @@ import { APP_CONFIG } from "../../config/school-config.js";
 import { showTributeSplash } from "../shared/tribute-splash.js";
 import { translationPairs } from "../shared/translations.js";
 import { roleNames, roleMeta, modules } from "../shared/role-config.js";
-import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal } from "../sections/super-admin/admin-portal.js";
+import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal, sendPortalPasswordReset } from "../sections/super-admin/admin-portal.js";
 import { createAlumniSponsorSection } from "../sections/alumni-sponsor/alumni-sponsor-section.js";
 import { createParentSection } from "../sections/parent/parent-section.js";
 import { createModulePage } from "../modules/module-page.js";
@@ -64,13 +64,13 @@ function selectWelcomeRole(role){
  state.view="login";render();
 }
 main.addEventListener("pointerup",event=>{
- const card=event.target.closest?.("[data-role]");
+ const card=event.target.closest?.(".role-card[data-role]");
  if(!card)return;
  event.preventDefault();
  selectWelcomeRole(card.dataset.role);
 },true);
 main.addEventListener("click",event=>{
- const card=event.target.closest?.("[data-role]");
+ const card=event.target.closest?.(".role-card[data-role]");
  if(!card)return;
  event.preventDefault();
  selectWelcomeRole(card.dataset.role);
@@ -129,7 +129,8 @@ function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
  renderSuperAdminLogin(main,{
   onSuccess:user=>{state.role="superadmin";state.authenticated=true;state.superAdminProfile=user;localStorage.setItem("gim_role","superadmin");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();},
-  onBack:()=>{state.view="welcome";render();}
+  onBack:()=>{state.view="welcome";render();},
+  onPasswordReset:sendPortalPasswordReset
  });
 }
 function renderCreativeWelcome(modal){footerController.renderCreativeWelcome(modal);}
@@ -153,7 +154,7 @@ const alumniSponsorSection = createAlumniSponsorSection({main,state,T,render,toa
 const parentSection = createParentSection({main,state,render,toast,escapeHtml});
 const { modulePage } = createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
 const loginScreen = createLoginScreen({
- main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,
+ main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
 });
 const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,escapeHtml,renderSuperAdminDashboard,signOutPortal});
