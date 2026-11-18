@@ -71,7 +71,7 @@
 }
 
 
-/* GI Super Admin logo: preserve its native 2032:528 ratio and reserve layout space before loading. */
-.role-login-layout[data-role="superadmin"].login-unified .login-hero-image--logo{display:block;width:100%;height:auto;aspect-ratio:2032 / 528;max-height:none;object-fit:contain;object-position:center;background:#fff;padding:0;margin:0 auto 12px;flex:none;}
+/* GI Super Admin logo: fill the complete image frame without changing other role logins. */
+.role-login-layout[data-role="superadmin"].login-unified .login-hero-image--logo{display:block;width:100%;height:clamp(112px,19vh,160px);aspect-ratio:auto;max-height:none;object-fit:cover;object-position:center;background:#fff;padding:0;margin:0 auto 12px;flex:none;}
 .role-login-layout[data-role="superadmin"].login-unified .role-login-panel-heading{min-width:0;}
 .role-login-layout[data-role="superadmin"].login-unified .login-hero-image--logo:not([src]){visibility:hidden;}
