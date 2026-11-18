@@ -306,3 +306,14 @@ PR #39 — Mobile Welcome tagline and role-card positioning
   unchanged. Only mobile CSS, stylesheet cache reference, service-worker
   cache v77, and this note were updated.
 - Browser visual/touch testing was not performed.
+
+
+PR #40 — Restore original mobile Welcome role-card size
+-------------------------------------------------------
+- Removed only the PR #39 mobile role-card aspect-ratio overrides.
+- Restored the previous mobile tile proportions (base mobile ratio 1/1.08).
+- Kept the mobile role-copy/title at the top of each tile, as requested.
+- Preserved tagline sizing, single-line behavior, card images/content/actions,
+  desktop presentation, social ribbon, footer, navigation and all functions.
+- Updated stylesheet cache reference and service-worker cache to v78.
+- Browser visual/touch testing was not performed.
