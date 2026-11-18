@@ -470,3 +470,22 @@ PR — Brief mobile brand opening + GI web logo fit
   frame without zoom or overflow; retained the mobile zoom/crop behavior.
 - Updated the two stylesheet cache references and Service Worker cache to v91.
 - Browser visual testing was not performed.
+
+
+PR — Remove the extra custom mobile logo opening screen
+--------------------------------------------------------
+- Removed the second, custom large-logo opening screen from the mobile
+  startup sequence. Mobile now proceeds from the Android-provided launch
+  screen directly to the existing Tribute Splash, then the existing Welcome
+  render callback runs as before.
+- Left the Tribute Splash content, three portraits, 3000ms duration, fade,
+  and completion callback unchanged. Desktop startup remains unchanged.
+- Removed only the now-unused custom mobile opening-screen CSS.
+- Updated tribute-splash.css cache reference to 20261118-06 and Service Worker
+  cache to v92 so clients receive the change.
+- No login, authentication, navigation, role, dashboard, module, or Welcome
+  Screen behavior was changed.
+- Android's native launch screen is controlled by the installed app icon and
+  platform rendering; its displayed artwork size was not changed in this PR.
+- Source-level verification only; Android-device/browser visual testing was
+  not performed.
