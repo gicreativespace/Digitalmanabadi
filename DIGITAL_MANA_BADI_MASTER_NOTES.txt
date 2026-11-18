@@ -432,3 +432,14 @@ PR #51 — Prevent the app header/footer flashing before the tribute splash
   render callback, header/footer, navigation, authentication and app behavior.
 - Updated tribute-splash.css cache-busting URL and Service Worker cache to v88.
 - Browser visual/performance testing was not performed; source-level checks only.
+
+
+PR — Fill the GI Super Admin login logo frame
+---------------------------------------------
+- Updated only the GI Super Admin-scoped logo image rule to use the full
+  available frame with `object-fit: cover` and a responsive fixed frame height.
+- Left the shared login image rules and all other role login screens unchanged.
+- No login/authentication logic, dashboard, navigation, or other app behavior changed.
+- Updated the Head Master login stylesheet cache reference to 20261118-05
+  and Service Worker cache to v89 so the scoped CSS update is picked up.
+- Browser visual testing was not performed; confirm the logo crop after a hard refresh.
