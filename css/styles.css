@@ -1204,3 +1204,9 @@ body{font-size:18px;line-height:1.65}
 }
 #appFooter #footerSignature{color:var(--deep)!important}
 #appFooter #footerInspired{color:var(--muted)!important}
+
+
+/* Approved lock: Welcome tagline matches school-name font size only. */
+.main-view:has(.welcome-panel) .welcome-motto{
+  font-size:clamp(14px,2.2vh,18px)!important;
+}
