@@ -340,3 +340,24 @@ PR — Welcome role themes below cards
 - Follow-up verification correction: inserted the actual theme-label row into the rendered Welcome role stack; JS cache 20261118-11 and service-worker cache v81.
 
 - Welcome role-card numbers 01–04 removed from the photo cards only. Leadership, Education, Inspiration and Community labels remain in the row below the cards; card layout, images, text and actions are unchanged. JS cache 20261118-12; service-worker cache v82.
+
+
+PR — Improve Tribute Splash first-load and repeat-load performance
+------------------------------------------------------------------
+- Kept all three Tribute portraits as their existing JPG files; no image
+  conversion, replacement, resizing, or visual changes.
+- Added high-priority image preload hints for the three exact Tribute JPGs
+  in the document head so their downloads can begin before the splash module
+  creates its image elements.
+- Moved Service Worker registration from the end of app startup to the
+  document head so installation/pre-caching can begin earlier.
+- Fixed a stale, missing logo path in the Service Worker app-shell list.
+  Because install used cache.addAll(), that single missing file could reject
+  the entire precache installation.
+- Updated cache lookup to ignore URL query strings so versioned CSS/JS
+  requests can reuse the matching current app-shell cache entries.
+- Bumped the Service Worker cache to v83 and the app.js URL version to
+  20261118-13.
+- Preserved Tribute Splash layout, images, timing, animation, content,
+  navigation, login, authentication, and all other app behavior.
+- Code-level checks only; browser/network/visual testing was not performed.
