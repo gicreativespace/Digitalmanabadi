@@ -211,7 +211,7 @@ The project belongs to the user. Work can continue across chats by using
 this repository and this handover document as shared context.
 
 
-LATEST WELCOME FOOTER / SOCIAL RIBBON UPDATE — IN PROGRESS
+LATEST WELCOME FOOTER / SOCIAL RIBBON UPDATE — COMPLETED
 ---------------------------------------------------------
 Approved visual direction:
 - Home Screen Telugu motto: "మన బడి · మన బాధ్యత… మన భవిష్యత్తు!"
@@ -230,3 +230,14 @@ Approved visual direction:
   action.
 - Scope is limited to the Welcome motto, shared footer controller/styles,
   and Welcome social ribbon sizing. Do not modify unrelated modules.
+
+
+PR #32 — Polish Welcome footer and social ribbon layout
+https://github.com/gicreativespace/Digitalmanabadi/pull/32
+Merged into main. Merge commit: e7064c4a6ce4b6892aa67d4da836c2c7fe64eeee
+- Restored the full Telugu Home Screen motto and compact centered styling.
+- Refined five social logo tiles and reduced the fixed footer to a compact box.
+- Enabled footer text selection/copy, tap popup and 850ms Super Admin long press.
+- Preserved the existing popup content and reduced its dimensions.
+- Updated CSS/JS cache references and service-worker cache to v71.
+- Code and merge verified from main. Browser visual/touch testing was not performed.
