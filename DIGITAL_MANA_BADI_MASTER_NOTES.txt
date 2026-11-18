@@ -209,3 +209,24 @@ truth for current code; this document is a maintained summary, not a
 replacement for inspecting relevant files.
 The project belongs to the user. Work can continue across chats by using
 this repository and this handover document as shared context.
+
+
+LATEST WELCOME FOOTER / SOCIAL RIBBON UPDATE — IN PROGRESS
+---------------------------------------------------------
+Approved visual direction:
+- Home Screen Telugu motto: "మన బడి · మన బాధ్యత… మన భవిష్యత్తు!"
+  with a smaller centered treatment; English equivalent follows language:
+  "Our School · Our Responsibility… Our Future!"
+- Five social icons stay in one row in compact, equal premium tiles with
+  readable labels. Keep the ribbon above the footer signature.
+- Footer is a compact centered premium box with reduced height and balanced
+  width. Footer text remains selectable and copyable; no hover/tap color
+  change or highlight.
+- Single tap on either footer signature line opens the existing GI Creative
+  Space popup, retaining its existing data. Popup is smaller but all content
+  remains.
+- 850ms long press on footer opens the existing Super Admin login entry;
+  authentication remains required. Text selection/copy must not trigger either
+  action.
+- Scope is limited to the Welcome motto, shared footer controller/styles,
+  and Welcome social ribbon sizing. Do not modify unrelated modules.
