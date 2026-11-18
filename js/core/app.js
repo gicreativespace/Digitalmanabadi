@@ -64,13 +64,13 @@ function selectWelcomeRole(role){
  state.view="login";render();
 }
 main.addEventListener("pointerup",event=>{
- const card=event.target.closest?.("[data-role]");
+ const card=event.target.closest?.(".role-card[data-role]");
  if(!card)return;
  event.preventDefault();
  selectWelcomeRole(card.dataset.role);
 },true);
 main.addEventListener("click",event=>{
- const card=event.target.closest?.("[data-role]");
+ const card=event.target.closest?.(".role-card[data-role]");
  if(!card)return;
  event.preventDefault();
  selectWelcomeRole(card.dataset.role);

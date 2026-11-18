@@ -62,7 +62,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    }
    if(state.role==="parent"&&!state.parentLinked){show(T("ముందుగా మీ పిల్లల వివరాలను Link చేయండి.","Please link your child before signing in."),"warning");return}
    if(state.role==="parent"&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){const n=fail("parent");show(T("Student ID లేదా Parent PIN సరిపోలలేదు. తప్పు ప్రయత్నం: "+n+".","Student ID or Parent PIN is incorrect. Failed attempt: "+n+".")+(n>=3?T(" దయచేసి వివరాలు మళ్లీ పరిశీలించండి."," Please double-check your details."):""),"error");return}
-   state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
+   if(state.role==="parent")state.loginAttempts.parent=0;state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
   };
  }
  return {render:login};
