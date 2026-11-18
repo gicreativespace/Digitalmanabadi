@@ -457,3 +457,16 @@ PR — Refine GI Super Admin logo framing and loading
 - Updated the login stylesheet cache reference to 20261118-06 and Service
   Worker cache to v90. The logo asset was already included in the app-shell cache.
 - Browser visual testing was not performed.
+
+
+PR — Brief mobile brand opening + GI web logo fit
+--------------------------------------------------
+- Added a borderless, panel-free mobile-only brand opening screen using the
+  existing official Digital Mana Badi logo asset and the exact requested text.
+- Kept the mobile brand screen brief (650ms plus a short fade), then mounts
+  the existing Tribute Splash unchanged at its existing 3000ms duration.
+- Desktop opening flow and all app screens/functions remain unchanged.
+- Corrected the GI Super Admin logo for desktop/web to contain within its
+  frame without zoom or overflow; retained the mobile zoom/crop behavior.
+- Updated the two stylesheet cache references and Service Worker cache to v91.
+- Browser visual testing was not performed.
