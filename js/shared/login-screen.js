@@ -2,10 +2,10 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
  function login(){
   const role=roleNames[state.role],view=roleLoginViews[state.role]({T,state}),community=view.kind==="community";
   const meta={
-   hm:{kicker:"SCHOOL LEADERSHIP",title:T("ప్రధానోపాధ్యాయుల ప్రవేశం","Head Master Access"),note:T("పాఠశాల నిర్వహణకు ఒకే సురక్షిత ప్రవేశం.","One secure gateway for school leadership.")},
-   teacher:{kicker:"TEACHING & LEARNING",title:T("ఉపాధ్యాయుల ప్రవేశం","Teacher Workspace"),note:T("మీ తరగతులు, బోధన, విద్యార్థుల పురోగతికి ఒకే వేదిక.","Your space for classes, teaching and student progress.")},
-   parent:{kicker:"FAMILY & SCHOOL",title:T("తల్లిదండ్రుల ప్రవేశం","Parent Connect"),note:T("మీ పిల్లల పాఠశాల ప్రయాణాన్ని దగ్గరగా తెలుసుకోండి.","Stay connected with your child's school journey.")},
-   community:{kicker:"SCHOOL COMMUNITY",title:T("పూర్వ విద్యార్థి / స్పాన్సర్","Alumni & Sponsor"),note:T("మీ పాఠశాలతో అనుబంధం కొనసాగించండి. భవిష్యత్తుకు తోడ్పడండి.","Stay connected with your school. Help shape its future.")}
+   hm:{kicker:"SCHOOL LEADERSHIP",title:T("ప్రధానోపాధ్యాయుల ప్రవేశం","Head Master Access"),note:T("పాఠశాల నిర్వహణకు ఒకే సురక్షిత ప్రవేశం.","One secure gateway for school leadership."),quote:T("నాయకత్వం అభ్యాసానికి స్ఫూర్తినిస్తేనే పాఠశాల మరింత బలపడుతుంది.","A school grows stronger when leadership inspires learning.")},
+   teacher:{kicker:"TEACHING & LEARNING",title:T("ఉపాధ్యాయుల ప్రవేశం","Teachers' Workspace"),note:T("మీ తరగతులు, బోధన, విద్యార్థుల పురోగతికి ఒకే వేదిక.","Your space for classes, teaching and student progress."),quote:T("మంచి ఉపాధ్యాయులు పాఠాలు మాత్రమే కాదు… భవిష్యత్తును నిర్మిస్తారు.","Great teachers don't just teach lessons… they shape the future.")},
+   parent:{kicker:"FAMILY & SCHOOL",title:T("తల్లిదండ్రుల ప్రవేశం","Parent Connect"),note:T("మీ పిల్లల పాఠశాల ప్రయాణాన్ని దగ్గరగా తెలుసుకోండి.","Stay connected with your child's school journey."),quote:T("పిల్లల కలలకు తొలి బలం… తల్లిదండ్రుల ప్రోత్సాహం.","Every child's dreams begin with the encouragement of parents.")},
+   community:{kicker:"SCHOOL COMMUNITY",title:T("పూర్వ విద్యార్థులు & ప్రోత్సాహకుల ప్రవేశం","Alumni & Sponsors"),note:T("మీ పాఠశాలతో అనుబంధం కొనసాగించండి. భవిష్యత్తుకు తోడ్పడండి.","Stay connected with your school. Help shape its future."),quote:T("మన బడి… మన గర్వం. దాని అభివృద్ధి… మన బాధ్యత.","Our School, Our Pride. Its Growth, Our Responsibility.")}
   }[state.role]||{};
   const title=view.title||meta.title||T(role[0]+" లాగిన్",role[1]+" Login");
   const isHm=state.role==="hm";
@@ -17,14 +17,17 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   const actions=community
    ? '<div class="link-row"><button type="button" class="text-link" id="communityHelp">'+T("Account సహాయం కావాలా?","Need account help?")+'</button></div>'
    : '<div class="link-row"><button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
+  const image=APP_CONFIG.schoolImage||"assets/branding/school/school-building.jpg";
   main.innerHTML='<div class="backline role-login-backline"><button class="btn secondary" id="backWelcome">← '+T("వెనక్కి","Back to Home")+'</button><span class="pill">'+T(role[0],role[1])+'</span></div>'+
-   '<section class="role-login-layout" data-role="'+state.role+'" aria-label="'+title+'">'+
-    '<aside class="role-login-visual"><div class="role-login-orbit role-login-orbit-one" aria-hidden="true"></div><div class="role-login-orbit role-login-orbit-two" aria-hidden="true"></div><div class="role-login-visual-content">'+
-     '<span class="role-login-visual-icon" aria-hidden="true">'+iconSvg(roleMeta[state.role].icon)+'</span><span class="role-login-eyebrow">'+(view.eyebrow||meta.kicker||"DIGITAL MANA BADI")+'</span><h1>'+title+'</h1><p>'+(view.visualNote||meta.note||view.description)+'</p><span class="role-login-brandline">DIGITAL MANA BADI <i>•</i> '+T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")+'</span></div></aside>'+
-    '<section class="role-login-panel"><div class="role-login-panel-heading">'+(isHm
-     ? '<h2 class="hm-welcome-title">'+T("స్వాగతం గౌరవనీయ ప్రధానోపాధ్యాయులవారికి","WELCOME Respected HM")+'</h2><p class="hm-welcome-quote">“'+T("నాయకత్వం అభ్యాసానికి స్ఫూర్తినిస్తేనే పాఠశాల మరింత బలపడుతుంది.","A school grows stronger when leadership inspires learning.")+'”</p><img class="hm-school-photo" src="'+(APP_CONFIG.schoolImage||"assets/branding/school/school-building.jpg")+'" alt="'+(APP_CONFIG.schoolName||T("పాఠశాల","School"))+' '+T("భవనం","building")+'"><h3 class="hm-login-label">'+T("ప్రధానోపాధ్యాయుల లాగిన్","Head Master Login")+'</h3>'
-     : '<span class="role-login-panel-kicker">'+T("స్వాగతం","WELCOME BACK")+'</span><h2>'+(community?T("మీ పాఠశాల సమాజంలో భాగమవ్వండి","Be Part of Your School Community"):T("మీ ఖాతాలోకి ప్రవేశించండి","Sign in to your account"))+'</h2><p>'+view.description+'</p>')+'</div>'+
-     '<div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+'</section></section>';
+   '<section class="role-login-layout login-unified" data-role="'+state.role+'" aria-label="'+title+'">'+
+    '<section class="role-login-panel"><div class="role-login-panel-heading">'+
+     '<img class="login-hero-image" src="'+image+'" alt="'+(APP_CONFIG.schoolName||T("పాఠశాల","School"))+' '+T("భవనం","building")+'">'+
+     '<span class="role-login-panel-kicker">'+(meta.kicker||"DIGITAL MANA BADI")+'</span>'+
+     '<h2>'+ (isHm?T("స్వాగతం గౌరవనీయ ప్రధానోపాధ్యాయులవారికి","Welcome, Respected Head Master"):T("స్వాగతం","Welcome")) +'</h2>'+
+     '<p class="login-role-quote">“'+(meta.quote||meta.note||"")+'”</p>'+
+     '<h3 class="login-role-heading">'+title+'</h3>'+
+     '<p>'+ (isHm?T("మీ పాఠశాల ఖాతాతో కొనసాగండి.","Sign in to your school account."):view.description) +'</p>'+
+    '</div><div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+'</section></section>';
   main.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
   if(community){
    main.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
