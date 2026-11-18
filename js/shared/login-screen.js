@@ -23,7 +23,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     '<section class="role-login-panel"><div class="role-login-panel-heading">'+
      '<img class="login-hero-image" src="'+image+'" alt="'+(APP_CONFIG.schoolName||T("పాఠశాల","School"))+' '+T("భవనం","building")+'">'+
      '<span class="role-login-panel-kicker">'+(meta.kicker||"DIGITAL MANA BADI")+'</span>'+
-     '<h2>'+ (isHm?T("స్వాగతం గౌరవనీయ ప్రధానోపాధ్యాయులవారికి","Welcome, Respected Head Master"):T("స్వాగతం","Welcome")) +'</h2>'+
+     '<h2>'+ T("స్వాగతం","Welcome") +'</h2>'+
      '<p class="login-role-quote">“'+(meta.quote||meta.note||"")+'”</p>'+
      '<h3 class="login-role-heading">'+title+'</h3>'+
      '<p>'+ (isHm?T("మీ పాఠశాల ఖాతాతో కొనసాగండి.","Sign in to your school account."):view.description) +'</p>'+
