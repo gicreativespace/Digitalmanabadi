@@ -8,6 +8,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    community:{kicker:"SCHOOL COMMUNITY",title:T("పూర్వ విద్యార్థి / స్పాన్సర్","Alumni & Sponsor"),note:T("మీ పాఠశాలతో అనుబంధం కొనసాగించండి. భవిష్యత్తుకు తోడ్పడండి.","Stay connected with your school. Help shape its future.")}
   }[state.role]||{};
   const title=view.title||meta.title||T(role[0]+" లాగిన్",role[1]+" Login");
+  const isHm=state.role==="hm";
   state.loginAttempts=state.loginAttempts||{};
   const show=(message,type)=>{const el=main.querySelector("#loginAlert");if(el){el.hidden=false;el.dataset.type=type||"error";el.textContent=message}};
   const clear=()=>{const el=main.querySelector("#loginAlert");if(el){el.hidden=true;el.textContent="";el.dataset.type=""}};
