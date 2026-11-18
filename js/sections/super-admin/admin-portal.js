@@ -2,8 +2,9 @@ import {auth,db} from "../../firebase-client.js";
 import {signInWithEmailAndPassword,sendPasswordResetEmail,signOut} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import {collection,addDoc,getDoc,getDocs,doc,setDoc,updateDoc,serverTimestamp,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const errMsg=e=>{const c=e?.code||"";if(c.includes("invalid-credential")||c.includes("user-not-found")||c.includes("wrong-password"))return "Email లేదా Password సరిపోలలేదు.";if(c.includes("too-many-requests"))return "చాలా ప్రయత్నాలు జరిగాయి. కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.";return e?.message||"ప్రస్తుతం చర్య పూర్తి కాలేదు.";};
-export async function signOutPortal(){if(auth.currentUser)await signOut(auth);}\nexport async function sendPortalPasswordReset(email){if(!email)throw new Error("Email is required.");return sendPasswordResetEmail(auth,email.trim());}
+const errMsg=e=>{const c=e?.code||"";if(c.includes("invalid-credential")||c.includes("user-not-found")||c.includes("wrong-password"))return "Email లేదా Password సరిపోలలేదు.";if(c.includes("too-many-requests"))return "చాలా ప్రయత్నాలు జరిగాయి. భద్రత కోసం కొద్దిసేపటి తర్వాత మళ్లీ ప్రయత్నించండి.";if(c.includes("network-request-failed")||c.includes("unavailable"))return "ఇంటర్నెట్ కనెక్షన్‌ను పరిశీలించి మళ్లీ ప్రయత్నించండి.";if(c.includes("user-disabled"))return "ఈ ఖాతా నిలిపివేయబడింది. GI Support‌ను సంప్రదించండి.";return e?.message||"ప్రస్తుతం చర్య పూర్తి కాలేదు.";};
+export async function signOutPortal(){if(auth.currentUser)await signOut(auth);}
+export async function sendPortalPasswordReset(email){if(!email)throw new Error("Email is required.");return sendPasswordResetEmail(auth,email.trim());}
 export async function authenticateHeadMaster(email,password){
  const cred=await signInWithEmailAndPassword(auth,email,password);if(!cred.user.emailVerified){await signOut(auth);throw Error("దయచేసి మీ అధికారిక Emailను ముందుగా Verify చేయండి.");}const uid=cred.user.uid,s=await getDoc(doc(db,"headMasters",uid));
  if(!s.exists()||s.data().email?.toLowerCase()!==cred.user.email?.toLowerCase()||s.data().status!=="active"){await signOut(auth);throw Error("ఈ Head Master ఖాతా ఇంకా సక్రియం కాలేదు. GI Super Adminను సంప్రదించండి.");}

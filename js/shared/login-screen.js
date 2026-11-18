@@ -23,7 +23,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   };
   const actions=community
    ? '<div class="link-row"><button type="button" class="text-link" id="communityHelp">'+T("Account సహాయం కావాలా?","Need account help?")+'</button></div>'
-   : '<div class="link-row">'+(state.role==="parent"?'<button type="button" class="text-link" id="startLink">'+T("మొదటిసారి? పిల్లలను లింక్ చేయండి","First time? Link your child")+'</button>':'')+'<button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
+   : '<div class="link-row"><button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
   main.innerHTML='<div class="backline role-login-backline"><button class="btn secondary" id="backWelcome">← '+T("వెనక్కి","Back to Home")+'</button><span class="pill">'+T(role[0],role[1])+'</span></div>'+
    '<section class="role-login-layout" data-role="'+state.role+'" aria-label="'+title+'">'+
     '<aside class="role-login-visual"><div class="role-login-orbit role-login-orbit-one" aria-hidden="true"></div><div class="role-login-orbit role-login-orbit-two" aria-hidden="true"></div><div class="role-login-visual-content">'+

@@ -129,7 +129,8 @@ function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
  renderSuperAdminLogin(main,{
   onSuccess:user=>{state.role="superadmin";state.authenticated=true;state.superAdminProfile=user;localStorage.setItem("gim_role","superadmin");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();},
-  onBack:()=>{state.view="welcome";render();}
+  onBack:()=>{state.view="welcome";render();},
+  onPasswordReset:sendPortalPasswordReset
  });
 }
 function renderCreativeWelcome(modal){footerController.renderCreativeWelcome(modal);}
