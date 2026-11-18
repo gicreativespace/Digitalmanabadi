@@ -329,3 +329,10 @@ PR #41 — Restore original mobile role-tile text placement and enlarge tagline
 - No desktop styling, images, role content/actions, ribbon, footer or app functions changed.
 - Updated stylesheet cache reference and service-worker cache to v79.
 - Browser visual/touch testing was not performed.
+
+
+PR — Welcome role themes below cards
+- Moved the four role theme labels (LEADERSHIP, EDUCATION, INSPIRATION, COMMUNITY) out of the photo-card index badges and into one aligned row directly below all four cards.
+- Card index badges retain their original numbers only.
+- No role-card dimensions, images, card text, click behavior, social ribbon, footer, authentication, or other app functions were changed.
+- Cache versions: styles.css 20261118-18; core app.js 20261118-10; service worker digital-mana-badi-preview-v80.

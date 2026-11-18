@@ -1256,3 +1256,18 @@ body{font-size:18px;line-height:1.65}
   top:auto!important;bottom:9px!important;left:9px!important;right:22px!important;
  }
 }
+
+
+/* Welcome Screen: role themes sit below the complete four-card row. */
+.main-view:has(.welcome-panel) .role-theme-strip{
+ grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;
+ gap:8px;width:100%;margin:0 auto;padding:2px 0 0;text-align:center;
+ color:var(--deep);font-size:clamp(8px,1.05vw,11px);font-weight:850;letter-spacing:.09em;line-height:1.25;
+}
+.main-view:has(.welcome-panel) .role-theme-strip span{white-space:nowrap}
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .role-theme-strip{gap:3px;font-size:clamp(7px,1.9vw,10px);letter-spacing:.045em;padding-top:1px}
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .role-theme-strip{font-size:7px;letter-spacing:.015em}
+}
