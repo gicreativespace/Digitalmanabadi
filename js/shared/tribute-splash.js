@@ -3,15 +3,15 @@ import { APP_CONFIG } from "../../config/school-config.js";
 const portraitAssets = [
   {
     src: "./assets/branding/file_000000006eb88211be2d14a2aa852ff6.png",
-    name: "B. V. Raju"
+    name: "Sri B. V. Raju"
   },
   {
     src: "./assets/branding/file_0000000082fc82119aa2b9ac83c738d7.png",
-    name: "C. V. P. Murthy Raju"
+    name: "Sri C. V. P. Murthy Raju"
   },
   {
     src: "./assets/branding/file_00000000b0f48211b34ae01aa4807498.png",
-    name: "Dantuluri Narayana Raju"
+    name: "Sri Dantuluri Narayana Raju"
   }
 ];
 
@@ -57,6 +57,7 @@ export function showTributeSplash(onComplete, duration = 3000) {
       </div>
 
       <div class="tribute-splash__identity">
+        <p class="tribute-splash__initials">BVR · CVPMR · DNR</p>
         <p class="tribute-splash__app-name">DIGITAL MANA BADI</p>
         <p class="tribute-splash__app-name-te">డిజిటల్ మన బడి</p>
         <p class="tribute-splash__school-name">${schoolName}</p>
