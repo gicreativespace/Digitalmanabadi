@@ -394,3 +394,28 @@ PR — Correct GI Creative Space logo asset path
 - Bumped the Service Worker cache to v86 so clients request the corrected app shell.
 - No authentication, login flow, UI layout, or other role behavior changed.
 - Repository tree/source verification only; browser visual testing was not performed.
+
+
+PR #50 — Stabilize GI Super Admin logo loading and sizing
+---------------------------------------------------------
+- Corrected the GI Super Admin login and footer popup image URL to the actual
+  repository asset: assets/branding/gi-creative-space-logo.jpg.
+- Corrected the Service Worker app-shell entry to the same existing asset;
+  the previous nested path did not exist and could reject cache.addAll() on
+  a clean install.
+- Added the logo's intrinsic 2032 × 528 dimensions to the login image so the
+  browser can reserve its correct aspect ratio before the image loads.
+- Replaced the fixed-height cover crop with a responsive native-ratio image
+  frame, preventing crop/letterboxing and reducing layout shift/overlap.
+- Bumped headmaster-login.css to 20261118-04 and Service Worker cache to v87.
+- Authentication, login form behavior, footer interactions, and other roles
+  remain unchanged.
+- Repository source/path verification only; browser visual/network testing
+  was not performed.
+
+CORRECTION TO THE PREVIOUS GI LOGO PATH NOTE
+--------------------------------------------
+- The PR #49 note incorrectly described the asset as being inside a duplicated
+  assets/branding/assets/branding directory. The current main repository tree
+  confirms the actual asset is at assets/branding/gi-creative-space-logo.jpg.
+  PR #50 corrects the login, footer, and Service Worker references to that path.
