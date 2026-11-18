@@ -118,7 +118,20 @@ function welcome(){
  main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
 }
 function roleCard(ic,te,en,role,tone){
- return `<button type="button" class="role-card role-${tone}" data-role="${role}"><span class="role-icon">${iconSvg(ic)}</span><span class="role-copy"><strong>${T(te,en)}</strong></span><span class="role-arrow" aria-hidden="true">›</span></button>`;
+ const cards={
+  hm:{image:"assets/branding/roles/sarvepalli-radhakrishnan.webp",alt:"Dr. Sarvepalli Radhakrishnan",number:"01",theme:"LEADERSHIP",tagline:"Wisdom · Guidance"},
+  teacher:{image:"assets/branding/roles/savitribai-phule.webp",alt:"Savitribai Phule",number:"02",theme:"EDUCATION",tagline:"Courage · Dedication"},
+  parent:{image:"assets/branding/roles/apj-abdul-kalam-family.webp",alt:"A. P. J. Abdul Kalam family values",number:"03",theme:"INSPIRATION",tagline:"Love · Values"},
+  community:{image:"assets/branding/roles/indian-philanthropists.webp",alt:"Indian philanthropists supporting education",number:"04",theme:"COMMUNITY",tagline:"Service · Giving"}
+ };
+ const card=cards[role];
+ return `<button type="button" class="role-card role-tile role-${tone}" data-role="${role}" aria-label="${escapeHtml(T(te,en))} — ${escapeHtml(en)}">
+  <img class="role-photo" src="./${card.image}" alt="${escapeHtml(card.alt)}" loading="eager" decoding="async">
+  <span class="role-shade" aria-hidden="true"></span>
+  <span class="role-index">${card.number} <span>·</span> ${card.theme}</span>
+  <span class="role-copy"><strong>${T(te,en)}</strong><small>${en}</small><span class="role-tagline">${card.tagline}</span></span>
+  <span class="role-arrow" aria-hidden="true">↗</span>
+ </button>`;
 }
 function login(){loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
