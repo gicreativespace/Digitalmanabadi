@@ -1,3 +1,5 @@
+/* Keep the app shell hidden from the first paint until the tribute overlay is mounted. */
+body.tribute-splash-pending #app{visibility:hidden!important}
 /* Full-screen, responsive tribute welcome experience */
 .tribute-splash-active{overflow:hidden!important}
 .tribute-splash{
