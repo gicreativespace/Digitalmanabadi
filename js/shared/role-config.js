@@ -1,4 +1,4 @@
-export const roleNames={hm:["ప్రధానోపాధ్యాయులు","Head Master"],teacher:["ఉపాధ్యాయుడు","Teacher"],parent:["తల్లిదండ్రులు","Parent"],community:["పూర్వ విద్యార్థి / దాత","Alumni / Donor"]};
+export const roleNames={hm:["ప్రధానోపాధ్యాయులు","Head Master"],teacher:["ఉపాధ్యాయులు","Teachers"],parent:["తల్లిదండ్రులు","Parent"],community:["పూర్వ విద్యార్థులు & ప్రోత్సాహకులు","Alumni & Sponsors"]};
 export const roleMeta={
  hm:{tone:"green",icon:"school",title:"ప్రధానోపాధ్యాయుల ప్రధాన పేజీ",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
  teacher:{tone:"gold",icon:"presentation",title:"ఉపాధ్యాయుల ప్రధాన పేజీ",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు"},
