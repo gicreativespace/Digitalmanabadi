@@ -939,3 +939,78 @@ body{font-size:18px;line-height:1.65}
  .role-login-layout[data-role="hm"] .role-login-panel .field input{min-height:40px}
  .role-login-layout[data-role="hm"] .role-login-submit{min-height:41px}
 }
+
+
+/* Premium photo role tiles — Welcome Screen only. Role selection remains delegated on .role-card[data-role]. */
+.main-view:has(.welcome-panel) .role-stack{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;
+ width:100%;max-width:100%;margin:0 auto;
+}
+.main-view:has(.welcome-panel) .role-card.role-tile{
+ position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:stretch;
+ justify-content:flex-end;gap:0;width:100%;min-width:0;min-height:0;
+ aspect-ratio:3/4;padding:15px 13px 14px;overflow:hidden;
+ border:1px solid rgba(255,255,255,.58);border-radius:19px;
+ background:#183d2a;color:#fff;text-align:left;
+ box-shadow:0 9px 25px rgba(22,55,35,.15);
+}
+.main-view:has(.welcome-panel) .role-card.role-tile:hover{
+ transform:translateY(-3px);box-shadow:0 14px 30px rgba(22,55,35,.22);
+}
+.main-view:has(.welcome-panel) .role-tile .role-photo{
+ position:absolute;inset:0;z-index:-2;width:100%;height:100%;display:block;
+ object-fit:cover;object-position:center 25%;transition:transform .35s ease;
+}
+.main-view:has(.welcome-panel) .role-tile:hover .role-photo{transform:scale(1.045)}
+.main-view:has(.welcome-panel) .role-tile .role-shade{
+ position:absolute;inset:0;z-index:-1;
+ background:linear-gradient(180deg,rgba(8,25,15,.04) 20%,rgba(8,25,15,.22) 48%,rgba(8,25,15,.91) 100%);
+}
+.main-view:has(.welcome-panel) .role-tile .role-index{
+ position:absolute;top:12px;left:12px;padding:5px 8px;border:1px solid rgba(255,255,255,.35);
+ border-radius:999px;background:rgba(10,35,20,.38);backdrop-filter:blur(8px);
+ color:#fff;font-size:9px;font-weight:800;letter-spacing:.09em;line-height:1.2;
+}
+.main-view:has(.welcome-panel) .role-tile .role-index span{color:#e4c98f}
+.main-view:has(.welcome-panel) .role-tile .role-copy{
+ display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+ width:100%;min-width:0;margin:0;padding:0 17px 0 0;color:#fff;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy strong{
+ display:block;width:100%;min-width:0;color:#fff;font-size:clamp(14px,1.45vw,18px)!important;
+ font-weight:850;line-height:1.42!important;letter-spacing:0;
+ white-space:normal;overflow-wrap:anywhere;word-break:normal;text-wrap:balance;
+}
+.main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+ font-size:clamp(12px,1.15vw,15px)!important;line-height:1.5!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy small{
+ display:block;color:rgba(255,255,255,.88);font-size:11px;line-height:1.25;font-weight:650;
+}
+.main-view:has(.welcome-panel) .role-tile .role-tagline{
+ display:block;color:#f0d9a8;font-size:9px;font-weight:700;letter-spacing:.025em;line-height:1.3;
+}
+.main-view:has(.welcome-panel) .role-tile .role-arrow{
+ position:absolute;right:11px;bottom:13px;color:#f0d9a8;font-size:18px;line-height:1;
+}
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .role-stack{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .main-view:has(.welcome-panel) .role-card.role-tile{aspect-ratio:1/1.08;padding:12px 11px 12px;border-radius:16px}
+ .main-view:has(.welcome-panel) .role-tile .role-index{top:9px;left:9px;font-size:8px;padding:4px 7px}
+ .main-view:has(.welcome-panel) .role-tile .role-copy{gap:4px;padding-right:14px}
+ .main-view:has(.welcome-panel) .role-tile .role-copy strong{font-size:clamp(14px,3.6vw,17px)!important;line-height:1.4!important}
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{font-size:clamp(12px,3.05vw,14px)!important;line-height:1.45!important}
+ .main-view:has(.welcome-panel) .role-tile .role-copy small{font-size:10px}
+ .main-view:has(.welcome-panel) .role-tile .role-tagline{font-size:8px}
+ .main-view:has(.welcome-panel) .role-tile .role-arrow{right:9px;bottom:10px;font-size:16px}
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .role-stack{gap:8px}
+ .main-view:has(.welcome-panel) .role-card.role-tile{padding:10px 9px 11px;border-radius:14px}
+ .main-view:has(.welcome-panel) .role-tile .role-copy strong{font-size:clamp(13px,3.55vw,15px)!important}
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{font-size:clamp(11px,3.05vw,12.5px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .main-view:has(.welcome-panel) .role-card.role-tile,
+ .main-view:has(.welcome-panel) .role-tile .role-photo{transition:none}
+}
