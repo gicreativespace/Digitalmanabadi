@@ -241,3 +241,22 @@ Merged into main. Merge commit: e7064c4a6ce4b6892aa67d4da836c2c7fe64eeee
 - Preserved the existing popup content and reduced its dimensions.
 - Updated CSS/JS cache references and service-worker cache to v71.
 - Code and merge verified from main. Browser visual/touch testing was not performed.
+
+
+PR #33 — Improve Welcome motto readability and compact social/footer interactions
+---------------------------------------------------------------------------
+Scope: Welcome motto, Welcome social ribbon sizing, footer interaction
+controller and related cache references only.
+
+- Keep the exact Telugu motto: "మన బడి · మన బాధ్యత… మన భవిష్యత్తు!"
+  (English equivalent remains language-aware).
+- Increase motto readability without changing the school-name typography,
+  size or layout.
+- Compact the five-icon Welcome social ribbon into equal premium tiles,
+  with responsive sizing and no horizontal overflow.
+- Disable footer text selection, copying and touch callout so they cannot
+  interfere with the footer gestures.
+- Preserve single-tap GI Creative Space popup and 850ms long-press Super Admin
+  entry. Existing popup content and authentication flow remain unchanged.
+- No unrelated modules, role cards, navigation or login code changed.
+- Cache version: v72. Browser visual/touch testing pending.
