@@ -338,3 +338,5 @@ PR — Welcome role themes below cards
 - Cache versions: styles.css 20261118-18; core app.js 20261118-10; service worker digital-mana-badi-preview-v80.
 
 - Follow-up verification correction: inserted the actual theme-label row into the rendered Welcome role stack; JS cache 20261118-11 and service-worker cache v81.
+
+- Welcome role-card numbers 01–04 removed from the photo cards only. Leadership, Education, Inspiration and Community labels remain in the row below the cards; card layout, images, text and actions are unchanged. JS cache 20261118-12; service-worker cache v82.
