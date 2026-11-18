@@ -1231,3 +1231,34 @@ body{font-size:18px;line-height:1.65}
  .main-view:has(.welcome-panel) .welcome-motto{font-size:9px!important}
  .main-view:has(.welcome-panel) .welcome-school span{font-size:10.5px!important}
 }
+
+
+/* Mobile-only final polish: readable one-line motto and role titles at tile top. */
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .welcome-motto{
+  width:100%;max-width:100%;box-sizing:border-box;padding:0 2px;
+  font-size:clamp(11.5px,3.35vw,13px)!important;
+  line-height:1.25!important;white-space:nowrap!important;
+  overflow-wrap:normal!important;word-break:keep-all!important;
+  letter-spacing:0!important;text-align:center!important;
+ }
+ .main-view:has(.welcome-panel) .role-card.role-tile{
+  aspect-ratio:1/0.96!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy{
+  top:39px!important;bottom:auto!important;
+  left:11px!important;right:25px!important;
+  justify-content:flex-start!important;
+ }
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .welcome-motto{
+  font-size:clamp(11px,3.1vw,11.8px)!important;
+ }
+ .main-view:has(.welcome-panel) .role-card.role-tile{
+  aspect-ratio:1/0.94!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy{
+  top:36px!important;left:9px!important;right:22px!important;
+ }
+}

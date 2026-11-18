@@ -292,3 +292,17 @@ PR #36 — Restore Welcome ribbon labels/alignment and theme-aware footer
   service-worker.js cache v74, and this note only.
 - No Welcome school-name or motto typography/content was changed.
 - Browser visual/touch testing was not performed.
+
+
+PR #39 — Mobile Welcome tagline and role-card positioning
+----------------------------------------------------------
+- Mobile-only tagline font size increased to a readable responsive range
+  while preserving its single-line centered presentation.
+- Mobile role cards made slightly shorter and role title/copy moved to
+  the upper area of each tile, clear of the index badge.
+- Desktop/web presentation is unchanged.
+- School name/location, ribbon, footer, role card content/images, card
+  actions, login, navigation, authentication and all other functions remain
+  unchanged. Only mobile CSS, stylesheet cache reference, service-worker
+  cache v77, and this note were updated.
+- Browser visual/touch testing was not performed.
