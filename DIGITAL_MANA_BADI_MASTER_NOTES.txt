@@ -61,6 +61,16 @@ School name and location should be loaded dynamically from school config.
 Do not add a language selector to Splash or Welcome screens. Login,
 dashboard and modules use the selected language.
 
+SPLASH SCREEN BRANDING — APPROVED
+---------------------------------
+Use this exact Telugu title and tagline on the opening tribute Splash Screen:
+- Title: మన బడి
+- Tagline: మన బాధ్యత… మన భవిష్యత్తు!
+Keep the existing Splash Screen layout, imagery, English app name, school
+name/location, tribute text, timing, transitions and all other behavior
+unchanged unless the user explicitly requests a change. This Telugu title
+and tagline are the approved brand wording for future Splash Screen work.
+
 WELCOME ROLE CARDS
 ------------------
 Four shared role cards, in this order:
