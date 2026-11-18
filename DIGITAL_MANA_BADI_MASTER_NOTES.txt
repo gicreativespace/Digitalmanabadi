@@ -71,6 +71,15 @@ name/location, tribute text, timing, transitions and all other behavior
 unchanged unless the user explicitly requests a change. This Telugu title
 and tagline are the approved brand wording for future Splash Screen work.
 
+HOME SCREEN BRAND MOTTO — APPROVED
+----------------------------------
+On the Home/Welcome Screen, show this compact, single-line Telugu brand
+motto directly below the configured school name and location, before the
+role-selection prompt:
+  మన బడి · మన బాధ్యత… మన భవిష్యత్తు!
+Keep it small, centered and readable. Do not alter other Home Screen content,
+layout, role cards, navigation or functionality when maintaining this motto.
+
 WELCOME ROLE CARDS
 ------------------
 Four shared role cards, in this order:
