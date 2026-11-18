@@ -106,7 +106,7 @@ function welcome(){
    <strong>${escapeHtml(APP_CONFIG.schoolName)}</strong>
    <span>${escapeHtml(APP_CONFIG.schoolLocation)}</span>
   </div>
-  <p class="welcome-motto">మన బడి · మన బాధ్యత… మన భవిష్యత్తు!</p>
+  <p class="welcome-motto">${T("మన బాధ్యత… మన భవిష్యత్తు!","Our Responsibility… Our Future!")}</p>
   <p class="role-prompt">${T("మీ పాత్రను ఎంచుకోండి","SELECT YOUR ROLE")}</p>
  </section>
  <section class="role-stack" aria-label="Select your role">
