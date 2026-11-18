@@ -45,7 +45,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    if(state.role==="parent"){state.view="link";render();return}
    const email=main.querySelector("#loginId").value.trim();
    if(!email){show(T("ముందుగా మీ అధికారిక School Email నమోదు చేయండి.","Enter your official school email first."),"warning");main.querySelector("#loginId").focus();return}
-   if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)){show(T("దయచేసి సరైన Email నమోదు చేయండి.","Please enter a valid email address."),"warning");return}
+   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show(T("దయచేసి సరైన Email నమోదు చేయండి.","Please enter a valid email address."),"warning");return}
    const b=main.querySelector("#forgotAccess");b.disabled=true;b.textContent=T("పంపిస్తోంది…","Sending…");
    try{await sendPortalPasswordReset(email);show(T("ఈ Email ఖాతా నమోదై ఉంటే Password Reset లింక్ పంపబడుతుంది. Inbox / Spam పరిశీలించండి.","If an account exists for this email, a password reset link has been sent. Check your inbox and spam folder."),"success")}
    catch(e){show(errorText(e,"hm-reset"),"error")}
