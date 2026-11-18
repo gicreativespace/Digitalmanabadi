@@ -11,7 +11,7 @@ export const APP_CONFIG = {
   schoolLocation: "DAGGULURU",
   academicYear: "",
   schoolLogo: "assets/branding/digital-mana-badi-logo.png",
-  schoolImage: "assets/branding/school-building.jpg",
+  schoolImage: "assets/branding/school/school-building.jpg",
   demoMode: true
 };
 
