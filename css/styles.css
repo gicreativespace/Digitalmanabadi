@@ -1210,3 +1210,24 @@ body{font-size:18px;line-height:1.65}
 .main-view:has(.welcome-panel) .welcome-motto{
   font-size:clamp(14px,2.2vh,18px)!important;
 }
+
+
+/* Locked Welcome refinements: single-line mobile tagline + clearer school location. */
+.main-view:has(.welcome-panel) .welcome-school span{
+  font-size:clamp(12px,1.7vh,15px)!important;
+}
+@media(max-width:520px){
+ .main-view:has(.welcome-panel) .welcome-motto{
+  font-size:clamp(9px,2.7vw,11px)!important;
+  white-space:nowrap!important;overflow:visible!important;
+  overflow-wrap:normal!important;word-break:keep-all!important;
+  letter-spacing:0!important;
+ }
+ .main-view:has(.welcome-panel) .welcome-school span{
+  font-size:clamp(11px,3vw,13px)!important;
+ }
+}
+@media(max-width:360px){
+ .main-view:has(.welcome-panel) .welcome-motto{font-size:9px!important}
+ .main-view:has(.welcome-panel) .welcome-school span{font-size:10.5px!important}
+}
