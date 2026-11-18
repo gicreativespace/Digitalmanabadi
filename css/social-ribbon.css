@@ -190,3 +190,42 @@
   width:24px!important;height:24px!important;
  }
 }
+
+
+/* Welcome ribbon: five evenly fitted premium icon tiles */
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact){
+ box-sizing:border-box;width:min(100%,620px);margin:clamp(5px,.8vh,8px) auto 0;
+ padding:6px 9px;border-radius:14px;gap:0;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-head{
+ margin:0 0 4px!important;font-size:9px!important;line-height:1.1;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{
+ grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{
+ min-width:0;min-height:48px;box-sizing:border-box;gap:3px;padding:4px 1px;
+ border:1px solid color-mix(in srgb,var(--green) 13%,var(--border));
+ border-radius:10px;background:color-mix(in srgb,var(--surface) 88%,var(--surface2));
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link:hover{
+ background:var(--surface);transform:translateY(-1px);
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{
+ width:24px!important;height:24px!important;object-fit:contain;
+}
+.main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{
+ font-size:9px!important;line-height:1.1;white-space:nowrap;
+}
+@media(max-width:700px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact){padding:5px 6px;margin-top:5px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-links{gap:3px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{min-height:44px;gap:2px;padding:3px 0}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:21px!important;height:21px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:8px!important}
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link{min-height:41px}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link img{width:19px!important;height:19px!important}
+ .main-view:has(.welcome-panel) .social-ribbon:not(.compact) .social-ribbon-link .social-name{font-size:7.5px!important}
+}
