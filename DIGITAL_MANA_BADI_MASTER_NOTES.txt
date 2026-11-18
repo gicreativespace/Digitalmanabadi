@@ -443,3 +443,17 @@ PR — Fill the GI Super Admin login logo frame
 - Updated the Head Master login stylesheet cache reference to 20261118-05
   and Service Worker cache to v89 so the scoped CSS update is picked up.
 - Browser visual testing was not performed; confirm the logo crop after a hard refresh.
+
+
+PR — Refine GI Super Admin logo framing and loading
+---------------------------------------------------
+- Inspected the actual GI logo asset: it is valid, but its artwork sits centrally
+  within a wide source image, leaving broad side margins in the login frame.
+- Added a GI Super Admin-only clipped image frame and a modest centered zoom
+  so the logo artwork appears larger without stretching the source image.
+- Set eager loading, async decoding and high fetch priority on this login image.
+- Kept the source image, other role login image rules, authentication and all
+  unrelated app behavior unchanged.
+- Updated the login stylesheet cache reference to 20261118-06 and Service
+  Worker cache to v90. The logo asset was already included in the app-shell cache.
+- Browser visual testing was not performed.
