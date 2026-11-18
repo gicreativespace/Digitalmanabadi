@@ -114,6 +114,7 @@ function welcome(){
   ${roleCard("presentation","ఉపాధ్యాయులు","Teachers","teacher","gold")}
   ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
   ${roleCard("heart-handshake","పూర్వ విద్యార్థులు & ప్రోత్సాహకులు","Alumni & Sponsors","community","green")}
+  <div class="role-theme-strip" aria-label="Leadership, Education, Inspiration and Community"><span>LEADERSHIP</span><span>EDUCATION</span><span>INSPIRATION</span><span>COMMUNITY</span></div>
  </section>`;
  /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
  main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
