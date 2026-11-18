@@ -1,0 +1,191 @@
+DIGITAL MANA BADI — MASTER PROJECT NOTES
+========================================
+Repository: https://github.com/gicreativespace/Digitalmanabadi
+Main branch: main
+Live preview: https://gicreativespace.github.io/Digitalmanabadi/
+Project owner: GI Creative Space
+Last updated: 2026-11-18
+
+PURPOSE
+-------
+Digital Mana Badi is a reusable, school-focused digital platform intended to
+support school administration, teachers, parents, alumni and sponsors.
+The repository is the master codebase. School-specific settings are managed
+through config/school-config.js, with a separate Firebase project intended
+for each school.
+
+CORE WORKING PRINCIPLES
+-----------------------
+1. Preserve all working functions. Never break or remove existing behavior
+   while improving the interface.
+2. Make focused, backward-compatible changes. Avoid unnecessary rewrites.
+3. Preserve authentication, role access, navigation, modules, integrations,
+   social ribbon and footer behavior unless a change is explicitly requested.
+4. Routine, in-scope changes may proceed through the established branch/PR
+   workflow without repeatedly asking for approval.
+5. Ask before major scope changes or destructive/security-sensitive decisions.
+6. Do not claim browser/visual testing unless it was actually performed.
+7. Keep the experience mobile-first, premium, readable and free of clipping
+   or unwanted horizontal scrolling.
+8. User-facing login errors must remain generic and friendly. Never expose
+   Firebase internals, implementation details or sensitive role restrictions.
+
+PROJECT STRUCTURE / ARCHITECTURE
+-------------------------------
+- Master repository supports multiple schools.
+- School-specific configuration: config/school-config.js
+- Role areas:
+  super-admin/
+  head-master/
+  teacher/
+  parent/
+  alumni-sponsor/
+- Shared reusable code belongs in js/shared/ or js/modules/.
+- Follow gradual migration; do not rewrite working modules just to reorganize.
+- Keep school-specific Firebase projects separate.
+
+WELCOME SCREEN — APPROVED CONTENT AND RULES
+-------------------------------------------
+Header hierarchy:
+1. BVR · CVPMR · DNR
+2. DIGITAL MANA BADI
+3. School Name
+4. School Location
+
+Welcome body:
+- Welcome to
+- B. V. Raju · C. V. P. Murthy Raju
+- Dantuluri Narayana Raju
+
+School name and location should be loaded dynamically from school config.
+Do not add a language selector to Splash or Welcome screens. Login,
+dashboard and modules use the selected language.
+
+WELCOME ROLE CARDS
+------------------
+Four shared role cards, in this order:
+1. Head Master — ప్రధానోపాధ్యాయులు
+   Image: assets/branding/roles/sarvepalli-radhakrishnan.webp
+2. Teachers — ఉపాధ్యాయులు
+   Image: assets/branding/roles/savitribai-phule.webp
+3. Parent — తల్లిదండ్రులు
+   Image: assets/branding/roles/apj-abdul-kalam-family.webp
+4. Alumni & Sponsors — పూర్వ విద్యార్థులు & ప్రోత్సాహకులు
+   Image: assets/branding/roles/indian-philanthropists.webp
+
+Card design: premium photo backgrounds, readable overlays, role/category
+labels, responsive layout. Desktop: four cards per row. Mobile: two cards
+per row. Keep large tap targets and existing delegated role selection.
+The Alumni & Sponsors title must remain comparable in font size to the
+other role titles and wrap naturally into two lines where needed.
+Do not shorten this role title without the user's request.
+
+Role-card image assets are shared illustrative role images, not personal
+profile photos. Personal profile photos, if later enabled, are a separate
+feature. The Alumni & Sponsors image is the initial representative image;
+additional gallery images may be added later if requested.
+
+SOCIAL RIBBON
+-------------
+Welcome Screen: five official brand logos in one row, below the four role
+cards and above the existing footer signature:
+Website, WhatsApp (using the Head Master number), YouTube, Instagram,
+Facebook. Small labels directly below each logo.
+Other screens: compact auto-hide ribbon behavior.
+Do not remove or disrupt existing social links.
+
+FOOTER — EXACT APPROVED CONTENT / BEHAVIOR
+------------------------------------------
+Text:
+- A GI Creative Space work
+- Inspired by Godavari.
+
+Keep the one-tap GI Creative Space popup.
+Long press for 850ms opens the Super Admin secure-login entry point;
+authentication must still be required.
+Do not weaken or bypass authentication.
+
+LOGIN EXPERIENCE
+----------------
+Use the shared premium login interface where applicable.
+School-role login uses the school building image; GI Super Admin uses
+the separate GI Creative Space logo/photo.
+Respect the role welcome messages and bilingual labels already approved.
+Never use “Principal”; the approved role label is “Head Master”.
+Generic user-facing status wording only:
+- Login Success
+- Login Failed
+- Please Re-enter
+- Connection Issue
+
+DESIGN / BRAND GUIDELINES
+-------------------------
+- Palette: soft green and white backgrounds, deep green for readable text
+  and key actions, restrained gold accents.
+- Red is reserved for alerts.
+- Official AP Government emblem must be used exactly as supplied:
+  do not redraw, recolor, stretch or distort it.
+- Maintain readable typography, spacing and responsive behavior.
+- No unrelated redesigns or unrequested on-screen text.
+
+GIT / DELIVERY WORKFLOW
+-----------------------
+- Repository: gicreativespace/Digitalmanabadi
+- Target branch: main
+- For code/documentation changes, use a focused branch and pull request.
+- Review the changed files and preserve unrelated work.
+- Merge routine in-scope changes using the established workflow.
+- After merging, verify the PR/merge result and report the commit/PR link.
+- Bump the service-worker cache version when a change requires updated
+  cached assets or code; do not bump it automatically for every document-only
+  change unless needed.
+
+RECENT COMPLETED WORK
+---------------------
+PR #22 — Unify premium login interfaces across all roles
+https://github.com/gicreativespace/Digitalmanabadi/pull/22
+Merged. Shared premium login UI and common renderer.
+
+PR #23 — Localize Teacher and Parent login form labels
+https://github.com/gicreativespace/Digitalmanabadi/pull/23
+Merged. Localized login labels and related text.
+
+PR #24 — Add premium photo-based Welcome Screen role cards
+https://github.com/gicreativespace/Digitalmanabadi/pull/24
+Merged. Added four role images and premium role-card presentation.
+
+PR #25 — Refine Welcome role card title alignment
+https://github.com/gicreativespace/Digitalmanabadi/pull/25
+Merged. Refined role-card text positioning and alignment.
+
+PR #26 — Keep Alumni & Sponsors role title same size on two lines
+https://github.com/gicreativespace/Digitalmanabadi/pull/26
+Merged. Adjusted only scoped role-card CSS and service-worker cache version.
+Merge commit: 320a02449653480f0576c1ccb7ea858d27f2bf03
+Cache version after this change: v67.
+
+CURRENT STATUS / TESTING NOTE
+-----------------------------
+The latest recorded change is PR #26, merged into main.
+The user was asked to hard-refresh the live site with Ctrl + Shift + R
+and inspect the Alumni & Sponsors card.
+A browser-based visual test was NOT performed for the latest card changes.
+Do not describe the visual result as independently verified until tested.
+
+PENDING / FUTURE WORK
+--------------------
+- Continue only with tasks requested or approved by the user.
+- Keep this file updated when meaningful architecture, design, security,
+  workflow, or milestone decisions change.
+- Record important merged PRs, commit identifiers, and testing status.
+- Do not invent pending features or assume unapproved scope.
+
+PROJECT CONTINUITY
+------------------
+This file is the durable project handover note for future ChatGPT sessions.
+At the start of a new session, read this file and check the current main
+branch/PR state before making changes. The live repository is the source of
+truth for current code; this document is a maintained summary, not a
+replacement for inspecting relevant files.
+The project belongs to the user. Work can continue across chats by using
+this repository and this handover document as shared context.
