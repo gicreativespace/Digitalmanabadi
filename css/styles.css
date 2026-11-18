@@ -1014,3 +1014,49 @@ body{font-size:18px;line-height:1.65}
  .main-view:has(.welcome-panel) .role-card.role-tile,
  .main-view:has(.welcome-panel) .role-tile .role-photo{transition:none}
 }
+
+
+/* Welcome role-card text alignment refinement: keep role identity on one line at the bottom. */
+.main-view:has(.welcome-panel) .role-card.role-tile{
+ justify-content:flex-end!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy{
+ position:absolute!important;left:13px!important;right:27px!important;bottom:13px!important;
+ display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+ justify-content:flex-end!important;gap:4px!important;width:auto!important;
+ min-width:0!important;margin:0!important;padding:0!important;text-align:left!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy strong{
+ display:block!important;width:100%!important;max-width:100%!important;
+ white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important;
+ text-wrap:nowrap!important;line-height:1.35!important;letter-spacing:0!important;
+ font-size:clamp(12px,1.25vw,16px)!important;
+}
+.main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+ font-size:clamp(8px,.78vw,10px)!important;letter-spacing:-.035em!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy small,
+.main-view:has(.welcome-panel) .role-tile .role-tagline{
+ white-space:nowrap!important;line-height:1.25!important;
+}
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .role-tile .role-copy{
+  left:11px!important;right:25px!important;bottom:11px!important;gap:3px!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy strong{
+  font-size:clamp(11px,3vw,14px)!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  font-size:clamp(7px,1.9vw,9px)!important;letter-spacing:-.045em!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy small{font-size:9px!important}
+ .main-view:has(.welcome-panel) .role-tile .role-tagline{font-size:7.5px!important}
+}
+@media(max-width:380px){
+ .main-view:has(.welcome-panel) .role-tile .role-copy{
+  left:9px!important;right:22px!important;bottom:9px!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  font-size:7px!important;letter-spacing:-.05em!important;
+ }
+}
