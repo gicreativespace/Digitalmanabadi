@@ -70,16 +70,41 @@ export function showTributeSplash(onComplete, duration = 3000) {
     </div>
   `;
 
-  document.body.append(overlay);
-  document.body.classList.add("tribute-splash-active");
-  document.body.classList.remove("tribute-splash-pending");
+  const mountTribute = () => {
+    document.body.append(overlay);
+    document.body.classList.add("tribute-splash-active");
+    document.body.classList.remove("tribute-splash-pending");
 
-  window.setTimeout(() => {
-    overlay.classList.add("tribute-splash--leaving");
     window.setTimeout(() => {
-      overlay.remove();
-      document.body.classList.remove("tribute-splash-active");
-      if (typeof onComplete === "function") onComplete();
-    }, 180);
-  }, Math.max(0, duration));
+      overlay.classList.add("tribute-splash--leaving");
+      window.setTimeout(() => {
+        overlay.remove();
+        document.body.classList.remove("tribute-splash-active");
+        if (typeof onComplete === "function") onComplete();
+      }, 180);
+    }, Math.max(0, duration));
+  };
+
+  if (window.matchMedia("(max-width: 600px)").matches) {
+    const brandSplash = document.createElement("section");
+    brandSplash.className = "brand-opening-splash";
+    brandSplash.setAttribute("aria-label", "Digital Mana Badi");
+    brandSplash.innerHTML = `
+      <img class="brand-opening-splash__logo" src="./assets/branding/digital-mana-badi-logo.png" alt="Digital Mana Badi" fetchpriority="high">
+      <h1 class="brand-opening-splash__title">DIGITAL MANA BADI</h1>
+      <p class="brand-opening-splash__tagline">మన బడి · మన బాధ్యత… మన భవిష్యత్తు!</p>
+      <p class="brand-opening-splash__loading">Loading…</p>
+    `;
+    document.body.append(brandSplash);
+    document.body.classList.remove("tribute-splash-pending");
+    window.setTimeout(() => {
+      brandSplash.classList.add("brand-opening-splash--leaving");
+      window.setTimeout(() => {
+        brandSplash.remove();
+        mountTribute();
+      }, 160);
+    }, 650);
+  } else {
+    mountTribute();
+  }
 }

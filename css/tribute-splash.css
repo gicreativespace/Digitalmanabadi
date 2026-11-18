@@ -117,3 +117,14 @@ body.tribute-splash-pending #app{visibility:hidden!important}
  .tribute-splash__frame{width:min(100%,22vh)}
 }
 @media(prefers-reduced-motion:reduce){.tribute-splash{transition:none}}
+
+
+/* Brief mobile brand opening screen — intentionally borderless and panel-free. */
+.brand-opening-splash{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(12px,2.5vh,22px);padding:env(safe-area-inset-top,12px) 20px env(safe-area-inset-bottom,12px);box-sizing:border-box;background:#f5faf6;color:#174b32;text-align:center;opacity:1;transition:opacity .16s ease}
+.brand-opening-splash__logo{display:block;width:min(58vw,230px);height:auto;max-height:34vh;object-fit:contain}
+.brand-opening-splash__title{margin:0;font-size:clamp(22px,6vw,30px);line-height:1.12;font-weight:950;letter-spacing:.035em;color:#174b32}
+.brand-opening-splash__tagline{margin:0;font-size:clamp(14px,3.8vw,18px);line-height:1.45;font-weight:750;color:#315c40}
+.brand-opening-splash__loading{margin:10px 0 0;font-size:13px;font-weight:600;color:#718174}
+.brand-opening-splash--leaving{opacity:0}
+@media(min-width:601px){.brand-opening-splash{display:none}}
+@media(prefers-reduced-motion:reduce){.brand-opening-splash{transition:none}}
