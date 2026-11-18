@@ -1271,3 +1271,8 @@ body{font-size:18px;line-height:1.65}
 @media(max-width:380px){
  .main-view:has(.welcome-panel) .role-theme-strip{font-size:7px;letter-spacing:.015em}
 }
+
+
+/* GI Creative Space popup: use the supplied official logo image. */
+.gcs-logo-image{display:block;width:64px;height:64px;flex:0 0 64px;object-fit:contain;border:2px solid var(--gold);border-radius:50%;background:var(--surface);box-shadow:0 7px 20px rgba(25,77,49,.16)}
+@media(max-width:520px){.gcs-logo-image{width:48px;height:48px;flex-basis:48px}}
