@@ -361,3 +361,16 @@ PR — Improve Tribute Splash first-load and repeat-load performance
 - Preserved Tribute Splash layout, images, timing, animation, content,
   navigation, login, authentication, and all other app behavior.
 - Code-level checks only; browser/network/visual testing was not performed.
+
+
+PR — Use the supplied GI Creative Space logo in the footer popup
+-----------------------------------------------------------------
+- Replaced the popup's text-only circular “GI” mark with the user's
+  renamed image: assets/branding/gi-creative-space-logo.jpg.
+- Kept the existing popup wording, services, WhatsApp link, close behavior,
+  footer tap interaction, 850ms Super Admin long press and authentication.
+- Added the exact logo image to the Service Worker app-shell cache and
+  bumped its cache to v84 so the image is available offline after install.
+- Updated the app.js cache-busting URL to 20261118-14.
+- Added responsive image sizing while preserving the existing logo position.
+- Browser visual testing was not performed; repository-level checks only.
