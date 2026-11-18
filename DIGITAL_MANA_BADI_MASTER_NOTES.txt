@@ -317,3 +317,15 @@ PR #40 — Restore original mobile Welcome role-card size
   desktop presentation, social ribbon, footer, navigation and all functions.
 - Updated stylesheet cache reference and service-worker cache to v78.
 - Browser visual/touch testing was not performed.
+
+
+PR #41 — Restore original mobile role-tile text placement and enlarge tagline
+----------------------------------------------------------------------------
+- Restored role-tile text to its previous bottom-aligned layout on mobile,
+  including the small-screen offsets; tile size and overall design are unchanged.
+- Increased the mobile Welcome tagline font size while retaining single-line
+  centered behavior: max-width 760px clamp(12px, 3.6vw, 14px); max-width 380px
+  clamp(11.8px, 3.3vw, 12.6px).
+- No desktop styling, images, role content/actions, ribbon, footer or app functions changed.
+- Updated stylesheet cache reference and service-worker cache to v79.
+- Browser visual/touch testing was not performed.
