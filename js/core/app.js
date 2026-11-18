@@ -110,9 +110,9 @@ function welcome(){
  </section>
  <section class="role-stack" aria-label="Select your role">
   ${roleCard("school","ప్రధానోపాధ్యాయులు","Head Master","hm","green")}
-  ${roleCard("presentation","ఉపాధ్యాయుడు","Teacher","teacher","gold")}
+  ${roleCard("presentation","ఉపాధ్యాయులు","Teachers","teacher","gold")}
   ${roleCard("users","తల్లిదండ్రులు","Parent","parent","blue")}
-  ${roleCard("heart-handshake","పూర్వ విద్యార్థి / స్పాన్సర్","Alumni / Sponsor","community","green")}
+  ${roleCard("heart-handshake","పూర్వ విద్యార్థులు & ప్రోత్సాహకులు","Alumni & Sponsors","community","green")}
  </section>`;
  /* Role selection is delegated at the main view so touch and keyboard activation remain reliable after re-renders. */
  main.querySelectorAll("[data-role]").forEach(b=>{b.onclick=null});
@@ -128,6 +128,7 @@ function profilePage(){accountScreens.profilePage();}
 function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
  renderSuperAdminLogin(main,{
+  T,APP_CONFIG,
   onSuccess:user=>{state.role="superadmin";state.authenticated=true;state.superAdminProfile=user;localStorage.setItem("gim_role","superadmin");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();},
   onBack:()=>{state.view="welcome";render();},
   onPasswordReset:sendPortalPasswordReset
