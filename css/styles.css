@@ -917,3 +917,25 @@ body{font-size:18px;line-height:1.65}
 .role-login-layout[data-role="hm"] .role-login-alert,.role-login-layout[data-role="superadmin"] .role-login-alert{margin-bottom:6px;padding:8px 10px;font-size:12px;line-height:1.35}}
 @media(max-width:380px){.role-login-layout[data-role="hm"] .role-login-panel,.role-login-layout[data-role="superadmin"] .role-login-panel{padding:10px 13px}.role-login-layout[data-role="hm"] .role-login-panel-heading h2,.role-login-layout[data-role="superadmin"] .role-login-panel-heading h2{font-size:18px}}
 @media(max-height:650px) and (max-width:680px){.role-login-layout[data-role="hm"] .role-login-visual,.role-login-layout[data-role="superadmin"] .role-login-visual{padding:6px 13px}.role-login-layout[data-role="hm"] .role-login-visual-icon,.role-login-layout[data-role="superadmin"] .role-login-visual-icon{width:34px;height:34px}.role-login-layout[data-role="hm"] .role-login-panel,.role-login-layout[data-role="superadmin"] .role-login-panel{padding:8px 14px}.role-login-layout[data-role="hm"] .role-login-panel-heading p,.role-login-layout[data-role="superadmin"] .role-login-panel-heading p{display:none}.role-login-layout[data-role="hm"] .role-login-panel .field,.role-login-layout[data-role="superadmin"] .role-login-panel .field{margin:6px 0}}
+
+
+/* Head Master login: clean, edge-to-edge mobile fit */
+@media(max-width:680px){
+ .app-shell:has(.role-login-layout[data-role="hm"]){height:100vh;height:100dvh;min-height:0;overflow:hidden}
+ .app-shell:has(.role-login-layout[data-role="hm"]) .topbar{height:54px;flex:0 0 54px;position:relative}
+ .app-shell:has(.role-login-layout[data-role="hm"]) .main-view{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;overflow:hidden;padding:5px 0!important}
+ .app-shell:has(.role-login-layout[data-role="hm"]) .footer{display:none}
+ .role-login-layout[data-role="hm"]{flex:1 1 auto;min-height:0;grid-template-rows:auto minmax(0,1fr);margin:0!important;border-radius:16px}
+ .role-login-layout[data-role="hm"] .role-login-visual{padding:9px 15px;min-height:0}
+ .role-login-layout[data-role="hm"] .role-login-panel{overflow-y:auto;overscroll-behavior:contain}
+}
+@media(max-height:620px) and (max-width:680px){
+ .app-shell:has(.role-login-layout[data-role="hm"]) .topbar{height:46px;flex-basis:46px}
+ .role-login-layout[data-role="hm"] .role-login-visual{padding:5px 12px}
+ .role-login-layout[data-role="hm"] .role-login-visual-icon{width:32px;height:32px}
+ .role-login-layout[data-role="hm"] .role-login-panel{padding:7px 13px}
+ .role-login-layout[data-role="hm"] .role-login-panel-heading p{display:none}
+ .role-login-layout[data-role="hm"] .role-login-panel .field{margin:5px 0}
+ .role-login-layout[data-role="hm"] .role-login-panel .field input{min-height:40px}
+ .role-login-layout[data-role="hm"] .role-login-submit{min-height:41px}
+}

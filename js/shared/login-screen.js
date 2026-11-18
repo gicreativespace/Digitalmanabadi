@@ -21,8 +21,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     '<aside class="role-login-visual"><div class="role-login-orbit role-login-orbit-one" aria-hidden="true"></div><div class="role-login-orbit role-login-orbit-two" aria-hidden="true"></div><div class="role-login-visual-content">'+
      '<span class="role-login-visual-icon" aria-hidden="true">'+iconSvg(roleMeta[state.role].icon)+'</span><span class="role-login-eyebrow">'+(view.eyebrow||meta.kicker||"DIGITAL MANA BADI")+'</span><h1>'+title+'</h1><p>'+(view.visualNote||meta.note||view.description)+'</p><span class="role-login-brandline">DIGITAL MANA BADI <i>•</i> '+T("మన భవిష్యత్తు… మన గర్వం!","Our Future… Our Pride!")+'</span></div></aside>'+
     '<section class="role-login-panel"><div class="role-login-panel-heading"><span class="role-login-panel-kicker">'+T("స్వాగతం","WELCOME BACK")+'</span><h2>'+(community?T("మీ పాఠశాల సమాజంలో భాగమవ్వండి","Be Part of Your School Community"):T("మీ ఖాతాలోకి ప్రవేశించండి","Sign in to your account"))+'</h2><p>'+view.description+'</p></div>'+
-     '<div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+
-     '<div class="role-login-secure-note"><span aria-hidden="true">◈</span><span>'+T("మీ పాత్రకు సంబంధించిన సేవలు మాత్రమే అందుబాటులో ఉంటాయి.","Access is limited to services assigned to your role.")+'</span></div></section></section>';
+     '<div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+'</section></section>';
   main.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
   if(community){
    main.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
