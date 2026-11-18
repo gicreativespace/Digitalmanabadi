@@ -384,3 +384,13 @@ PR — Fill the GI Super Admin logo image frame
 - Updated the login stylesheet cache-busting URL and Service Worker cache to v85.
 - Authentication, login fields, wording, navigation and other app functions are unchanged.
 - Repository-level checks only; browser visual testing was not performed.
+
+
+PR — Correct GI Creative Space logo asset path
+----------------------------------------------
+- Verified the committed logo file is stored at `assets/branding/assets/branding/gi-creative-space-logo.jpg`, not at the shorter path previously referenced by the login, footer popup, and Service Worker.
+- Corrected the image source in the GI Super Admin login and GI Creative Space footer popup to the exact existing repository path.
+- Corrected the Service Worker app-shell path. The stale missing path caused `cache.addAll()` installation to reject, preventing the app-shell cache from being populated after a clean browser cache reset.
+- Bumped the Service Worker cache to v86 so clients request the corrected app shell.
+- No authentication, login flow, UI layout, or other role behavior changed.
+- Repository tree/source verification only; browser visual testing was not performed.
