@@ -12,7 +12,32 @@ export async function authenticateHeadMaster(email,password){
  return {profile:{...profile,uid,school:school.data()}};
 }
 export function renderSuperAdminLogin(main,{onSuccess,onBack}){
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="superBack">← Back</button></div><section class="form-card super-card"><div class="login-symbol">⬡</div><h2>GI Super Admin</h2><p>Authorized GI Administrator Only</p><div class="field"><label>Registered Email</label><input id="superEmail" type="email" autocomplete="username" placeholder="GI Super Admin Email"></div><div class="field"><label>Password</label><input id="superPassword" type="password" autocomplete="current-password" placeholder="Enter password"></div><button class="btn full" id="superContinue">Secure Login</button><div class="demo-note">Firebase Authentication + GI Super Admin authorization verification.</div><p id="superError" class="admin-inline-note" hidden></p></section>`;
+ main.innerHTML=`<div class="backline role-login-backline"><button class="btn secondary" id="superBack">← Back to Home</button><span class="pill">GI SUPER ADMIN</span></div>
+ <section class="role-login-layout" data-role="superadmin" aria-label="GI Super Admin secure login">
+  <aside class="role-login-visual">
+   <div class="role-login-orbit role-login-orbit-one" aria-hidden="true"></div><div class="role-login-orbit role-login-orbit-two" aria-hidden="true"></div>
+   <div class="role-login-visual-content">
+    <span class="role-login-visual-icon" aria-hidden="true">⬡</span>
+    <span class="role-login-eyebrow">PLATFORM ADMINISTRATION</span>
+    <h1>GI Super Admin</h1>
+    <p>Central platform access for authorized GI administrators. Manage schools and platform-level operations securely.</p>
+    <span class="role-login-brandline">DIGITAL MANA BADI <i>•</i> GI CREATIVE SPACE</span>
+   </div>
+  </aside>
+  <section class="role-login-panel">
+   <div class="role-login-panel-heading">
+    <span class="role-login-panel-kicker">SECURE ADMIN ACCESS</span>
+    <h2>Administrator Sign In</h2>
+    <p>Use your registered GI Super Admin credentials to continue.</p>
+   </div>
+   <div class="field"><label for="superEmail">Registered Email</label><input id="superEmail" type="email" autocomplete="username" placeholder="GI Super Admin Email"></div>
+   <div class="field"><label for="superPassword">Password</label><input id="superPassword" type="password" autocomplete="current-password" placeholder="Enter your password"></div>
+   <button class="btn full role-login-submit" id="superContinue">Secure Login</button>
+   <div class="demo-note">Firebase Authentication, verified email and active GI Super Admin authorization are checked before access is granted.</div>
+   <p id="superError" class="admin-inline-note" hidden></p>
+   <div class="role-login-secure-note"><span aria-hidden="true">◈</span><span>Restricted platform access. Authorized administrators only.</span></div>
+  </section>
+ </section>`;
  main.querySelector("#superBack").onclick=onBack;
  main.querySelector("#superContinue").onclick=async()=>{const email=main.querySelector("#superEmail").value.trim(),password=main.querySelector("#superPassword").value,btn=main.querySelector("#superContinue"),box=main.querySelector("#superError");if(!email||!password){box.hidden=false;box.textContent="Email మరియు Password నమోదు చేయండి.";return;}btn.disabled=true;btn.textContent="Verifying…";box.hidden=true;try{const c=await signInWithEmailAndPassword(auth,email,password);if(!c.user.emailVerified){await signOut(auth);throw Error("GI Super Admin Email ఇంకా Verify కాలేదు.");}const s=await getDoc(doc(db,"platformAdmins",c.user.uid));if(!s.exists()||s.data().role!=="GI_SUPER_ADMIN"||s.data().status!=="active"){await signOut(auth);throw Error("ఈ ఖాతాకు GI Super Admin అనుమతి లేదు.");}onSuccess({uid:c.user.uid,email:c.user.email,role:"GI_SUPER_ADMIN"});}catch(e){box.hidden=false;box.textContent=errMsg(e);btn.disabled=false;btn.textContent="Secure Login";}};
 }
