@@ -69,3 +69,8 @@
  .role-login-layout.login-unified .role-login-panel .demo-note{margin-top:8px;padding:8px 10px;font-size:11px}
  .app-shell:has(.role-login-layout.login-unified) .main-view{overflow-y:auto}
 }
+
+
+/* GI Super Admin logo: fill the complete framed image area without inner padding. */
+.role-login-layout[data-role="superadmin"].login-unified .login-hero-image--logo{width:100%;height:clamp(112px,19vh,160px);object-fit:cover;object-position:center;background:#fff;padding:0;}
+@media(max-width:680px){.role-login-layout[data-role="superadmin"].login-unified .login-hero-image--logo{height:clamp(92px,15vh,126px);}}
