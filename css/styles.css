@@ -1242,9 +1242,6 @@ body{font-size:18px;line-height:1.65}
   overflow-wrap:normal!important;word-break:keep-all!important;
   letter-spacing:0!important;text-align:center!important;
  }
- .main-view:has(.welcome-panel) .role-card.role-tile{
-  aspect-ratio:1/0.96!important;
- }
  .main-view:has(.welcome-panel) .role-tile .role-copy{
   top:39px!important;bottom:auto!important;
   left:11px!important;right:25px!important;
@@ -1254,9 +1251,6 @@ body{font-size:18px;line-height:1.65}
 @media(max-width:380px){
  .main-view:has(.welcome-panel) .welcome-motto{
   font-size:clamp(11px,3.1vw,11.8px)!important;
- }
- .main-view:has(.welcome-panel) .role-card.role-tile{
-  aspect-ratio:1/0.94!important;
  }
  .main-view:has(.welcome-panel) .role-tile .role-copy{
   top:36px!important;left:9px!important;right:22px!important;
