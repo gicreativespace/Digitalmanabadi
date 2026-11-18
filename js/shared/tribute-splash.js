@@ -72,6 +72,7 @@ export function showTributeSplash(onComplete, duration = 3000) {
 
   document.body.append(overlay);
   document.body.classList.add("tribute-splash-active");
+  document.body.classList.remove("tribute-splash-pending");
 
   window.setTimeout(() => {
     overlay.classList.add("tribute-splash--leaving");
