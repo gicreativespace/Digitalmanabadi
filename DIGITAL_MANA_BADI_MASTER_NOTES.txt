@@ -274,3 +274,21 @@ Only css/social-ribbon.css, its index.html cache reference, service-worker.js
 cache version (v73), and this project note are in scope.
 No role, navigation, login, footer, authentication or social-link logic changed.
 Browser visual/touch testing was not performed.
+
+
+PR #36 — Restore Welcome ribbon labels/alignment and theme-aware footer
+-----------------------------------------------------------------------
+- Keep the configured school name, its font size/height, and the existing
+  Welcome motto/tagline unchanged.
+- Restore the "CONNECT WITH US" ribbon heading and ensure all five logos
+  are centered in equal columns with each label visible beneath its logo.
+- Keep a single continuous ribbon (no individual tiles), compact height,
+  minimal spacing, and a subtle pressed/focused-item highlight.
+- Make the footer background, border, shadow and text colors respond to
+  the active light/dark theme using existing theme variables.
+- Preserve footer dimensions, tap popup, 850ms long-press Super Admin entry,
+  social-ribbon JavaScript, and compact auto-hide behavior on other screens.
+- Scope: css/social-ribbon.css, css/styles.css, index.html cache references,
+  service-worker.js cache v74, and this note only.
+- No Welcome school-name or motto typography/content was changed.
+- Browser visual/touch testing was not performed.

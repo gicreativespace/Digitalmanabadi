@@ -1194,3 +1194,13 @@ body{font-size:18px;line-height:1.65}
  outline:none!important;box-shadow:none!important;filter:none!important;
 }
 #appFooter{touch-action:manipulation}
+
+
+/* Footer theme colors only — preserve its existing size, layout and gestures. */
+#appFooter.footer{
+  background:var(--surface2)!important;
+  border-color:var(--border)!important;
+  box-shadow:0 -6px 22px color-mix(in srgb,var(--text) 9%,transparent)!important;
+}
+#appFooter #footerSignature{color:var(--deep)!important}
+#appFooter #footerInspired{color:var(--muted)!important}
