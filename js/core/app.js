@@ -1,4 +1,5 @@
 import { APP_CONFIG } from "../../config/school-config.js";
+import { showTributeSplash } from "../shared/tribute-splash.js";
 import { translationPairs } from "../shared/translations.js";
 import { roleNames, roleMeta, modules } from "../shared/role-config.js";
 import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal } from "../sections/super-admin/admin-portal.js";
@@ -160,5 +161,6 @@ const accountScreens = createAccountScreens({main,state,roleNames,APP_CONFIG,ren
 const footerController = createFooterController({state,T,render});
 const navigationController = createNavigationController({state,render});
 
-render();setupFooter();setupBottomNavigation();updateBottomNavigation();
+setupFooter();setupBottomNavigation();updateBottomNavigation();
+showTributeSplash(render, 3000);
 if("serviceWorker" in navigator && location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
