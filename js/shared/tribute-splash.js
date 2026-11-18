@@ -59,10 +59,10 @@ export function showTributeSplash(onComplete, duration = 3000) {
       <div class="tribute-splash__identity">
         <p class="tribute-splash__initials">BVR · CVPMR · DNR</p>
         <p class="tribute-splash__app-name">DIGITAL MANA BADI</p>
-        <p class="tribute-splash__app-name-te">డిజిటల్ మన బడి</p>
+        <p class="tribute-splash__app-name-te">మన బడి</p>
         <p class="tribute-splash__school-name">${schoolName}</p>
         <p class="tribute-splash__school-location">${schoolLocation}</p>
-        <p class="tribute-splash__tagline">మన భవిష్యత్తు… మన గర్వం!</p>
+        <p class="tribute-splash__tagline">మన బాధ్యత… మన భవిష్యత్తు!</p>
         <p class="tribute-splash__tagline-en">Our Future… Our Pride!</p>
       </div>
 
