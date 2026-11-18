@@ -12,15 +12,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   const show=(message,type)=>{const el=main.querySelector("#loginAlert");if(el){el.hidden=false;el.dataset.type=type||"error";el.textContent=message}};
   const clear=()=>{const el=main.querySelector("#loginAlert");if(el){el.hidden=true;el.textContent="";el.dataset.type=""}};
   const fail=key=>(state.loginAttempts[key]=(state.loginAttempts[key]||0)+1);
-  const errorText=(e,key)=>{
-   const c=e&&e.code||"";
-   if(c.includes("network-request-failed")||c.includes("unavailable")||c.includes("timeout"))return T("ఇంటర్నెట్ కనెక్షన్‌ను పరిశీలించి మళ్లీ ప్రయత్నించండి.","Network issue. Check your internet connection and try again.");
-   if(c.includes("too-many-requests"))return T("చాలా ప్రయత్నాలు జరిగాయి. భద్రత కోసం కొద్దిసేపు వేచి ఉండండి.","Too many attempts. Please wait before trying again.");
-   if(c.includes("user-disabled"))return T("ఈ ఖాతా నిలిపివేయబడింది. Head Master / GI Support‌ను సంప్రదించండి.","This account is disabled. Contact the Head Master or GI Support.");
-   if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found")){const n=fail(key);return T("Email లేదా Password సరిపోలలేదు. తప్పు ప్రయత్నం: "+n+".","Email or password is incorrect. Failed attempt: "+n+".")+(n>=3?T(" మరిన్ని ప్రయత్నాలపై భద్రతా పరిమితులు వర్తించవచ్చు."," Further attempts may be security-limited."):"")}
-   if(c.includes("user-token-expired")||c.includes("requires-recent-login")||c.includes("invalid-user-token"))return T("మీ Session గడువు ముగిసింది. మళ్లీ Login చేయండి.","Your session has expired. Please sign in again.");
-   return e&&e.message||T("లాగిన్ ధృవీకరణ పూర్తికాలేదు. మళ్లీ ప్రయత్నించండి.","Sign-in could not be completed. Please try again.");
-  };
+  const errorText=(e,key)=>{const c=e&&e.code||"";if(c.includes("network-request-failed")||c.includes("unavailable")||c.includes("timeout"))return T("ఇంటర్నెట్ కనెక్షన్‌ను పరిశీలించి మళ్లీ ప్రయత్నించండి.","Connection issue. Please check and try again.");if(c.includes("too-many-requests"))return T("కొద్దిసేపు వేచి ఉండి మళ్లీ ప్రయత్నించండి.","Please wait a moment and try again.");if(c.includes("user-disabled"))return T("ప్రస్తుతం Login సాధ్యం కావడం లేదు. పాఠశాల నిర్వాహకులను సంప్రదించండి.","Unable to sign in right now. Please contact your school administrator.");if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found")){fail(key);return T("Login వివరాలు సరిపోలలేదు. మళ్లీ నమోదు చేయండి.","Login failed. Please check your details and try again.");}if(c.includes("user-token-expired")||c.includes("requires-recent-login")||c.includes("invalid-user-token"))return T("మీ Session గడువు ముగిసింది. మళ్లీ Login చేయండి.","Your session has expired. Please sign in again.");return T("Login పూర్తి కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.","Sign-in failed. Please try again.");};
   const actions=community
    ? '<div class="link-row"><button type="button" class="text-link" id="communityHelp">'+T("Account సహాయం కావాలా?","Need account help?")+'</button></div>'
    : '<div class="link-row"><button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
@@ -61,7 +53,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.role==="parent"&&!state.parentLinked){show(T("ముందుగా మీ పిల్లల వివరాలను Link చేయండి.","Please link your child before signing in."),"warning");return}
-   if(state.role==="parent"&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){const n=fail("parent");show(T("Student ID లేదా Parent PIN సరిపోలలేదు. తప్పు ప్రయత్నం: "+n+".","Student ID or Parent PIN is incorrect. Failed attempt: "+n+".")+(n>=3?T(" దయచేసి వివరాలు మళ్లీ పరిశీలించండి."," Please double-check your details."):""),"error");return}
+   if(state.role==="parent"&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){fail("parent");show(T("వివరాలు సరిపోలలేదు. మళ్లీ నమోదు చేయండి.","Login failed. Please check your details and try again."),"error");return}
    if(state.role==="parent")state.loginAttempts.parent=0;state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
   };
  }
