@@ -668,3 +668,19 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
   modules, or any other app functionality.
 - Source-level checks only; actual mobile-device fit still requires user
   confirmation after the updated stylesheet is served.
+
+
+2026-11-19 — Installed-app tribute splash refresh fit
+-----------------------------------------------------
+- Diagnosed why the prior mobile splash fixes did not affect the installed app:
+  the CSS selectors targeted html.is-mobile-browser, while standalone mode
+  is classified as html.is-installed-app and was excluded from those rules.
+- Added dedicated installed-app-only mobile viewport sizing and compact
+  vertical spacing rules, matching the safe inset-based sizing approach
+  without altering the mobile-browser rules.
+- Bumped tribute stylesheet query version to 20261119-07.
+- No splash content, portraits, wording, colors, desktop/browser mode,
+  Welcome Screen, role cards, authentication, navigation, modules, or
+  other application functions were changed.
+- Source-level checks only; installed Android/iOS device verification
+  remains pending.
