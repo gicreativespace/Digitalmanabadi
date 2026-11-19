@@ -551,3 +551,19 @@ PR — Fit Welcome role-tile titles, names and quotes to their content
   cache to v95.
 - Source-level verification only; browser/device visual testing remains
   necessary to confirm the final appearance at actual screen sizes.
+
+
+PR — Simplify Welcome role-card copy and align two-line titles
+----------------------------------------------------------------
+- Removed the extra light-colored tagline from all four Welcome role cards.
+- Kept exactly two text lines: the language-aware role title and its single
+  English role name. This prevents the role name from appearing twice.
+- Increased title emphasis and set a consistent bottom-left text position
+  and balanced title-to-name spacing across the four cards.
+- Kept the Alumni & Sponsors Telugu title on one line with a responsive
+  smaller size; the English name may wrap to two lines where needed.
+- Preserved card dimensions, images, colors, role destinations, delegated
+  click handling, authentication, navigation and all unrelated modules.
+- Updated styles.css and app.js cache references; Service Worker cache v96.
+- Source-level verification only; browser/mobile visual testing remains
+  pending.
