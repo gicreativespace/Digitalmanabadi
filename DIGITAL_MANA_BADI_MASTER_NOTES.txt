@@ -534,3 +534,20 @@ PR — Mobile Welcome layout stability and role interaction
 - Updated app asset references and Service Worker cache to v94.
 - Repository source checks only; physical mobile-browser and installed-PWA
   visual/touch testing remain pending.
+
+
+PR — Fit Welcome role-tile titles, names and quotes to their content
+--------------------------------------------------------------------
+- Removed the fixed three-row text grid that forced long role titles into
+  clipped single lines and gave all cards an inflexible text height.
+- Replaced it with a bottom-anchored flexible text stack. Titles can wrap
+  naturally up to two lines; names and quotes use responsive font sizes,
+  readable line heights and spacing based on available tile width.
+- Kept the four existing role images, tile dimensions, colors, content,
+  role destinations, role-selection handling, theme labels and Welcome
+  layout unchanged.
+- Scoped the new rules only to the four Welcome role tiles.
+- Updated styles.css cache reference to 20261119-03 and Service Worker
+  cache to v95.
+- Source-level verification only; browser/device visual testing remains
+  necessary to confirm the final appearance at actual screen sizes.
