@@ -581,3 +581,11 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
   behavior, authentication, navigation and unrelated modules unchanged.
 - Updated CSS/JS cache references and Service Worker cache to v97.
 - Source-level verification only; browser/device visual testing remains pending.
+
+
+2026-11-19 — Role Card bilingual title translation fix
+- Root cause: applyTranslations() recursively translated both the Telugu and English title text nodes inside each .role-copy, causing both lines to become the currently selected language.
+- Excluded only .role-copy descendants from automatic text translation. The four role cards now retain their authored Telugu and English labels in both language modes; the rest of the app continues using the existing translation behavior.
+- No changes to role-card layout, typography, imagery, dimensions, destinations, selection, authentication, navigation, or other modules.
+- Updated the app.js cache query and Service Worker cache to v98.
+- Source-level verification only; browser/device visual testing remains pending.
