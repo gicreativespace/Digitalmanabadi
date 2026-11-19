@@ -121,10 +121,10 @@ function roleCard(ic,te,en,role,tone){
   community:{image:"assets/branding/roles/indian-philanthropists.webp",alt:"Indian philanthropists supporting education",number:"04",theme:"COMMUNITY",tagline:"Service · Giving"}
  };
  const card=cards[role];
- return `<button type="button" class="role-card role-tile role-${tone}" data-role="${role}" aria-label="${escapeHtml(T(te,en))} — ${escapeHtml(en)}">
+ return `<button type="button" class="role-card role-tile role-${tone}" data-role="${role}" aria-label="${escapeHtml(T(te,en))}">
   <img class="role-photo" src="./${card.image}" alt="${escapeHtml(card.alt)}" loading="eager" decoding="async">
   <span class="role-shade" aria-hidden="true"></span>
-  <span class="role-copy"><strong class="role-title-te">${escapeHtml(te)}</strong><strong class="role-title-en">${escapeHtml(en)}</strong></span>
+  <span class="role-copy"><strong class="role-title">${escapeHtml(T(te,en))}</strong></span>
   <span class="role-arrow" aria-hidden="true">↗</span>
  </button>`;
 }
