@@ -124,7 +124,7 @@ function roleCard(ic,te,en,role,tone){
  return `<button type="button" class="role-card role-tile role-${tone}" data-role="${role}" aria-label="${escapeHtml(T(te,en))} — ${escapeHtml(en)}">
   <img class="role-photo" src="./${card.image}" alt="${escapeHtml(card.alt)}" loading="eager" decoding="async">
   <span class="role-shade" aria-hidden="true"></span>
-  <span class="role-copy"><strong>${T(te,en)}</strong><small>${en}</small><span class="role-tagline">${card.tagline}</span></span>
+  <span class="role-copy"><strong>${T(te,en)}</strong><small>${en}</small></span>
   <span class="role-arrow" aria-hidden="true">↗</span>
  </button>`;
 }
