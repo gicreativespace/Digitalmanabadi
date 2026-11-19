@@ -489,3 +489,24 @@ PR — Remove the extra custom mobile logo opening screen
   platform rendering; its displayed artwork size was not changed in this PR.
 - Source-level verification only; Android-device/browser visual testing was
   not performed.
+
+
+PR — Improve Welcome screen text readability and shorten Tribute Splash
+-----------------------------------------------------------------------
+- Reduced the existing Tribute Splash display duration from 3000ms to
+  2000ms, retaining the three portraits, content, fade-out and render callback.
+- Increased the four Welcome role-card titles, English role names and short
+  quote/tagline text using responsive, Welcome-only CSS overrides.
+- Increased the Welcome motto font size and kept the exact Telugu wording
+  centered on one line: "మన బడి · మన బాధ్యత… మన భవిష్యత్తు!"
+  The English equivalent and language switching remain unchanged.
+- Inspected the existing Android icon and official logo assets. Both are
+  square 1024px artwork showing the complete Digital Mana Badi logo; these
+  source assets were left unchanged to avoid replacing or distorting official
+  branding. Android's launcher may still apply its platform icon mask.
+- No card content, card dimensions, role selection actions, authentication,
+  navigation, modules, social ribbon, footer, or dashboard functions changed.
+- Updated styles.css and app.js cache-busting references and Service Worker
+  cache to digital-mana-badi-preview-v93.
+- Source-level checks only; browser and physical Android-device visual
+  testing were not performed.
