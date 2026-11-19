@@ -1533,3 +1533,12 @@ body{font-size:18px;line-height:1.65}
   font-size:clamp(13px,3.5vw,15px)!important;
  }
 }
+
+
+/* Desktop website only: slightly reduce Telugu role-card title size for visual balance.
+   Mobile browser and installed app typography remain unchanged. */
+@media(min-width:701px){
+ html:not(.is-installed-app):not(.is-mobile-browser)[lang="te"] .main-view:has(.welcome-panel) .role-tile .role-copy strong{
+  font-size:clamp(14px,1.9vw,17px)!important;
+ }
+}

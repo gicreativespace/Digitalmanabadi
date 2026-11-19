@@ -597,3 +597,11 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - Preserved role card images, positions, colors, layout, navigation, selection, authentication, and all unrelated functionality.
 - Updated CSS/JS cache references and Service Worker cache to v99.
 - Source-level verification only; browser/device visual testing remains pending.
+
+
+2026-11-19 — Desktop website Telugu role-title size adjustment (isolated)
+- Slightly reduced Telugu role-card title font size on desktop website view only (701px and wider, lang=te, not installed app or mobile browser) to improve visual balance.
+- English website typography is unchanged. Mobile browser and installed app typography are explicitly excluded and remain unchanged.
+- No JavaScript, role-card layout, font weight, card dimensions, images, navigation, authentication, or other modules changed.
+- Updated only the CSS cache query and Service Worker cache to v100.
+- Source-level verification only; no live PC/mobile visual test performed.
