@@ -1332,3 +1332,66 @@ body{font-size:18px;line-height:1.65}
  .main-view:has(.welcome-panel) .role-tile .role-tagline{font-size:9px!important}
  .main-view:has(.welcome-panel) .welcome-motto{font-size:11.5px!important}
 }
+
+
+/* Focused alignment: all four Welcome role-tile text blocks share one bottom-left grid. */
+.main-view:has(.welcome-panel) .role-tile .role-copy{
+  height:5.25em!important;
+  display:grid!important;
+  grid-template-rows:2.7em 1.25em 1.3em!important;
+  align-content:end!important;
+  justify-content:stretch!important;
+  gap:3px!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy strong{
+  min-height:0!important;height:100%!important;
+  display:block!important;overflow:hidden!important;
+  white-space:nowrap!important;text-overflow:clip!important;
+  line-height:1.3!important;
+}
+.main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  white-space:normal!important;text-overflow:clip!important;
+  overflow-wrap:normal!important;text-wrap:balance!important;
+  line-height:1.3!important;
+}
+
+/* Mobile browser only: allow Welcome content, social ribbon and footer to flow without clipping.
+   Installed PWA and desktop layouts intentionally retain their existing sizing rules. */
+@media(max-width:700px){
+  html.is-mobile-browser,
+  html.is-mobile-browser body{
+    height:auto!important;
+    min-height:100%!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  html.is-mobile-browser .app-shell:has(.welcome-panel){
+    height:auto!important;
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    overflow:visible!important;
+  }
+  html.is-mobile-browser .main-view:has(.welcome-panel){
+    display:flex!important;
+    flex:0 0 auto!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+    min-height:0!important;
+    overflow:visible!important;
+    padding:10px 0 18px!important;
+    gap:0!important;
+  }
+  html.is-mobile-browser .main-view:has(.welcome-panel) .social-ribbon:not(.compact){
+    flex:0 0 auto!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:10px auto 0!important;
+  }
+  html.is-mobile-browser .app-shell:has(.welcome-panel) .footer{
+    position:relative!important;
+    inset:auto!important;
+    flex:0 0 auto!important;
+    margin:8px auto 0!important;
+    transform:none!important;
+  }
+}
