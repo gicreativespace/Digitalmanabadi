@@ -149,3 +149,36 @@ body.tribute-splash-pending #app{visibility:hidden!important}
   box-sizing:border-box;
  }
 }
+
+
+/* Mobile-browser refresh fix: bound the splash to the live viewport and keep its footer scroll-reachable. */
+@media(max-width:700px){
+ html.is-mobile-browser .tribute-splash{
+  height:100vh!important;
+  height:100svh!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  max-height:100dvh!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior-y:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+ }
+ html.is-mobile-browser .tribute-splash__inner{
+  box-sizing:border-box!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:100dvh!important;
+  justify-content:space-between!important;
+  gap:clamp(8px,1.4dvh,14px)!important;
+  padding-top:max(12px,env(safe-area-inset-top,0px))!important;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+ }
+ html.is-mobile-browser .tribute-splash__heading,
+ html.is-mobile-browser .tribute-splash__portraits,
+ html.is-mobile-browser .tribute-splash__dedication,
+ html.is-mobile-browser .tribute-splash__identity,
+ html.is-mobile-browser .tribute-splash__footer{
+  flex:0 0 auto!important;
+ }
+}
