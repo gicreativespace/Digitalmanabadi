@@ -589,3 +589,11 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - No changes to role-card layout, typography, imagery, dimensions, destinations, selection, authentication, navigation, or other modules.
 - Updated the app.js cache query and Service Worker cache to v98.
 - Source-level verification only; browser/device visual testing remains pending.
+
+
+2026-11-19 — Role card language selection and uniform typography
+- Role cards now render a single title using T(Telugu, English), so the displayed name follows the selected app language instead of showing both languages or duplicating the same name.
+- All four role cards, including Alumni & Sponsors, use the Head Master card's shared title font scale at desktop, mobile, and narrow mobile breakpoints.
+- Preserved role card images, positions, colors, layout, navigation, selection, authentication, and all unrelated functionality.
+- Updated CSS/JS cache references and Service Worker cache to v99.
+- Source-level verification only; browser/device visual testing remains pending.
