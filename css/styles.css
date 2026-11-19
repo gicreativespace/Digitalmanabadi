@@ -1276,3 +1276,59 @@ body{font-size:18px;line-height:1.65}
 /* GI Creative Space popup: use the supplied official logo image. */
 .gcs-logo-image{display:block;width:64px;height:64px;flex:0 0 64px;object-fit:contain;border:2px solid var(--gold);border-radius:50%;background:var(--surface);box-shadow:0 7px 20px rgba(25,77,49,.16)}
 @media(max-width:520px){.gcs-logo-image{width:48px;height:48px;flex-basis:48px}}
+
+
+/* Welcome screen readability refinement — scoped to the four role tiles and motto. */
+.main-view:has(.welcome-panel) .role-tile .role-copy strong{
+ font-size:clamp(15px,1.65vw,18px)!important;
+ line-height:1.3!important;
+}
+.main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+ font-size:clamp(14px,1.55vw,17px)!important;
+ line-height:1.25!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-copy small{
+ font-size:clamp(12px,1.25vw,14px)!important;
+ line-height:1.25!important;
+}
+.main-view:has(.welcome-panel) .role-tile .role-tagline{
+ font-size:clamp(10.5px,1.1vw,12px)!important;
+ line-height:1.25!important;
+}
+.main-view:has(.welcome-panel) .welcome-motto{
+ display:block!important;width:100%!important;max-width:100%!important;
+ margin:5px auto 0!important;padding:0 3px!important;
+ font-size:clamp(15px,2.2vh,18px)!important;
+ font-weight:750!important;line-height:1.25!important;
+ text-align:center!important;white-space:nowrap!important;
+ overflow:visible!important;overflow-wrap:normal!important;word-break:keep-all!important;
+ letter-spacing:0!important;
+}
+@media(max-width:760px){
+ .main-view:has(.welcome-panel) .role-tile .role-copy strong{
+  font-size:clamp(13.5px,3.7vw,16px)!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  font-size:clamp(12.5px,3.35vw,15px)!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy small{
+  font-size:clamp(10.5px,2.8vw,12px)!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-tagline{
+  font-size:clamp(9.5px,2.45vw,11px)!important;
+ }
+ .main-view:has(.welcome-panel) .welcome-motto{
+  font-size:clamp(11.5px,3.8vw,16px)!important;
+ }
+}
+@media(max-width:360px){
+ .main-view:has(.welcome-panel) .role-tile .role-copy strong{
+  font-size:13px!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile[data-role="community"] .role-copy strong{
+  font-size:12px!important;
+ }
+ .main-view:has(.welcome-panel) .role-tile .role-copy small{font-size:10px!important}
+ .main-view:has(.welcome-panel) .role-tile .role-tagline{font-size:9px!important}
+ .main-view:has(.welcome-panel) .welcome-motto{font-size:11.5px!important}
+}
