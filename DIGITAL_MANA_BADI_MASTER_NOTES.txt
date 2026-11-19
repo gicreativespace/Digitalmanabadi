@@ -567,3 +567,17 @@ PR — Simplify Welcome role-card copy and align two-line titles
 - Updated styles.css and app.js cache references; Service Worker cache v96.
 - Source-level verification only; browser/mobile visual testing remains
   pending.
+
+
+PR — Use matching-size Telugu and English titles on Welcome role cards
+-----------------------------------------------------------------------
+- Removed the small secondary text element that caused the role name to
+  repeat in English-language mode.
+- Each role card now displays the Telugu title and English title explicitly,
+  both as prominent strong text at the same responsive font size.
+- Alumni & Sponsors uses the same title typography as the other three cards;
+  both Telugu and English labels can wrap naturally when their length needs it.
+- Kept the four card images, dimensions, colors, destinations, selection
+  behavior, authentication, navigation and unrelated modules unchanged.
+- Updated CSS/JS cache references and Service Worker cache to v97.
+- Source-level verification only; browser/device visual testing remains pending.
