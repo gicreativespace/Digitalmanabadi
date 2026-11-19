@@ -21,7 +21,7 @@ function escapeHtml(value = "") {
   })[char]);
 }
 
-export function showTributeSplash(onComplete, duration = 3000) {
+export function showTributeSplash(onComplete, duration = 2000) {
   const schoolName = escapeHtml(APP_CONFIG.schoolName || "");
   const schoolLocation = escapeHtml(
     (APP_CONFIG.schoolAddress || APP_CONFIG.schoolLocation || "").replace(",", " ·")
