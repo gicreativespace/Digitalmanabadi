@@ -120,27 +120,6 @@ body.tribute-splash-pending #app{visibility:hidden!important}
 
 
 
-/* Mobile browser only: keep the tribute content naturally sized and its signature reachable. */
-@media(max-width:700px){
-  html.is-mobile-browser .tribute-splash{
-    height:auto!important;
-    min-height:100svh!important;
-    min-height:100dvh!important;
-    overflow-x:hidden!important;
-    overflow-y:auto!important;
-  }
-  html.is-mobile-browser .tribute-splash__inner{
-    min-height:100svh!important;
-    min-height:100dvh!important;
-    height:auto!important;
-    justify-content:flex-start!important;
-    gap:clamp(10px,1.8vh,18px)!important;
-    padding-top:max(14px,env(safe-area-inset-top,0px))!important;
-    padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;
-  }
-}
-
-
 /* Desktop browser only: keep the tribute splash inner frame bounded to the viewport on reload. */
 @media(min-width:701px){
  html:not(.is-mobile-browser):not(.is-installed-app) .tribute-splash__inner{
@@ -151,28 +130,31 @@ body.tribute-splash-pending #app{visibility:hidden!important}
 }
 
 
-/* Mobile-browser refresh fix: bound the splash to the live viewport and keep its footer scroll-reachable. */
+/* Mobile browser only: use the fixed inset as the single viewport sizing constraint.
+   Avoid combining fixed top/bottom insets with an explicit viewport height, which can
+   over-constrain the splash during mobile-browser refresh and viewport-bar changes. */
 @media(max-width:700px){
  html.is-mobile-browser .tribute-splash{
-  height:100vh!important;
-  height:100svh!important;
-  height:100dvh!important;
-  min-height:100dvh!important;
-  max-height:100dvh!important;
+  inset:0!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
   overflow-x:hidden!important;
   overflow-y:auto!important;
   overscroll-behavior-y:contain!important;
   -webkit-overflow-scrolling:touch!important;
  }
  html.is-mobile-browser .tribute-splash__inner{
-  box-sizing:border-box!important;
   width:100%!important;
   height:auto!important;
-  min-height:100dvh!important;
-  justify-content:space-between!important;
-  gap:clamp(8px,1.4dvh,14px)!important;
-  padding-top:max(12px,env(safe-area-inset-top,0px))!important;
-  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+  min-height:100%!important;
+  box-sizing:border-box!important;
+  justify-content:flex-start!important;
+  gap:clamp(10px,1.8vh,18px)!important;
+  padding-top:max(14px,env(safe-area-inset-top,0px))!important;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;
  }
  html.is-mobile-browser .tribute-splash__heading,
  html.is-mobile-browser .tribute-splash__portraits,
