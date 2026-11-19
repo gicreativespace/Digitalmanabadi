@@ -178,4 +178,4 @@ const footerController = createFooterController({state,T,render});
 const navigationController = createNavigationController({state,render});
 
 setupFooter();setupBottomNavigation();updateBottomNavigation();
-showTributeSplash(render, 3000);
+showTributeSplash(render, 2000);
