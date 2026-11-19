@@ -510,3 +510,27 @@ PR — Improve Welcome screen text readability and shorten Tribute Splash
   cache to digital-mana-badi-preview-v93.
 - Source-level checks only; browser and physical Android-device visual
   testing were not performed.
+
+
+PR — Mobile Welcome layout stability and role interaction
+----------------------------------------------------------
+- Added early display-mode detection for mobile browser versus installed
+  standalone PWA, including the iOS navigator.standalone signal.
+- Mobile-browser Welcome Screen now uses natural document flow so the
+  social ribbon and footer signature are not clipped by a fixed-height,
+  overflow-hidden app shell. Desktop and installed PWA layouts are not
+  targeted by these new browser-only rules.
+- Tribute Splash on mobile browser uses top-aligned natural content flow
+  with safe-area padding; the existing portraits, wording, fade and 2000ms
+  display duration remain unchanged.
+- Four Welcome role-tile text areas now use equal title/name/tagline rows
+  anchored to the same bottom-left position; original role images, tile
+  dimensions, colors and selection destinations remain unchanged.
+- Removed the duplicate delegated pointerup activation and retained the
+  native delegated click handler, which supports mouse, touch and keyboard
+  activation on the existing role buttons.
+- No authentication, Firebase, database, navigation, dashboards, modules,
+  social destinations or footer interactions were changed.
+- Updated app asset references and Service Worker cache to v94.
+- Repository source checks only; physical mobile-browser and installed-PWA
+  visual/touch testing remain pending.

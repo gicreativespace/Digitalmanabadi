@@ -3,6 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    (() => {
+      const standaloneQuery = window.matchMedia("(display-mode: standalone)");
+      const updateDisplayMode = () => {
+        const installed = standaloneQuery.matches || navigator.standalone === true;
+        const mobileBrowser = !installed && window.matchMedia("(max-width: 700px)").matches;
+        document.documentElement.classList.toggle("is-installed-app", installed);
+        document.documentElement.classList.toggle("is-mobile-browser", mobileBrowser);
+      };
+      updateDisplayMode();
+      window.addEventListener("resize", updateDisplayMode, { passive: true });
+      standaloneQuery.addEventListener?.("change", updateDisplayMode);
+    })();
+  </script>
   <meta name="theme-color" content="#245b3d">
   <meta name="description" content="డిజిటల్ మన బడి — మన భవిష్యత్తు… మన గర్వం!">
   <title>డిజిటల్ మన బడి</title>
@@ -10,10 +24,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/app-icons/favicon-32.png">
   <link rel="apple-touch-icon" href="assets/app-icons/icon-192.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/styles.css?v=20261119-01">
+  <link rel="stylesheet" href="css/styles.css?v=20261119-02">
   <link rel="stylesheet" href="css/social-ribbon.css?v=20261118-43">
   <link rel="stylesheet" href="css/headmaster-login.css?v=20261118-07">
-  <link rel="stylesheet" href="css/tribute-splash.css?v=20261118-06">
+  <link rel="stylesheet" href="css/tribute-splash.css?v=20261119-02">
   <link rel="preload" as="image" href="assets/branding/tribute/b-v-raju.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="assets/branding/tribute/c-v-p-murthy-raju.jpg" fetchpriority="high">
   <link rel="preload" as="image" href="assets/branding/tribute/d-n-raju.jpg" fetchpriority="high">
@@ -47,7 +61,7 @@
       <button type="button" class="footer-link" id="footerInspired">Inspired by Godavari.</button>
     </footer>
   </div>
-  <script type="module" src="js/core/app.js?v=20261119-01"></script>
+  <script type="module" src="js/core/app.js?v=20261119-02"></script>
   <script type="module" src="js/shared/social-ribbon.js?v=20261118-41"></script>
 </body>
 </html>
