@@ -632,3 +632,24 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - No changes to installed app, desktop/PC, Welcome Screen, role cards, social ribbon, application screens, authentication, navigation, or other functions.
 - Updated tribute stylesheet cache reference to 20261119-05 and Service Worker cache to v103.
 - Source-level verification only; no real mobile device/browser visual test performed.
+
+
+2026-11-19 — Correct Service Worker refresh behavior for app-shell assets
+-------------------------------------------------------------------------
+- Root cause follow-up: the Service Worker used cache-first for every GET
+  request and matched cached entries with ignoreSearch:true. As a result,
+  changing a CSS/JS query-string version did not guarantee that the browser
+  would receive the latest file; a cached stylesheet could continue to be
+  served after ordinary refreshes.
+- Updated only the Service Worker strategy for same-origin document,
+  stylesheet and script requests: network-first while online, updating the
+  current cache with successful responses; cached fallback remains available
+  when offline.
+- Kept cache-first behavior for other same-origin static assets, preserved
+  the app-shell precache list, and retained old-cache cleanup on activation.
+- Bumped the Service Worker cache to digital-mana-badi-preview-v104.
+- No Splash CSS, layout, images, timing, Welcome Screen, role cards,
+  authentication, navigation, modules, or other app functions were changed.
+- Source-level checks only; no live browser or mobile-device testing was
+  performed. The updated Service Worker must install and activate on the
+  user's browser before its network-first behavior takes effect.
