@@ -622,3 +622,13 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - Installed app, desktop/PC, Welcome Screen, role cards, social ribbon, footer, login, navigation, and all other app functions/styles remain untouched.
 - Updated tribute-splash.css cache reference to 20261119-04 and Service Worker cache to v102.
 - Source-level verification only; mobile browser/device visual testing was not performed.
+
+
+2026-11-19 — Corrected mobile-browser Tribute Splash fixed-viewport sizing
+- Root cause identified in CSS: the fixed overlay used inset:0 together with explicit 100vh/100dvh height declarations. These competing constraints can over-constrain the fixed box during mobile browser refresh and viewport-bar changes.
+- Removed the two prior, conflicting mobile-browser splash height override blocks.
+- Mobile browser only: retained position:fixed and used inset:0 as the sole viewport sizing constraint (height:auto, min-height:0, max-height:none); overlay scrolls internally when content exceeds the viewport.
+- Inner tribute content remains naturally sized with safe-area padding; portrait, dedication, identity, and footer sections are non-shrinking so the footer remains reachable.
+- No changes to installed app, desktop/PC, Welcome Screen, role cards, social ribbon, application screens, authentication, navigation, or other functions.
+- Updated tribute stylesheet cache reference to 20261119-05 and Service Worker cache to v103.
+- Source-level verification only; no real mobile device/browser visual test performed.
