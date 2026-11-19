@@ -702,3 +702,21 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - No app navigation, authentication, role selection, modules, screen layout,
   or other application functions were changed.
 - Source-level checks only; actual click-through testing was not performed.
+
+
+2026-11-19 — Welcome Screen CSS consolidation
+---------------------------------------------
+- Extracted the Welcome Screen-scoped override rules using the
+  .main-view:has(.welcome-panel) scope from the shared styles.css into
+  a dedicated css/welcome-screen.css file, preserving the original rule
+  order and declarations.
+- Removed those extracted Welcome-only rules from styles.css and loaded
+  the new stylesheet immediately after styles.css and before social-ribbon.css
+  so the existing cascade order relative to the ribbon styles is retained.
+- Added the new stylesheet to the Service Worker app-shell precache and
+  bumped the cache to v106.
+- No shared/global rules, role actions, authentication, navigation,
+  dashboards, modules, images, wording, or layout values were intentionally
+  redesigned; this is a stylesheet organization change only.
+- Source-level extraction and reference checks only; browser/device visual
+  regression testing remains pending.
