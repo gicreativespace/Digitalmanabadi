@@ -605,3 +605,11 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - No JavaScript, role-card layout, font weight, card dimensions, images, navigation, authentication, or other modules changed.
 - Updated only the CSS cache query and Service Worker cache to v100.
 - Source-level verification only; no live PC/mobile visual test performed.
+
+
+2026-11-19 — Isolated splash reload sizing and footer GI monogram
+- Desktop browser tribute splash inner frame is now explicitly bounded to the viewport height to prevent content-driven vertical stretching on reload. Rule is scoped to desktop browser only; mobile browser and installed app splash sizing are excluded.
+- Footer popup brand header now displays a bold, clear “GI” monogram only, centered on a white background with black lettering. Removed the prior logo image and brand-name text from this popup header only.
+- Footer popup copy, language selection, close behavior, WhatsApp link, and other interactions are unchanged. No other app modules or screens were modified.
+- Updated only the relevant stylesheet cache references and Service Worker cache to v101.
+- Source-level verification only; browser/device visual testing remains pending.
