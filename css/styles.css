@@ -1484,3 +1484,13 @@ body{font-size:18px;line-height:1.65}
     font-size:8.5px!important;
   }
 }
+
+
+/* Welcome role tiles: clear two-line hierarchy, consistent left alignment. */
+.main-view:has(.welcome-panel) .role-tile .role-copy{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:clamp(7px,1.1vw,11px);text-align:left;min-width:0;width:100%;}
+.main-view:has(.welcome-panel) .role-tile .role-copy strong{display:block;width:100%;font-size:clamp(20px,3.1vw,27px);font-weight:850;line-height:1.3;letter-spacing:0;white-space:nowrap;overflow:visible;text-overflow:clip;}
+.main-view:has(.welcome-panel) .role-tile.role-green:last-of-type .role-copy strong{font-size:clamp(15px,2.35vw,21px);}
+.main-view:has(.welcome-panel) .role-tile .role-copy small{display:block;width:100%;font-size:clamp(13px,1.7vw,16px);font-weight:650;line-height:1.3;letter-spacing:.015em;opacity:.9;white-space:normal;}
+.main-view:has(.welcome-panel) .role-tile .role-tagline{display:none!important;}
+@media(max-width:700px){.main-view:has(.welcome-panel) .role-tile .role-copy{gap:7px;}.main-view:has(.welcome-panel) .role-tile .role-copy strong{font-size:clamp(18px,4.1vw,24px);}.main-view:has(.welcome-panel) .role-tile.role-green:last-of-type .role-copy strong{font-size:clamp(13px,3.05vw,17px);}.main-view:has(.welcome-panel) .role-tile .role-copy small{font-size:clamp(12px,2.9vw,15px);}}
+@media(max-width:380px){.main-view:has(.welcome-panel) .role-tile.role-green:last-of-type .role-copy strong{font-size:12px;letter-spacing:-.025em;}}
