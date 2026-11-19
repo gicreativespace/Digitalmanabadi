@@ -653,3 +653,18 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
 - Source-level checks only; no live browser or mobile-device testing was
   performed. The updated Service Worker must install and activate on the
   user's browser before its network-first behavior takes effect.
+
+
+2026-11-19 — Mobile-browser tribute splash footer fit refinement
+----------------------------------------------------------------
+- Reviewed the user's mobile screenshot: the tribute content extended to the
+  lower viewport edge, leaving the final attribution line partly below view.
+- Added a compact-spacing refinement only for mobile-browser splash screens
+  up to 900 CSS px viewport height. It reduces vertical gaps and dedication
+  padding/line spacing while retaining all tribute content and the footer.
+- Updated the tribute stylesheet query version to 20261119-06.
+- No changes to portraits, wording, colors, main splash artwork, installed-app
+  mode, desktop mode, Welcome Screen, role cards, navigation, authentication,
+  modules, or any other app functionality.
+- Source-level checks only; actual mobile-device fit still requires user
+  confirmation after the updated stylesheet is served.
