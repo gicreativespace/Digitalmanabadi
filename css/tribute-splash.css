@@ -139,3 +139,13 @@ body.tribute-splash-pending #app{visibility:hidden!important}
     padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;
   }
 }
+
+
+/* Desktop browser only: keep the tribute splash inner frame bounded to the viewport on reload. */
+@media(min-width:701px){
+ html:not(.is-mobile-browser):not(.is-installed-app) .tribute-splash__inner{
+  height:100%;
+  min-height:0;
+  box-sizing:border-box;
+ }
+}

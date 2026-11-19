@@ -1542,3 +1542,13 @@ body{font-size:18px;line-height:1.65}
   font-size:clamp(14px,1.9vw,17px)!important;
  }
 }
+
+
+/* Footer popup identity: bold, clear GI monogram on white with black lettering. */
+.gcs-welcome-card .gcs-brand{display:flex;align-items:center;justify-content:center;margin:0 auto 16px!important}
+.gcs-welcome-card .gcs-gi-mark{
+ display:flex;align-items:center;justify-content:center;width:76px;height:76px;flex:0 0 76px;box-sizing:border-box;
+ border-radius:16px;background:#fff;color:#000;border:1px solid #e5e5e5;box-shadow:0 5px 16px rgba(0,0,0,.10);
+ font-family:Arial,Helvetica,sans-serif;font-size:39px;font-weight:900;line-height:1;letter-spacing:-3px;text-indent:-3px;
+}
+@media(max-width:520px){.gcs-welcome-card .gcs-gi-mark{width:64px;height:64px;flex-basis:64px;font-size:33px}}
