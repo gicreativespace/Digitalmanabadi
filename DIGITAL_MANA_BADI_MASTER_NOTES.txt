@@ -684,3 +684,39 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
   other application functions were changed.
 - Source-level checks only; installed Android/iOS device verification
   remains pending.
+
+
+2026-11-19 — Official school social links
+-----------------------------------------
+- Configured the shared Social Media Ribbon destinations:
+  Website: https://daggulurumppschoolno1.pages.dev/
+  WhatsApp: https://wa.me/919666766688
+  YouTube: https://youtube.com/@srinivasarajuvegesna-i1k?si=tZVzZlPjnANCrjFt
+- Instagram and Facebook remain intentionally disabled because no URLs
+  were supplied; they are not pointed to guessed or placeholder destinations.
+- The same shared ribbon is used on the Welcome Screen and the compact
+  auto-hide ribbon on all other app screens. Configured links open in a
+  separate tab/window with noopener/noreferrer protection.
+- Updated the shared ribbon script query version and Service Worker cache
+  to v105 so installed/browser clients can receive the link configuration.
+- No app navigation, authentication, role selection, modules, screen layout,
+  or other application functions were changed.
+- Source-level checks only; actual click-through testing was not performed.
+
+
+2026-11-19 — Welcome Screen CSS consolidation
+---------------------------------------------
+- Extracted the Welcome Screen-scoped override rules using the
+  .main-view:has(.welcome-panel) scope from the shared styles.css into
+  a dedicated css/welcome-screen.css file, preserving the original rule
+  order and declarations.
+- Removed those extracted Welcome-only rules from styles.css and loaded
+  the new stylesheet immediately after styles.css and before social-ribbon.css
+  so the existing cascade order relative to the ribbon styles is retained.
+- Added the new stylesheet to the Service Worker app-shell precache and
+  bumped the cache to v106.
+- No shared/global rules, role actions, authentication, navigation,
+  dashboards, modules, images, wording, or layout values were intentionally
+  redesigned; this is a stylesheet organization change only.
+- Source-level extraction and reference checks only; browser/device visual
+  regression testing remains pending.
