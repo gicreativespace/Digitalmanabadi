@@ -118,3 +118,24 @@ body.tribute-splash-pending #app{visibility:hidden!important}
 }
 @media(prefers-reduced-motion:reduce){.tribute-splash{transition:none}}
 
+
+
+/* Mobile browser only: keep the tribute content naturally sized and its signature reachable. */
+@media(max-width:700px){
+  html.is-mobile-browser .tribute-splash{
+    height:auto!important;
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+  }
+  html.is-mobile-browser .tribute-splash__inner{
+    min-height:100svh!important;
+    min-height:100dvh!important;
+    height:auto!important;
+    justify-content:flex-start!important;
+    gap:clamp(10px,1.8vh,18px)!important;
+    padding-top:max(14px,env(safe-area-inset-top,0px))!important;
+    padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
