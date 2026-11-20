@@ -39,12 +39,25 @@ function cleanList(value, allowed, label) {
 
 function validateTeacher(payload) {
   const name = cleanText(payload.name, 100);
-  const dob = cleanText(payload.dob, 10);
+  const dob = cleanText(payload.dob, 8);
   const gender = cleanText(payload.gender, 20);
   if (name.length < 2) throw new Error("Enter the teacher's full name.");
-  const parsedDob = new Date(dob + "T00:00:00");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(parsedDob.getTime()) || parsedDob.toISOString().slice(0, 10) !== dob || parsedDob > new Date()) {
-    throw new Error("Enter a valid date of birth.");
+  const dobParts = /^(\d{2})(\d{2})(\d{4})$/.exec(dob);
+  if (!dobParts) throw new Error("Enter date of birth in DDMMYYYY format.");
+  const day = Number(dobParts[1]);
+  const month = Number(dobParts[2]);
+  const year = Number(dobParts[3]);
+  const parsedDob = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (
+    year < 1900 ||
+    parsedDob.getFullYear() !== year ||
+    parsedDob.getMonth() !== month - 1 ||
+    parsedDob.getDate() !== day ||
+    parsedDob > today
+  ) {
+    throw new Error("Enter a valid date of birth in DDMMYYYY format.");
   }
   if (!["Female", "Male", "Other"].includes(gender)) throw new Error("Select a valid gender.");
   return {
