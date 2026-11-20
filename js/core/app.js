@@ -199,6 +199,12 @@ onAuthStateChanged(auth,async user=>{
  if(state.role==="teacher"){
   initialAuthRestoreHandled=true;
   if(state.teacherEnrollmentInProgress)return;
+  if(user&&!user.email?.toLowerCase().endsWith("@dagguluruschool.in")){
+   state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
+   state.teacherLoginNotice=T("Teacher ID మరియు Passwordతో ప్రవేశించండి.","Please sign in with your Teacher ID and Password.");
+   localStorage.removeItem("gim_authenticated");
+   state.view="login";render();return;
+  }
   if(!user){
    const wasInDashboard=state.authenticated||state.view==="dashboard";
    state.authenticated=false;state.teacherProfile=null;state.teacherPinMode=null;state.teacherLoginStep="id";
