@@ -4,6 +4,7 @@ import { auth } from "../../firebase-client.js";
 export function createParentSection({main,state,T,render,toast,escapeHtml}) {
  const t=(te,en)=>T?T(te,en):te;
  const esc=value=>escapeHtml?escapeHtml(String(value??"")):String(value??"");
+ const classTitle=value=>{const match=/^class-([1-5])$/.exec(String(value||""));return match?t(match[1]+"వ తరగతి","Class "+match[1]):String(value||"")};
  function linking(){
   main.innerHTML='<div class="backline"><button class="btn secondary" id="linkBack">← '+t("వెనక్కి","Back")+'</button></div><section class="form-card"><div class="login-symbol">♧</div><h2>'+t("తల్లిదండ్రి – విద్యార్థి అనుసంధానం","Parent–Student Verification")+'</h2><p>'+t("మీ నమోదిత మొబైల్ నంబర్‌తో పిల్లల వివరాలను కనుగొని, పుట్టిన తేదీ మరియు Permanent Secret Codeతో నిర్ధారించండి.","Find your child using the registered mobile number, then verify with date of birth and Permanent Secret Code.")+'</p>'+
   '<div class="stepper"><span class="active">'+t("1. మొబైల్","1. Mobile")+'</span><span>'+t("2. ధృవీకరణ","2. Verification")+'</span><span>'+t("3. PIN","3. PIN")+'</span></div>'+
@@ -20,7 +21,7 @@ export function createParentSection({main,state,T,render,toast,escapeHtml}) {
     const result=await findParentStudents(mobile),students=result.students||[];
     if(!students.length){say(t("ఈ మొబైల్ నంబర్‌కు విద్యార్థుల వివరాలు అందుబాటులో లేవు. పాఠశాలను సంప్రదించండి.","No student records are available for this mobile number. Please contact the school."),true);return;}
     say(t("మీ పిల్లల్లో ఒకరిని ఎంచుకోండి.","Select one of your children."));
-    choices.innerHTML='<div class="field"><label>'+t("విద్యార్థిని ఎంచుకోండి","Select Student")+'</label><select id="parentStudentChoice"><option value="">'+t("ఎంచుకోండి","Choose")+'</option>'+students.map(s=>'<option value="'+esc(s.studentRecordId)+'">'+esc(s.name)+' · '+esc(s.classId)+' · '+t("రోల్","Roll")+' '+esc(s.rollNumber)+'</option>').join("")+'</select></div>'+
+    choices.innerHTML='<div class="field"><label>'+t("విద్యార్థిని ఎంచుకోండి","Select Student")+'</label><select id="parentStudentChoice"><option value="">'+t("ఎంచుకోండి","Choose")+'</option>'+students.map(s=>'<option value="'+esc(s.studentRecordId)+'">'+esc(s.name)+' · '+esc(classTitle(s.classId))+' · '+t("రోల్","Roll")+' '+esc(s.rollNumber)+'</option>').join("")+'</select></div>'+
     '<div class="field"><label>'+t("పుట్టిన తేదీ (DD/MM/YYYY)","Date of Birth (DD/MM/YYYY)")+'</label><input id="parentStudentDob" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY"></div>'+
     '<div class="field"><label>'+t("Permanent Secret Code","Permanent Secret Code")+'</label><input id="parentSecretCode" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="'+t("12 అంకెల Secret Code","12-digit Secret Code")+'"></div>'+
     '<button class="btn full" id="verifyParentStudent">'+t("ధృవీకరించి అనుసంధానించండి","Verify & Link Child")+'</button>';
