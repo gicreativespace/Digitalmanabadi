@@ -6,11 +6,20 @@ const errMsg=e=>{const c=e?.code||"";if(c.includes("invalid-credential")||c.incl
 export async function signOutPortal(){if(auth.currentUser)await signOut(auth);}
 export async function sendPortalPasswordReset(email){if(!email)throw new Error("Email is required.");return sendPasswordResetEmail(auth,email.trim());}
 export async function authenticateHeadMaster(email,password){
- const cred=await signInWithEmailAndPassword(auth,email,password);if(!cred.user.emailVerified){await signOut(auth);throw Error("దయచేసి మీ అధికారిక Emailను ముందుగా Verify చేయండి.");}const uid=cred.user.uid,s=await getDoc(doc(db,"headMasters",uid));
- if(!s.exists()||s.data().email?.toLowerCase()!==cred.user.email?.toLowerCase()||s.data().status!=="active"){await signOut(auth);throw Error("ఈ Head Master ఖాతా ఇంకా సక్రియం కాలేదు. GI Super Adminను సంప్రదించండి.");}
- const profile=s.data(),school=await getDoc(doc(db,"schools",profile.schoolId));
- if(!school.exists()||school.data().status!=="active"){await signOut(auth);throw Error("ఈ పాఠశాల ఖాతా ప్రస్తుతం సక్రియంగా లేదు.");}
- return {profile:{...profile,uid,school:school.data()}};
+ const cred=await signInWithEmailAndPassword(auth,email,password);
+ try{
+  if(!cred.user.emailVerified)throw Error("దయచేసి మీ అధికారిక Emailను ముందుగా Verify చేయండి.");
+  const uid=cred.user.uid,s=await getDoc(doc(db,"headMasters",uid));
+  if(!s.exists())throw Error("ఈ Head Master ఖాతా ఇంకా సక్రియం కాలేదు. GI Super Adminను సంప్రదించండి.");
+  const profile=s.data();
+  if(profile.role!=="HEAD_MASTER"||profile.email?.trim().toLowerCase()!==cred.user.email?.toLowerCase()||profile.status!=="active"){
+   throw Error("ఈ Head Master ఖాతా ఇంకా సక్రియం కాలేదు. GI Super Adminను సంప్రదించండి.");
+  }
+  return {profile:{...profile,uid}};
+ }catch(error){
+  try{await signOut(auth);}catch{}
+  throw error;
+ }
 }
 export function renderSuperAdminLogin(main,{onSuccess,onBack,onPasswordReset,T=(te,en)=>en,APP_CONFIG={}}){
  const quote=T("సాంకేతికతతో అనుసంధానం… బాధ్యతతో నిర్వహణ… నాణ్యతతో అభివృద్ధి.","Connected by technology. Guided by responsibility. Driven by excellence.");
