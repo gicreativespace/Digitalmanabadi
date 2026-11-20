@@ -1,4 +1,4 @@
-import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue } from "../_lib/admin.js";
+import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue } from "../../lib/backend/admin.js";
 
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
