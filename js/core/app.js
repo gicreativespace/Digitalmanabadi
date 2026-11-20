@@ -29,9 +29,17 @@ const roleDashboardIntro = {
 
 const savedRole = localStorage.getItem("gim_role") || null;
 const savedAuth = localStorage.getItem("gim_authenticated") === "true";
+// Browser-local preview flags are not authentication. Discard legacy Teacher,
+// Parent and Community preview sessions instead of restoring protected dashboards.
+const stalePreviewSession = savedAuth && ["teacher","parent","community"].includes(savedRole);
+if (stalePreviewSession) {
+  localStorage.removeItem("gim_role");
+  localStorage.removeItem("gim_authenticated");
+}
+const restoredRole = stalePreviewSession ? null : savedRole;
 const state = {
-  role: savedRole === "superadmin" ? null : savedRole, authenticated: Boolean(savedRole && savedAuth && !["hm","superadmin"].includes(savedRole)),
-  view: savedRole && savedAuth && !["hm","superadmin"].includes(savedRole) ? "dashboard" : savedRole && savedRole !== "superadmin" ? "login" : "welcome", module: null,
+  role: restoredRole === "superadmin" ? null : restoredRole, authenticated: Boolean(restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole)),
+  view: restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole) ? "dashboard" : restoredRole && restoredRole !== "superadmin" ? "login" : "welcome", module: null,
   superAdminProfile: null, headMasterProfile: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
