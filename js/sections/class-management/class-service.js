@@ -1,7 +1,7 @@
 import { auth } from "../../firebase-client.js";
 import { APP_CONFIG } from "../../../config/school-config.js";
 
-const apiBase = () => String(APP_CONFIG.backendApiBaseUrl || "").replace(/\\/$/, "");
+const apiBase = () => String(APP_CONFIG.backendApiBaseUrl || "").replace(/\/$/, "");
 const te = () => localStorage.getItem("gim_lang") !== "en";
 const messages = {
  "Trusted Backend ఇంకా కనెక్ట్ కాలేదు. Backend URL సెట్టింగ్ అవసరం.": "Trusted Backend is not connected yet. Backend URL configuration is required.",
