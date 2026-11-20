@@ -161,10 +161,26 @@ async function bindTeacherManagement(){
   button.disabled=true;button.textContent=T("సృష్టిస్తోంది…","Creating…");
   try{
    const created=await createTeacherRecord(payload);
-   resultBox.innerHTML='<h4>'+T("Teacher Profile రూపొందించబడింది","Teacher profile created")+'</h4><p class="teacher-admin-help">Teacher ID: <strong>'+esc(created.teacherId)+'</strong>. '+T("Login ID మరియు Password రూపొందించడానికి Teacher Profileలో Create Login ఎంచుకోండి.","Select Create Login in the Teacher Profile to generate Login ID and Password.")+'</p>';
-   resultBox.classList.add("is-visible");form.reset();createCard.hidden=true;showCreateButton.hidden=false;await refreshList();
+   const loginButtonId="createLoginForNewTeacher";
+   resultBox.innerHTML='<h4>'+T("Teacher Profile రూపొందించబడింది","Teacher profile created")+'</h4><p class="teacher-admin-help">Teacher ID: <strong>'+esc(created.teacherId)+'</strong><br>Login ID: <strong>'+esc(created.teacherId+'@dagguluruschool.in')+'</strong></p><p class="teacher-admin-help">'+T("ఇప్పుడు ఇదే పేజీలో Create Login నొక్కి Firebase Login సృష్టించండి. మళ్లీ Teacher record సృష్టించాల్సిన అవసరం లేదు.","Create the Firebase login here using the button below. Do not create another teacher record.")+'</p><div class="teacher-admin-action"><button type="button" class="btn" id="'+loginButtonId+'">'+T("Create Login","Create Login")+'</button><span id="newTeacherLoginStatus" class="teacher-admin-help" role="status" aria-live="polite"></span></div>';
+   resultBox.classList.add("is-visible");form.reset();button.disabled=true;button.textContent=T("Teacher Created","Teacher Created");if(cancelCreateButton)cancelCreateButton.hidden=true;await refreshList();
+   const loginButton=resultBox.querySelector("#"+loginButtonId),loginStatus=resultBox.querySelector("#newTeacherLoginStatus");
+   loginButton.onclick=async()=>{
+    loginButton.disabled=true;loginButton.textContent=T("లాగిన్ సృష్టిస్తోంది…","Creating Login…");loginStatus.textContent=T("Firebase Authenticationలో Login సృష్టిస్తోంది…","Creating Firebase Authentication login…");
+    try{
+     const credentials=await createTeacherLogin(created.teacherId);
+     renderCredentials(credentials);
+     status.textContent=T("Teacher Login విజయవంతంగా రూపొందించబడింది.","Teacher login created successfully.");
+     await refreshList();
+    }catch(error){
+     const message=error?.message||T("లాగిన్ సృష్టించలేకపోయాం.","Could not create login.");
+     loginStatus.textContent=message;status.textContent=message;
+     loginButton.disabled=false;loginButton.textContent=T("మళ్లీ ప్రయత్నించండి","Retry Create Login");
+    }
+   };
+   await refreshList();
   }catch(error){formStatus.textContent=error?.message||T("ఉపాధ్యాయుడిని నమోదు చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.","Could not create teacher. Please try again.");}
-  finally{button.disabled=false;button.textContent=T("Create Teacher","Create Teacher");}
+  finally{if(!resultBox.classList.contains("is-visible")){button.disabled=false;button.textContent=T("Create Teacher","Create Teacher");}}
  };
  await refreshList();
 }
