@@ -189,14 +189,15 @@ setupFooter();setupBottomNavigation();updateBottomNavigation();
 // Restore only a valid Firebase Head Master session, then require the device PIN.
 let initialAuthRestoreHandled=false;
 onAuthStateChanged(auth,async user=>{
- if(initialAuthRestoreHandled)return;
- initialAuthRestoreHandled=true;
  if(state.role==="teacher"){
+  initialAuthRestoreHandled=true;
   if(state.teacherEnrollmentInProgress)return;
   if(!user){
-   state.authenticated=false;
+   const wasInDashboard=state.authenticated||state.view==="dashboard";
+   state.authenticated=false;state.teacherProfile=null;state.teacherPinMode=null;state.teacherLoginStep="id";
    localStorage.removeItem("gim_authenticated");
    state.view="login";
+   if(wasInDashboard){state.teacherLoginNotice=T("మీ Login Session ముగిసింది. Teacher IDతో మళ్లీ ధృవీకరించండి.","Your login session has expired. Please verify again with your Teacher ID.");render();}
    return;
   }
   try{
@@ -220,6 +221,8 @@ onAuthStateChanged(auth,async user=>{
   }
   return;
  }
+ if(initialAuthRestoreHandled)return;
+ initialAuthRestoreHandled=true;
  if(state.role!=="hm"||state.view!=="login")return;
  if(!user){
   state.authenticated=false;
