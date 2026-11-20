@@ -1,6 +1,6 @@
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
 import { auth } from "../firebase-client.js";
-import { signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { signInWithCustomToken, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { lookupTeacherName, verifyTeacherIdentity, completeTeacherEnrollment, getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
@@ -157,7 +157,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      '<h3 class="login-role-heading">'+title+'</h3>'+
      '<p>'+ (isHm?T("మీ పాఠశాల ఖాతాతో కొనసాగండి.","Sign in to your school account."):view.description) +'</p>'+
     '</div><div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+'</section></section>';
-  main.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+  main.querySelector("#backWelcome").onclick=async()=>{if(state.role==="teacher"){try{await signOut(auth)}catch{}state.teacherLoginStep="id";state.teacherLoginRecord=null;state.teacherPinMode=null;state.teacherEnrollmentInProgress=false;state.teacherLoginNotice=null;state.teacherProfile=null;}state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
   if(teacher){setupTeacherFlow();return;}
   if(community){
    main.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
