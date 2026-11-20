@@ -2,7 +2,7 @@ import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHead
 import { auth } from "../firebase-client.js";
 import { signInWithCustomToken, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { lookupTeacherName, verifyTeacherIdentity, completeTeacherEnrollment, getTeacherProfile } from "../sections/teacher/teacher-service.js";
-import { getLocalTeacherPinRecord, saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
+import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
  async function renderHmPinGate(){
@@ -124,8 +124,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     }catch(error){show(error?.message||T("Teacher ID కనుగొనబడలేదు.","Teacher ID was not found."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");}
    };
   };
-  if(state.teacherLoginNotice){show(state.teacherLoginNotice,"info");state.teacherLoginNotice=null;}
   renderStage();
+  if(state.teacherLoginNotice){show(state.teacherLoginNotice,"info");state.teacherLoginNotice=null;}
  }
  function login(){
   const role=roleNames[state.role],view=roleLoginViews[state.role]({T,state}),community=view.kind==="community",teacher=view.kind==="teacher";
@@ -195,10 +195,6 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      }
     }
     catch(e){state.hmPasswordJustVerified=false;show(errorText(e,"hm"));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Secure Login")}
-    return;
-   }
-   if(state.role==="teacher"){
-    show(T("Teacher Login ప్రస్తుతం Preview Modeలో ఉంది. Registered Mobile + 4-digit PIN కోసం సురక్షిత Authentication ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Teacher login is currently in Preview Mode. Secure authentication for registered mobile + 4-digit PIN is not connected yet. Please contact the Head Master."),"info");
     return;
    }
    if(state.role==="parent"){
