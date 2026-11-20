@@ -37,8 +37,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   if(state.role==="parent")main.querySelector("#startLink").onclick=()=>{state.view="link";render()};
   main.querySelector("#forgotAccess").onclick=async()=>{
    clear();
-   if(state.role==="teacher"){show(T("Teacher Login ప్రస్తుతం Preview Modeలో ఉంది. Password Recovery ఇంకా అనుసంధానం కాలేదు; Head Master‌ను సంప్రదించండి.","Teacher login is currently in Preview Mode. Password recovery is not connected yet; contact the Head Master."),"info");return}
-   if(state.role==="parent"){state.view="link";render();return}
+   if(state.role==="teacher"){show(T("Teacher PIN Recovery ప్రస్తుతం అందుబాటులో లేదు. సురక్షిత ధృవీకరణ అనుసంధానం అయ్యే వరకు Head Master‌ను సంప్రదించండి.","Teacher PIN recovery is not available yet. Please contact the Head Master until secure verification is connected."),"info");return}
+   if(state.role==="parent"){show(T("Parent PIN Recovery ప్రస్తుతం అందుబాటులో లేదు. సురక్షిత ధృవీకరణ అనుసంధానం అయ్యే వరకు Head Master‌ను సంప్రదించండి.","Parent PIN recovery is not available yet. Please contact the Head Master until secure verification is connected."),"info");return}
    const email=main.querySelector("#loginId").value.trim();
    if(!email){show(T("ముందుగా మీ అధికారిక School Email నమోదు చేయండి.","Enter your official school email first."),"warning");main.querySelector("#loginId").focus();return}
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show(T("దయచేసి సరైన Email నమోదు చేయండి.","Please enter a valid email address."),"warning");return}
