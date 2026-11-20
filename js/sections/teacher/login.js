@@ -1,3 +1,7 @@
 export function getTeacherLoginView({T}) {
- return {kind:"credentials",description:T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account."),formMarkup:'<div class="field"><label>'+T("నమోదిత మొబైల్ నంబర్","Registered Mobile Number")+'</label><input id="loginId" type="tel" inputmode="tel" autocomplete="username" placeholder="'+T("మీ మొబైల్ నంబర్ నమోదు చేయండి","Enter your mobile number")+'"></div><div class="field"><label>'+T("4 అంకెల PIN","4-digit PIN")+'</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••"></div><button class="btn full" id="loginGo">'+T("ప్రవేశించండి","Sign In")+'</button><div class="demo-note">'+T("Preview Mode — సురక్షిత Teacher Authentication ఇంకా అనుసంధానం కాలేదు.","Preview Mode — secure Teacher authentication is not connected yet.")+'</div>'};
+  return {
+    kind: "teacher",
+    description: T("మీ Teacher IDతో కొనసాగండి.", "Continue with your Teacher ID."),
+    formMarkup: '<style>.teacher-name-confirm{display:grid;gap:5px;margin:4px 0 16px;padding:14px;border:1px solid var(--border);border-radius:13px;background:var(--surface2)}.teacher-name-confirm small{font-size:12px;color:var(--muted)}.teacher-name-confirm strong{font-size:18px;color:var(--text)}.teacher-flow-hint{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.6}#teacherFlow h3{margin:0 0 8px;font-size:19px;color:var(--text)}#teacherFlow .text-link{display:block;margin:12px auto 0}</style><div id="teacherFlow" aria-live="polite"></div>'
+  };
 }

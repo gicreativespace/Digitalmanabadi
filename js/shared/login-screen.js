@@ -1,4 +1,8 @@
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
+import { auth } from "../firebase-client.js";
+import { signInWithCustomToken, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { lookupTeacherName, verifyTeacherIdentity, completeTeacherEnrollment, getTeacherProfile } from "../sections/teacher/teacher-service.js";
+import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
  async function renderHmPinGate(){
@@ -36,8 +40,95 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   const forgot=main.querySelector("#hmForgotPin");
   if(forgot)forgot.onclick=async()=>{forgot.disabled=true;try{await signOutPortal?.();}catch{}state.authenticated=false;state.hmPinMode=null;state.hmPinReset=true;localStorage.setItem("gim_role","hm");localStorage.removeItem("gim_authenticated");state.view="login";render();};
  }
+ function setupTeacherFlow(){
+  const flow=main.querySelector("#teacherFlow");
+  const alert=main.querySelector("#loginAlert");
+  const show=(message,type="error")=>{alert.hidden=false;alert.dataset.type=type;alert.textContent=message;};
+  const clear=()=>{alert.hidden=true;alert.textContent="";alert.dataset.type="";};
+  const buttonBusy=(button,label)=>{button.disabled=true;button.textContent=label;};
+  const inputField=(id,label,type="text",extra="")=>'<div class="field"><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+type+'" '+extra+'></div>';
+  const renderStage=()=>{
+   clear();
+   if(state.teacherPinMode==="unlock"){
+    flow.innerHTML='<h3>'+T("Teacher PIN","Teacher PIN")+'</h3><p class="teacher-flow-hint">'+T("మీ Firebase Session సక్రియంగా ఉంది. కొనసాగడానికి మీ PIN నమోదు చేయండి.","Your secure session is active. Enter your PIN to continue.")+'</p>'+inputField("teacherUnlockPin",T("4 అంకెల PIN","4-digit PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherUnlock">'+T("కొనసాగించండి","Continue")+'</button>';
+    main.querySelector("#teacherUnlock").onclick=async()=>{
+     const pin=main.querySelector("#teacherUnlockPin").value,button=main.querySelector("#teacherUnlock");
+     if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter your 4-digit PIN."),"warning");return;}
+     buttonBusy(button,T("ధృవీకరిస్తోంది…","Verifying…"));
+     try{
+      const user=auth.currentUser;
+      if(!user)throw new Error("Session expired. Please sign in again.");
+      const valid=await verifyLocalTeacherPin(user.uid,pin);
+      if(!valid){show(T("PIN సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Incorrect PIN. Please try again."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");return;}
+      state.teacherProfile=await getTeacherProfile();
+      state.teacherPinMode=null;state.authenticated=true;
+      localStorage.setItem("gim_role","teacher");localStorage.setItem("gim_authenticated","true");
+      state.view="dashboard";render();
+     }catch(error){show(error?.message||T("Login సాధ్యం కాలేదు.","Unable to sign in."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");}
+    };
+    return;
+   }
+   if(state.teacherLoginStep==="verify"){
+    const teacher=state.teacherLoginRecord||{};
+    flow.innerHTML='<div class="teacher-name-confirm"><small>'+T("Teacher Name","Teacher Name")+'</small><strong>'+String(teacher.name||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</strong></div>'+inputField("teacherSecretCode",T("Secret Code","Secret Code"),"password",'inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"') + inputField("teacherDob",T("Date of Birth","Date of Birth"),"date",'autocomplete="bday"')+'<button type="button" class="btn full role-login-submit" id="teacherVerify">'+T("ధృవీకరించండి","Verify Identity")+'</button><button type="button" class="text-link" id="teacherChangeId">'+T("Teacher ID మార్చండి","Change Teacher ID")+'</button>';
+    main.querySelector("#teacherChangeId").onclick=()=>{state.teacherLoginStep="id";state.teacherLoginRecord=null;renderStage();};
+    main.querySelector("#teacherVerify").onclick=async()=>{
+     const secretCode=main.querySelector("#teacherSecretCode").value.trim(),dob=main.querySelector("#teacherDob").value,button=main.querySelector("#teacherVerify");
+     if(!/^\d{4}$/.test(secretCode)||!dob){show(T("Secret Code మరియు Date of Birth నమోదు చేయండి.","Enter the Secret Code and Date of Birth."),"warning");return;}
+     buttonBusy(button,T("ధృవీకరిస్తోంది…","Verifying…"));
+     try{
+      await setPersistence(auth,browserLocalPersistence);
+      const result=await verifyTeacherIdentity({teacherId:teacher.teacherId,secretCode,dob});
+      state.teacherEnrollmentInProgress=true;
+      const credential=await signInWithCustomToken(auth,result.customToken);
+      state.teacherAuthUid=credential.user.uid;
+      state.teacherLoginStep="pin";state.teacherPinMode="setup";
+      renderStage();
+     }catch(error){
+      state.teacherEnrollmentInProgress=false;
+      show(error?.message||T("వివరాలు సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Verification failed. Please check your details."));
+      button.disabled=false;button.textContent=T("ధృవీకరించండి","Verify Identity");
+     }
+    };
+    return;
+   }
+   if(state.teacherLoginStep==="pin"){
+    flow.innerHTML='<h3>'+T("మీ 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN")+'</h3><p class="teacher-flow-hint">'+T("తదుపరి సారి ఈ పరికరంలో త్వరగా ప్రవేశించడానికి PIN ఉపయోగించండి.","Use this PIN for quick access on this device next time.")+'</p>'+inputField("teacherNewPin",T("కొత్త PIN","New PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"') + inputField("teacherConfirmPin",T("PIN మళ్లీ నమోదు చేయండి","Confirm PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherSavePin">'+T("PIN సేవ్ చేయండి","Save PIN")+'</button>';
+    main.querySelector("#teacherSavePin").onclick=async()=>{
+     const pin=main.querySelector("#teacherNewPin").value,confirm=main.querySelector("#teacherConfirmPin").value,button=main.querySelector("#teacherSavePin");
+     if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter a 4-digit PIN."),"warning");return;}
+     if(pin!==confirm){show(T("రెండు PINలు సరిపోలలేదు.","The PINs do not match."),"warning");return;}
+     buttonBusy(button,T("సేవ్ చేస్తోంది…","Saving…"));
+     try{
+      const user=auth.currentUser;if(!user)throw new Error("Secure session expired. Please verify again.");
+      await saveLocalTeacherPin(user.uid,pin);
+      await completeTeacherEnrollment();
+      state.teacherProfile=await getTeacherProfile();
+      state.teacherEnrollmentInProgress=false;state.teacherPinMode=null;state.teacherLoginStep=null;state.authenticated=true;
+      localStorage.setItem("gim_role","teacher");localStorage.setItem("gim_authenticated","true");
+      state.view="dashboard";render();
+     }catch(error){show(error?.message||T("PIN సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.","Could not save the PIN. Please try again."));button.disabled=false;button.textContent=T("PIN సేవ్ చేయండి","Save PIN");}
+    };
+    return;
+   }
+   state.teacherLoginStep="id";
+   flow.innerHTML=inputField("teacherIdInput",T("Teacher ID","Teacher ID"),"text",'inputmode="numeric" maxlength="4" autocomplete="username" placeholder="ఉదా: 2601"')+'<button type="button" class="btn full role-login-submit" id="teacherLookup">'+T("కొనసాగించండి","Continue")+'</button>';
+   main.querySelector("#teacherLookup").onclick=async()=>{
+    const teacherId=main.querySelector("#teacherIdInput").value.trim(),button=main.querySelector("#teacherLookup");
+    if(!/^\d{4}$/.test(teacherId)){show(T("సరైన Teacher ID నమోదు చేయండి.","Enter a valid Teacher ID."),"warning");return;}
+    buttonBusy(button,T("వివరాలు చూస్తోంది…","Checking…"));
+    try{
+     const profile=await lookupTeacherName(teacherId);
+     state.teacherLoginRecord={teacherId,name:profile.name};
+     state.teacherLoginStep="verify";renderStage();
+    }catch(error){show(error?.message||T("Teacher ID కనుగొనబడలేదు.","Teacher ID was not found."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");}
+   };
+  };
+  renderStage();
+  if(state.teacherLoginNotice){show(state.teacherLoginNotice,"info");state.teacherLoginNotice=null;}
+ }
  function login(){
-  const role=roleNames[state.role],view=roleLoginViews[state.role]({T,state}),community=view.kind==="community";
+  const role=roleNames[state.role],view=roleLoginViews[state.role]({T,state}),community=view.kind==="community",teacher=view.kind==="teacher";
   const meta={
    hm:{kicker:"SCHOOL LEADERSHIP",title:T("ప్రధానోపాధ్యాయుల ప్రవేశం","Head Master Access"),note:T("పాఠశాల నిర్వహణకు ఒకే సురక్షిత ప్రవేశం.","One secure gateway for school leadership."),quote:T("నాయకత్వం అభ్యాసానికి స్ఫూర్తినిస్తేనే పాఠశాల మరింత బలపడుతుంది.","A school grows stronger when leadership inspires learning.")},
    teacher:{kicker:"TEACHING & LEARNING",title:T("ఉపాధ్యాయుల ప్రవేశం","Teachers' Workspace"),note:T("మీ తరగతులు, బోధన, విద్యార్థుల పురోగతికి ఒకే వేదిక.","Your space for classes, teaching and student progress."),quote:T("మంచి ఉపాధ్యాయులు పాఠాలు మాత్రమే కాదు… భవిష్యత్తును నిర్మిస్తారు.","Great teachers don't just teach lessons… they shape the future.")},
@@ -54,7 +145,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   const errorText=(e,key)=>{const c=e&&e.code||"";if(c.includes("network-request-failed")||c.includes("unavailable")||c.includes("timeout"))return T("ఇంటర్నెట్ కనెక్షన్‌ను పరిశీలించి మళ్లీ ప్రయత్నించండి.","Connection issue. Please check and try again.");if(c.includes("too-many-requests"))return T("కొద్దిసేపు వేచి ఉండి మళ్లీ ప్రయత్నించండి.","Please wait a moment and try again.");if(c.includes("user-disabled"))return T("ప్రస్తుతం Login సాధ్యం కావడం లేదు. పాఠశాల నిర్వాహకులను సంప్రదించండి.","Unable to sign in right now. Please contact your school administrator.");if(c.includes("invalid-credential")||c.includes("wrong-password")||c.includes("user-not-found")){fail(key);return T("Login వివరాలు సరిపోలలేదు. మళ్లీ నమోదు చేయండి.","Login failed. Please check your details and try again.");}if(c.includes("user-token-expired")||c.includes("requires-recent-login")||c.includes("invalid-user-token"))return T("మీ Session గడువు ముగిసింది. మళ్లీ Login చేయండి.","Your session has expired. Please sign in again.");return T("Login పూర్తి కాలేదు. దయచేసి మళ్లీ ప్రయత్నించండి.","Sign-in failed. Please try again.");};
   const actions=community
    ? '<div class="link-row"><button type="button" class="text-link" id="communityHelp">'+T("Account సహాయం కావాలా?","Need account help?")+'</button></div>'
-   : '<div class="link-row"><button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
+   : teacher ? "" : '<div class="link-row"><button type="button" class="text-link" id="forgotAccess">'+(state.role==="parent"?T("Parent PIN మర్చిపోయారా?","Forgot Parent PIN?"):T("Password మర్చిపోయారా?","Forgot Password?"))+'</button></div>';
   const image=APP_CONFIG.schoolImage||"assets/branding/school/school-building.jpg";
   main.innerHTML='<div class="backline role-login-backline"><button class="btn secondary" id="backWelcome">← '+T("వెనక్కి","Back to Home")+'</button><span class="pill">'+T(role[0],role[1])+'</span></div>'+
    '<section class="role-login-layout login-unified" data-role="'+state.role+'" aria-label="'+title+'">'+
@@ -66,7 +157,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      '<h3 class="login-role-heading">'+title+'</h3>'+
      '<p>'+ (isHm?T("మీ పాఠశాల ఖాతాతో కొనసాగండి.","Sign in to your school account."):view.description) +'</p>'+
     '</div><div class="role-login-alert" id="loginAlert" role="alert" aria-live="assertive" hidden></div>'+view.formMarkup+actions+'</section></section>';
-  main.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+  main.querySelector("#backWelcome").onclick=async()=>{if(state.role==="teacher"){const keepLinkedSession=state.teacherPinMode==="unlock"&&auth.currentUser?.uid?.startsWith("teacher_");if(!keepLinkedSession&&auth.currentUser?.uid?.startsWith("teacher_")){try{await signOut(auth)}catch{}}state.teacherLoginStep="id";state.teacherLoginRecord=null;state.teacherEnrollmentInProgress=false;state.teacherLoginNotice=null;if(!keepLinkedSession){state.teacherPinMode=null;state.teacherProfile=null;}}state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
+  if(teacher){setupTeacherFlow();return;}
   if(community){
    main.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
    main.querySelector("#communityHelp").onclick=()=>show(T("నమోదు అభ్యర్థన ప్రస్తుతం Preview Modeలో ఉంది. నిజమైన ఖాతా అనుమతి మరియు Sign-in ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Registration requests are currently in Preview Mode. Account approval and secure sign-in are not connected yet. Please contact the Head Master."),"info");
@@ -103,10 +195,6 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      }
     }
     catch(e){state.hmPasswordJustVerified=false;show(errorText(e,"hm"));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Secure Login")}
-    return;
-   }
-   if(state.role==="teacher"){
-    show(T("Teacher Login ప్రస్తుతం Preview Modeలో ఉంది. Registered Mobile + 4-digit PIN కోసం సురక్షిత Authentication ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Teacher login is currently in Preview Mode. Secure authentication for registered mobile + 4-digit PIN is not connected yet. Please contact the Head Master."),"info");
     return;
    }
    if(state.role==="parent"){

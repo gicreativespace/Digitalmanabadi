@@ -1,8 +1,84 @@
 import { renderCalendarMarkup } from "./calendar.js";
+import { createTeacherRecord, listTeacherRecords } from "../sections/teacher/teacher-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
 export function createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection}) {
+function teacherManagementMarkup(){
+ return '<style>'+
+ '.teacher-admin{display:grid;gap:16px;margin-top:18px}'+
+ '.teacher-admin-card{border:1px solid var(--border);border-radius:16px;padding:16px;background:var(--surface)}'+
+ '.teacher-admin-card h3{margin:0 0 12px;font-size:17px;color:var(--text)}'+
+ '.teacher-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'+
+ '.teacher-admin .field{display:grid;gap:6px;margin:0}.teacher-admin .field label{font-size:13px;font-weight:700;color:var(--text)}'+
+ '.teacher-admin input,.teacher-admin select{width:100%;min-height:45px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit}'+
+ '.teacher-admin-help{font-size:12px;color:var(--muted);line-height:1.5;margin:6px 0 0}'+
+ '.teacher-admin-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}'+
+ '.teacher-admin-result{display:none;margin-top:12px;padding:13px;border:1px solid var(--green);border-radius:12px;background:var(--surface2);overflow-wrap:anywhere}'+
+ '.teacher-admin-result.is-visible{display:block}.teacher-admin-result strong{display:block;margin:4px 0;font-size:20px;letter-spacing:.06em}'+
+ '.teacher-admin-list{display:grid;gap:10px}.teacher-admin-row{padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}'+
+ '.teacher-admin-row-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.teacher-admin-row strong{color:var(--text)}'+
+ '.teacher-admin-row small{display:block;color:var(--muted);font-size:12px;line-height:1.55;margin-top:5px}'+
+ '.teacher-admin-id{font-size:12px;font-weight:800;color:var(--green);letter-spacing:.06em}'+
+ '.teacher-admin-empty{padding:14px;border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:13px}'+
+ '@media(max-width:560px){.teacher-admin-grid{grid-template-columns:1fr}.teacher-admin-card{padding:13px}}'+
+ '</style>'+
+ '<div class="teacher-admin">'+
+  '<section class="teacher-admin-card"><h3>కొత్త ఉపాధ్యాయుడిని చేర్చండి</h3>'+
+   '<form id="teacherCreateForm">'+
+    '<div class="teacher-admin-grid">'+
+     '<div class="field"><label for="teacherName">Teacher Name</label><input id="teacherName" name="name" maxlength="100" required autocomplete="name"></div>'+
+     '<div class="field"><label for="teacherDob">Date of Birth</label><input id="teacherDob" name="dob" type="date" required></div>'+
+     '<div class="field"><label for="teacherGender">Gender</label><select id="teacherGender" name="gender" required><option value="">Select Gender</option><option value="Female">Female</option><option value="Male">Male</option><option value="Other">Other</option></select></div>'+
+     '<div class="field"><label for="teacherClasses">Assigned Classes</label><input id="teacherClasses" name="classes" placeholder="ఉదా: Class 1, Class 2" required></div>'+
+     '<div class="field"><label for="teacherSubjects">Teaching Subjects</label><input id="teacherSubjects" name="subjects" placeholder="ఉదా: Telugu, Maths" required></div>'+
+    '</div>'+
+    '<p class="teacher-admin-help">Classes, Subjects‌ను commaతో వేరు చేసి నమోదు చేయండి.</p>'+
+    '<div class="teacher-admin-action"><button class="btn" id="teacherCreateButton" type="submit">Create Teacher</button><span id="teacherCreateStatus" class="teacher-admin-help" role="status"></span></div>'+
+   '</form>'+
+   '<div id="teacherCreateResult" class="teacher-admin-result" aria-live="polite"></div>'+
+  '</section>'+
+  '<section class="teacher-admin-card"><h3>ఉపాధ్యాయుల జాబితా</h3><div id="teacherList" class="teacher-admin-list"><div class="teacher-admin-empty">ఉపాధ్యాయుల వివరాలను లోడ్ చేస్తోంది…</div></div></section>'+
+ '</div>';
+}
+async function bindTeacherManagement(){
+ const form=main.querySelector("#teacherCreateForm");
+ const button=main.querySelector("#teacherCreateButton");
+ const status=main.querySelector("#teacherCreateStatus");
+ const resultBox=main.querySelector("#teacherCreateResult");
+ const listBox=main.querySelector("#teacherList");
+ const showError=error=>{status.textContent=error?.message||"ఉపాధ్యాయుడిని నమోదు చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.";};
+ const refreshList=async()=>{
+  listBox.innerHTML='<div class="teacher-admin-empty">ఉపాధ్యాయుల వివరాలను లోడ్ చేస్తోంది…</div>';
+  try{
+   const response=await listTeacherRecords();
+   const teachers=response.teachers||[];
+   listBox.innerHTML=teachers.length?teachers.map(teacher=>'<article class="teacher-admin-row"><div class="teacher-admin-row-top"><strong>'+escapeHtml(teacher.name)+'</strong><span class="teacher-admin-id">'+escapeHtml(teacher.teacherId)+'</span></div><small>Classes: '+escapeHtml((teacher.assignedClasses||[]).join(", "))+'</small><small>Subjects: '+escapeHtml((teacher.teachingSubjects||[]).join(", "))+'</small><small>Status: '+(teacher.linked?"Linked":"Not yet linked")+'</small></article>').join(""):'<div class="teacher-admin-empty">ఇంకా ఉపాధ్యాయులు నమోదు కాలేదు.</div>';
+  }catch(error){listBox.innerHTML='<div class="teacher-admin-empty">'+escapeHtml(error?.message||"ఉపాధ్యాయుల జాబితాను లోడ్ చేయలేకపోయాం.")+'</div>';}
+ };
+ if(form)form.onsubmit=async event=>{
+  event.preventDefault();status.textContent="";resultBox.classList.remove("is-visible");
+  const split=value=>value.split(",").map(item=>item.trim()).filter(Boolean);
+  const payload={
+   name:main.querySelector("#teacherName").value.trim(),
+   dob:main.querySelector("#teacherDob").value,
+   gender:main.querySelector("#teacherGender").value,
+   assignedClasses:split(main.querySelector("#teacherClasses").value),
+   teachingSubjects:split(main.querySelector("#teacherSubjects").value)
+  };
+  if(!payload.assignedClasses.length||!payload.teachingSubjects.length){status.textContent="Classes మరియు Subjects నమోదు చేయండి.";return;}
+  button.disabled=true;button.textContent="Creating…";
+  try{
+   const created=await createTeacherRecord(payload);
+   resultBox.innerHTML='<span class="teacher-admin-help">Teacher నమోదు పూర్తయింది. ఈ Secret Code‌ను ఉపాధ్యాయుడికి వ్యక్తిగతంగా అందించండి. ఇది మళ్లీ చూపించబడదు.</span><small>Teacher ID</small><strong>'+escapeHtml(created.teacherId)+'</strong><small>Secret Code</small><strong>'+escapeHtml(created.secretCode)+'</strong><button type="button" class="btn secondary" id="teacherCopyCredentials">Copy Teacher ID & Secret Code</button>';
+   resultBox.classList.add("is-visible");
+   main.querySelector("#teacherCopyCredentials").onclick=async()=>{try{await navigator.clipboard.writeText("Teacher ID: "+created.teacherId+"\nSecret Code: "+created.secretCode);status.textContent="Credentials copied.";}catch{status.textContent="Copy unavailable. Please copy the details manually.";}};
+   form.reset();await refreshList();
+  }catch(error){showError(error);}
+  finally{button.disabled=false;button.textContent="Create Teacher";}
+ };
+ await refreshList();
+}
 function modulePage(){
  const title=state.module||"Module";
  const cfg={
@@ -48,14 +124,17 @@ function modulePage(){
  };
  const groupLinks=state.role==="hm"?hmGroupLinks[title]:null;
  const groupMarkup=groupLinks?'<div class="detail-list hm-group-links">'+groupLinks.map(([key,label,desc])=>'<button type="button" class="detail-row" data-hm-submodule="'+escapeHtml(key)+'"><span class="detail-icon">↗</span><div><strong>'+escapeHtml(label)+'</strong><small>'+escapeHtml(desc)+'</small></div><span>›</span></button>').join("")+'</div>':title==="GI Knowledge World"&&state.role==="hm"?'<div class="detail-list"><a class="detail-row" href="'+escapeHtml(APP_CONFIG.knowledgeBlogUrl)+'" target="_blank" rel="noopener"><span class="detail-icon">◎</span><div><strong>Open GI Knowledge World Blog</strong><small>One centrally managed GI Blog</small></div><span>↗</span></a></div>':"";
+ const teacherManagement=title==="Teachers"&&state.role==="hm";
+ const detailMarkup=teacherManagement?teacherManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
+ const previewNote=teacherManagement?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="moduleBack">← Dashboard</button><span class="pill">${escapeHtml(title)}</span></div><section class="card module-detail"><h2>${escapeHtml(title)}</h2><p>ఈ విభాగానికి సంబంధించిన వివరాలు మరియు చర్యలు.</p>
  ${calendar?renderCalendarMarkup({state,T}):""}
  ${alumniSponsorSection.communityModuleMarkup(title)}
  ${groupMarkup}
- <div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>
+ ${detailMarkup}
  ${title==="Mid-Day Meal"?renderMidDayMealMarkup({T}):""}
  ${title==="Poster Studio"?renderPosterStudioMarkup({T,APP_CONFIG,escapeHtml}):""}
- <div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div></section>`;
+ ${previewNote}</section>`;
  document.querySelector("#moduleBack").onclick=()=>{state.view="dashboard";render()};
  main.querySelectorAll("[data-hm-submodule]").forEach(b=>b.onclick=()=>{state.module=b.dataset.hmSubmodule;state.view="module";render()});
  main.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{state.selectedDate=Number(b.dataset.day);render()});
@@ -65,6 +144,7 @@ function modulePage(){
   
  setupPosterStudio();
  alumniSponsorSection.bindCommunityModuleActions();
+ if(teacherManagement)bindTeacherManagement();
 }
  return { modulePage };
 }
