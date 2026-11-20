@@ -194,8 +194,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.role==="parent"){
-    const mobile=id.replace(/\\D/g,"").slice(-10),user=auth.currentUser;
-    if(!user||!/^\\d{10}$/.test(mobile)||localStorage.getItem("gim_parent_mobile")!==mobile){
+    const mobile=id.replace(/\D/g,"").slice(-10),user=auth.currentUser;
+    if(!user||!/^\d{10}$/.test(mobile)||localStorage.getItem("gim_parent_mobile")!==mobile){
      show(T("ఈ పరికరంలో Parent Verification చేయాలి. మొదటిసారి? పిల్లలను లింక్ చేయండి.","Parent Verification is required on this device. First time? Link your child."),"warning");return;
     }
     const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("ధృవీకరిస్తోంది…","Verifying…");
