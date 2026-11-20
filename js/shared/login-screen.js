@@ -1,7 +1,7 @@
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
 import { auth } from "../firebase-client.js";
-import { signInWithCustomToken, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { lookupTeacherName, verifyTeacherIdentity, completeTeacherEnrollment, getTeacherProfile } from "../sections/teacher/teacher-service.js";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getTeacherProfile, getTeacherLoginId } from "../sections/teacher/teacher-service.js";
 import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
@@ -58,8 +58,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      try{
       const user=auth.currentUser;
       if(!user)throw new Error("Session expired. Please sign in again.");
-      const valid=await verifyLocalTeacherPin(user.uid,pin);
-      if(!valid){show(T("PIN సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Incorrect PIN. Please try again."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");return;}
+      if(!await verifyLocalTeacherPin(user.uid,pin)){show(T("PIN సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Incorrect PIN. Please try again."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");return;}
       state.teacherProfile=await getTeacherProfile();
       state.teacherPinMode=null;state.authenticated=true;
       localStorage.setItem("gim_role","teacher");localStorage.setItem("gim_authenticated","true");
@@ -68,43 +67,18 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     };
     return;
    }
-   if(state.teacherLoginStep==="verify"){
-    const teacher=state.teacherLoginRecord||{};
-    flow.innerHTML='<div class="teacher-name-confirm"><small>'+T("Teacher Name","Teacher Name")+'</small><strong>'+String(teacher.name||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</strong></div>'+inputField("teacherSecretCode",T("Secret Code","Secret Code"),"password",'inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"') + inputField("teacherDob",T("Date of Birth","Date of Birth"),"date",'autocomplete="bday"')+'<button type="button" class="btn full role-login-submit" id="teacherVerify">'+T("ధృవీకరించండి","Verify Identity")+'</button><button type="button" class="text-link" id="teacherChangeId">'+T("Teacher ID మార్చండి","Change Teacher ID")+'</button>';
-    main.querySelector("#teacherChangeId").onclick=()=>{state.teacherLoginStep="id";state.teacherLoginRecord=null;renderStage();};
-    main.querySelector("#teacherVerify").onclick=async()=>{
-     const secretCode=main.querySelector("#teacherSecretCode").value.trim(),dob=main.querySelector("#teacherDob").value,button=main.querySelector("#teacherVerify");
-     if(!/^\d{4}$/.test(secretCode)||!dob){show(T("Secret Code మరియు Date of Birth నమోదు చేయండి.","Enter the Secret Code and Date of Birth."),"warning");return;}
-     buttonBusy(button,T("ధృవీకరిస్తోంది…","Verifying…"));
-     try{
-      await setPersistence(auth,browserLocalPersistence);
-      const result=await verifyTeacherIdentity({teacherId:teacher.teacherId,secretCode,dob});
-      state.teacherEnrollmentInProgress=true;
-      const credential=await signInWithCustomToken(auth,result.customToken);
-      state.teacherAuthUid=credential.user.uid;
-      state.teacherLoginStep="pin";state.teacherPinMode="setup";
-      renderStage();
-     }catch(error){
-      state.teacherEnrollmentInProgress=false;
-      show(error?.message||T("వివరాలు సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Verification failed. Please check your details."));
-      button.disabled=false;button.textContent=T("ధృవీకరించండి","Verify Identity");
-     }
-    };
-    return;
-   }
    if(state.teacherLoginStep==="pin"){
-    flow.innerHTML='<h3>'+T("మీ 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN")+'</h3><p class="teacher-flow-hint">'+T("తదుపరి సారి ఈ పరికరంలో త్వరగా ప్రవేశించడానికి PIN ఉపయోగించండి.","Use this PIN for quick access on this device next time.")+'</p>'+inputField("teacherNewPin",T("కొత్త PIN","New PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"') + inputField("teacherConfirmPin",T("PIN మళ్లీ నమోదు చేయండి","Confirm PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherSavePin">'+T("PIN సేవ్ చేయండి","Save PIN")+'</button>';
+    flow.innerHTML='<h3>'+T("మీ 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN")+'</h3><p class="teacher-flow-hint">'+T("తదుపరి సారి ఈ పరికరంలో త్వరగా ప్రవేశించడానికి PIN ఉపయోగించండి.","Use this PIN for quick access on this device next time.")+'</p>'+inputField("teacherNewPin",T("కొత్త PIN","New PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"')+inputField("teacherConfirmPin",T("PIN మళ్లీ నమోదు చేయండి","Confirm PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherSavePin">'+T("PIN సేవ్ చేయండి","Save PIN")+'</button>';
     main.querySelector("#teacherSavePin").onclick=async()=>{
      const pin=main.querySelector("#teacherNewPin").value,confirm=main.querySelector("#teacherConfirmPin").value,button=main.querySelector("#teacherSavePin");
      if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter a 4-digit PIN."),"warning");return;}
      if(pin!==confirm){show(T("రెండు PINలు సరిపోలలేదు.","The PINs do not match."),"warning");return;}
      buttonBusy(button,T("సేవ్ చేస్తోంది…","Saving…"));
      try{
-      const user=auth.currentUser;if(!user)throw new Error("Secure session expired. Please verify again.");
+      const user=auth.currentUser;if(!user)throw new Error("Secure session expired. Please sign in again.");
       await saveLocalTeacherPin(user.uid,pin);
-      await completeTeacherEnrollment();
       state.teacherProfile=await getTeacherProfile();
-      state.teacherEnrollmentInProgress=false;state.teacherPinMode=null;state.teacherLoginStep=null;state.authenticated=true;
+      state.teacherEnrollmentInProgress=false;state.teacherPinMode=null;state.teacherLoginStep="id";state.authenticated=true;
       localStorage.setItem("gim_role","teacher");localStorage.setItem("gim_authenticated","true");
       state.view="dashboard";render();
      }catch(error){show(error?.message||T("PIN సేవ్ కాలేదు. మళ్లీ ప్రయత్నించండి.","Could not save the PIN. Please try again."));button.disabled=false;button.textContent=T("PIN సేవ్ చేయండి","Save PIN");}
@@ -112,16 +86,35 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    state.teacherLoginStep="id";
-   flow.innerHTML=inputField("teacherIdInput",T("Teacher ID","Teacher ID"),"text",'inputmode="numeric" maxlength="4" autocomplete="username" placeholder="ఉదా: 2601"')+'<button type="button" class="btn full role-login-submit" id="teacherLookup">'+T("కొనసాగించండి","Continue")+'</button>';
-   main.querySelector("#teacherLookup").onclick=async()=>{
-    const teacherId=main.querySelector("#teacherIdInput").value.trim(),button=main.querySelector("#teacherLookup");
-    if(!/^\d{4}$/.test(teacherId)){show(T("సరైన Teacher ID నమోదు చేయండి.","Enter a valid Teacher ID."),"warning");return;}
-    buttonBusy(button,T("వివరాలు చూస్తోంది…","Checking…"));
+   flow.innerHTML='<h3>'+T("Teacher Login","Teacher Login")+'</h3>'+inputField("teacherIdInput",T("Teacher ID","Teacher ID"),"text",'inputmode="numeric" maxlength="4" autocomplete="username" placeholder="ఉదా: 2601"')+inputField("teacherPassword",T("Password","Password"),"password",'autocomplete="current-password" placeholder="Enter your temporary password"')+'<button type="button" class="btn full role-login-submit" id="teacherSignIn">'+T("ప్రవేశించండి","Sign In")+'</button>';
+   main.querySelector("#teacherSignIn").onclick=async()=>{
+    const teacherId=main.querySelector("#teacherIdInput").value.trim(),password=main.querySelector("#teacherPassword").value,button=main.querySelector("#teacherSignIn");
+    if(!/^\d{4}$/.test(teacherId)||!password){show(T("Teacher ID మరియు Password నమోదు చేయండి.","Enter your Teacher ID and Password."),"warning");return;}
+    buttonBusy(button,T("ప్రవేశిస్తోంది…","Signing in…"));
+    state.teacherEnrollmentInProgress=true;
     try{
-     const profile=await lookupTeacherName(teacherId);
-     state.teacherLoginRecord={teacherId,name:profile.name};
-     state.teacherLoginStep="verify";renderStage();
-    }catch(error){show(error?.message||T("Teacher ID కనుగొనబడలేదు.","Teacher ID was not found."));button.disabled=false;button.textContent=T("కొనసాగించండి","Continue");}
+     await setPersistence(auth,browserLocalPersistence);
+     await signInWithEmailAndPassword(auth,getTeacherLoginId(teacherId),password);
+     state.teacherProfile=await getTeacherProfile();
+     state.teacherEnrollmentInProgress=false;
+     if(getLocalTeacherPinRecord(auth.currentUser.uid)){
+      state.teacherPinMode="unlock";state.teacherLoginStep="id";
+     }else{
+      state.teacherPinMode="setup";state.teacherLoginStep="pin";
+     }
+     renderStage();
+    }catch(error){
+     state.teacherEnrollmentInProgress=false;
+     if(auth.currentUser?.email===getTeacherLoginId(teacherId)){try{await signOut(auth);}catch{}}
+     const code=error?.code||"";
+     const message=code.includes("invalid-credential")||code.includes("user-not-found")||code.includes("wrong-password")
+      ?T("Teacher ID లేదా Password సరిపోలలేదు.","Teacher ID or password is incorrect.")
+      :code.includes("user-disabled")||code.includes("permission-denied")
+       ?T("ఈ Teacher ఖాతా క్రియాశీలంగా లేదు. Head Master‌ను సంప్రదించండి.","This teacher account is inactive. Please contact the Head Master.")
+       :error?.message||T("Login పూర్తి కాలేదు. మళ్లీ ప్రయత్నించండి.","Unable to sign in. Please try again.");
+     show(message);
+     button.disabled=false;button.textContent=T("ప్రవేశించండి","Sign In");
+    }
    };
   };
   renderStage();
