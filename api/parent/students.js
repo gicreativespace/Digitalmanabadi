@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const mobile = normalizeMobile(req.body?.mobile);
     const db = adminDb();
     const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
-    const lookupId = hmac("lookup:" + mobile + ":" + ip);
+    const lookupId = hmac("lookup:" + mobile);
     const attemptRef = db.collection("parentLookupAttempts").doc(lookupId);
     const result = await db.runTransaction(async tx => {
       const snap = await tx.get(attemptRef);
