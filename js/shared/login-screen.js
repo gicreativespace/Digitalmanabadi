@@ -31,8 +31,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   main.querySelector("#backWelcome").onclick=()=>{state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
   if(community){
    main.querySelector("#communityRegister").onclick=()=>{state.view="communityRegister";render()};
-   main.querySelector("#communityPreview").onclick=()=>{state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render()};
-   main.querySelector("#communityHelp").onclick=()=>show(T("Registration ఇంకా Preview Modeలో ఉంది. Account approval లేదా sign-in సహాయం కోసం Head Master‌ను సంప్రదించండి.","Registration is currently in Preview Mode. Contact the Head Master for account approval or sign-in assistance."),"info");
+   main.querySelector("#communityHelp").onclick=()=>show(T("నమోదు అభ్యర్థన ప్రస్తుతం Preview Modeలో ఉంది. నిజమైన ఖాతా అనుమతి మరియు Sign-in ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Registration requests are currently in Preview Mode. Account approval and secure sign-in are not connected yet. Please contact the Head Master."),"info");
    return;
   }
   if(state.role==="parent")main.querySelector("#startLink").onclick=()=>{state.view="link";render()};
@@ -57,9 +56,16 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     catch(e){show(errorText(e,"hm"));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Secure Login")}
     return;
    }
-   if(state.role==="parent"&&!state.parentLinked){show(T("ముందుగా మీ పిల్లల వివరాలను Link చేయండి.","Please link your child before signing in."),"warning");return}
-   if(state.role==="parent"&&(id!==state.linkedStudent?.id||pin!==state.linkedStudent?.pin)){fail("parent");show(T("వివరాలు సరిపోలలేదు. మళ్లీ నమోదు చేయండి.","Login failed. Please check your details and try again."),"error");return}
-   if(state.role==="parent")state.loginAttempts.parent=0;state.authenticated=true;localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
+   if(state.role==="teacher"){
+    show(T("Teacher Login ప్రస్తుతం Preview Modeలో ఉంది. Registered Mobile + 4-digit PIN కోసం సురక్షిత Authentication ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Teacher login is currently in Preview Mode. Secure authentication for registered mobile + 4-digit PIN is not connected yet. Please contact the Head Master."),"info");
+    return;
+   }
+   if(state.role==="parent"){
+    if(!state.parentLinked){show(T("ముందుగా మీ పిల్లల వివరాలను Link చేయండి.","Please link your child before signing in."),"warning");return}
+    show(T("Parent Login ప్రస్తుతం Preview Modeలో ఉంది. పిల్లల వివరాల ధృవీకరణ, Mobile + PIN Authentication ఇంకా సురక్షితంగా అనుసంధానం కాలేదు.","Parent login is currently in Preview Mode. Secure child verification and mobile + PIN authentication are not connected yet."),"info");
+    return;
+   }
+   show(T("ఈ Roleకు సురక్షిత Login ఇంకా అందుబాటులో లేదు.","Secure sign-in is not available for this role yet."),"info");
   };
  }
  return {render:login};
