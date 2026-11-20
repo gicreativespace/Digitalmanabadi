@@ -10,6 +10,13 @@ service cloud.firestore {
   match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
   match /headMasters/{headMasterUid}{allow read: if isSuperAdmin() || (signedIn() && request.auth.uid==headMasterUid);allow write: if isSuperAdmin();}
   match /adminAudit/{auditId}{allow read,write: if isSuperAdmin();}
+
+  // Teacher records contain DOB and verification hashes. All client access is
+  // routed through authenticated callable functions; Admin SDK bypasses rules.
+  match /teachers/{teacherId}{allow read,write: if false;}
+  match /teacherCounters/{counterId}{allow read,write: if false;}
+  match /teacherAccessAttempts/{attemptId}{allow read,write: if false;}
+
   match /{document=**}{allow read,write: if false;}
  }
 }
