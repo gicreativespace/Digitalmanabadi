@@ -20,7 +20,7 @@ function managementLandingMarkup(){
  '.hm-management-icon{display:grid;width:64px;height:64px;place-items:center;border-radius:19px;background:#e1f0e3;color:#2d7047;font-size:31px;font-weight:800}'+
  '.hm-management-card h3{margin:0;color:#284d34;font-size:19px;font-weight:850}'+
  '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr;gap:13px}.hm-management-card{min-height:145px;padding:20px}}'+
- '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+card.title+'</h3></button>').join("")+'</div>';
+ '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+T(card.titleTe,card.title)+'</h3></button>').join("")+'</div>';
 }
 function classManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
