@@ -1,0 +1,226 @@
+DIGITAL MANA BADI — PROJECT HANDOVER / CONTINUATION NOTES
+Updated: 20 November 2026
+Repository: https://github.com/gicreativespace/Digitalmanabadi
+Project: MPMPS School, Dagguluru
+
+============================================================
+1. LATEST WORK COMPLETED
+============================================================
+
+PR #103 — Telugu / English Translation Consistency
+Status: MERGED
+PR: https://github.com/gicreativespace/Digitalmanabadi/pull/103
+Branch: fix/consistent-telugu-english-translations
+Merge commit: ee17e7e2bcde7104fa850bf10e3fd15be6600b04
+
+Changes included:
+- Added shared translation helpers in js/shared/translations.js:
+  - createTranslator(getLanguage) for explicit Telugu/English pairs.
+  - createDictionaryTranslator(getLanguage, pairs) for safer legacy dictionary fallback.
+- Updated shared app translation wiring in js/core/app.js.
+- Added bilingual UI text for Teacher, Parent, Alumni/Donor dashboards and modules.
+- Updated Parent Linking, Profile, Settings, Class Management, and Teacher-related labels.
+- Updated Alumni/Donor forms, statuses, empty states, buttons, and action feedback.
+- Added docs/TRANSLATION_STANDARD.md for future development.
+- Extended .github/workflows/teacher-module-check.yml to syntax-check the translation-related JS files.
+- Preserved existing language state and persistence mechanism.
+- User-entered data, IDs, numeric values, and internal keys are not translated.
+
+Validation / deployment:
+- Translation-related JavaScript syntax validation: PASSED.
+- GitHub Pages deployment run #44755486520: COMPLETED SUCCESSFULLY.
+  https://github.com/gicreativespace/Digitalmanabadi/actions/runs/44755486520
+- Deployment commit: ee17e7e2bcde7104fa850bf10e3fd15be6600b04
+- No browser-based runtime test or Firebase test was performed by us.
+- User should hard refresh with Ctrl + Shift + R and verify Telugu ↔ English switching on the relevant screens.
+
+============================================================
+2. IMMEDIATE NEXT STEP
+============================================================
+
+Ask the user to verify the deployed translation changes:
+- Hard refresh the app (Ctrl + Shift + R).
+- Switch Telugu to English and English to Telugu.
+- Check Teacher, Parent, Alumni/Donor, Parent Linking, Profile, Settings, and Class Management screens.
+- If any specific label remains untranslated or has incorrect meaning, fix only that translation issue.
+- Do not change working functions or locked UI.
+
+============================================================
+3. TRANSLATION STANDARD FOR ALL FUTURE CODE
+============================================================
+
+- Every new user-facing string must use T("తెలుగు", "English").
+- This includes headings, labels, buttons, hints, placeholders, toast messages, errors, empty states, status labels, and accessibility labels.
+- Inject T into dynamic modules/screens as a dependency and use it at render time.
+- Do not hardcode one-language UI strings for new features.
+- Do not rely on the legacy dictionary alone for new UI.
+- Keep Telugu and English meaning equivalent and avoid ambiguous generic dictionary mappings.
+- Do not translate user-entered content, IDs, numeric values, or internal keys.
+- Preserve the existing state.lang and existing language persistence/toggle mechanism.
+
+============================================================
+4. LOCKED / PROTECTED PROJECT RULES
+============================================================
+
+- Preserve all existing working code and features.
+- The Head Master Dashboard VIEW is LOCKED. Do not alter its layout, design, styling, typography, spacing, greeting, motivation, section arrangement, GI Knowledge link position, bottom navigation, footer, or social ribbon unless the user explicitly authorizes it.
+- Existing modules, authentication, roles, Firebase behavior, PIN workflows, credentials, data services, shared components, configuration, and other code are locked by default.
+- Translation-only changes are authorized when explicitly requested; do not use them as a reason to redesign or refactor functionality.
+- Do not change existing Super Admin or Head Master login credentials. They are saved in the user's File Store. Never ask the user to post passwords in chat.
+- Role title must be “Head Master”, never “Principal”.
+- Do not create multi-school architecture. This project is for MPMPS School, Dagguluru only.
+- Do not use Firebase Cloud Functions. User explicitly stated: “we dont use cloud functions”.
+- Do not deploy or introduce Cloud Functions.
+- Do not change Firestore Rules or authentication flows unless specifically authorized.
+- User will delete old teacher accounts themselves. Never delete accounts.
+- Do not make claims of browser/Firebase testing unless actually performed.
+- Clearly distinguish implemented, deployed, preview, proposed, and tested status.
+
+============================================================
+5. RECENT TEACHER LOGIN WORK
+============================================================
+
+PR #102 — Teacher Login import fix
+Status: MERGED
+PR: https://github.com/gicreativespace/Digitalmanabadi/pull/102
+- Fixed missing getLocalTeacherPinRecord import in js/shared/login-screen.js.
+- Syntax check passed.
+- User explicitly confirmed: “teacher login worked”.
+
+PR #101 — Teacher Login ID and Password field
+Status: MERGED AND DEPLOYED
+PR: https://github.com/gicreativespace/Digitalmanabadi/pull/101
+- Login ID format: 2601@dagguluruschool.in (four-digit ID + @dagguluruschool.in).
+- Password field accepts exactly six numeric digits.
+- Non-digit characters are stripped; maximum length six.
+- Preserved Firebase sign-in, active-status checks, and existing local 4-digit Teacher PIN setup/unlock.
+- Do not conflate Firebase six-digit password with local four-digit app PIN.
+
+PR #100 — Teacher View typography
+Status: MERGED AND DEPLOYED
+PR: https://github.com/gicreativespace/Digitalmanabadi/pull/100
+- Teacher Details Values: 20px.
+- Field Labels: 20px.
+- Improved line spacing and contrast.
+
+PR #98 — Teacher flat View layout
+Status: MERGED
+PR: https://github.com/gicreativespace/Digitalmanabadi/pull/98
+- Teacher Name, Teacher ID, DOB, Gender, Assigned Classes, Teaching Subjects, Login ID, Secret Code, Login Status, Teacher Status.
+- User approved the result (“perfect now”).
+
+============================================================
+6. TEACHER LOGIN / SECRET CODE RULES
+============================================================
+
+- Teacher ID format: YYNN (example 2601).
+- Login ID format: 2601@dagguluruschool.in.
+- Fixed number: 919720.
+- DOB is converted to DDMMYY.
+- Secret/Login code = 919720 minus DOB(DDMMYY).
+- Example DOB 29/04/1991 -> DDMMYY 290491 -> code 629229.
+- Six-digit code is used as Firebase Auth password and Teacher Secret Code.
+- Teacher profile stores the Secret Code in Firestore.
+- Existing teacher missing Secret Code may have it calculated and saved before Auth provisioning.
+- Firebase Email/Password provider must be enabled in Firebase Console.
+- Firebase Auth default minimum password length is six; a stricter Password Policy may reject numeric-only passwords.
+- Existing Firebase Auth passwords cannot be retrieved. Existing account reuse only happens if the approved code successfully signs in.
+- Do not delete or reset existing accounts.
+- The six-digit Firebase password and four-digit local Teacher PIN are separate workflows.
+- Note: DOB-derived code is weak and should not be represented as strong security.
+
+============================================================
+7. TEACHER / CLASS MANAGEMENT AGREEMENTS
+============================================================
+
+- Class Management and Teacher Management are separate dashboards/cards.
+- Teacher creation fields: Teacher Name, DOB, Gender.
+- Assign classes and teaching subjects using checkboxes/multi-select.
+- Current subject options: Telugu, English, Mathematics, EVS.
+- Do not add Hindi unless user confirms it is taught.
+- Teacher ID is auto-generated YYNN.
+- Teacher can be edited: name, DOB, gender, classes, subjects.
+- Deactivation reasons: School Transfer, Retired, Other Reason.
+- Record deactivation date/reason; preserve historical records.
+- Reactivation is available.
+- Teacher ID and Login ID remain unchanged.
+- No hard deletion.
+- Some Class Management workflows may still be preview/unwired; do not claim full Firebase-backed functionality unless verified.
+
+============================================================
+8. FIRESTORE RULES / SECURITY STATUS
+============================================================
+
+- PR #85 is OPEN / NOT MERGED as last known:
+  https://github.com/gicreativespace/Digitalmanabadi/pull/85
+- It proposes rules for GI Super Admin, active Head Master, and active Teacher access.
+- Static review only; not tested in Firebase Emulator or Rules Playground.
+- Current Head Master profile path is platformAdmins/{uid}, verified in js/sections/head-master/pin-auth.js.
+- Firestore Rules do not prevent Firebase Auth self-registration. Without Cloud Functions, someone could pre-register a Teacher Login ID, but protected Firestore school data should remain inaccessible.
+- Do not merge or change PR #85 unless user asks.
+
+============================================================
+9. HEAD MASTER DASHBOARD — LOCKED VIEW
+============================================================
+
+Approved design: Light Green + White + subtle Gold.
+Daily-first sections:
+1. Today’s Attendance
+2. Today’s Approvals (Diary, Notices, Leaves)
+3. Today’s Mid-Day Meal
+
+School Sections:
+- Diary (approved, class-wise)
+- Notice Board (approved notices)
+- Events & Calendar merged
+- Great People & Quotes merged
+- Alumni & Donor Management:
+  - Login approval requests
+  - School requirements
+  - Student adoptions
+  - Donor details and offerings
+  - Volunteer teaching / school support
+  - Merit list, awards, scholarships
+
+GI Knowledge World:
+- One centrally managed GI blog link at bottom.
+- No duplicate tile in School Sections grid.
+
+Remove Poster Studio, Reports, School Settings from HM home navigation only; do not delete underlying code.
+Bottom navigation Home, Calendar, Profile, Settings and footer/social ribbon remain unchanged.
+No fake live data. Attendance/Diary/Notice/Leave/Mid-Day Meal Firebase-backed live data are not implemented unless separately verified.
+
+============================================================
+10. GI SUPER ADMIN DASHBOARD — SCOPE RESTRICTION
+============================================================
+
+Previously approved scope was GI Super Admin Dashboard only:
+- Light Green + White + subtle Gold; no dark green.
+- No Connected Schools, school counts, school management, Create School, or Head Master account management.
+- No extra dashboard language selector; use existing shared header selector.
+- Logout in dashboard top header.
+- Auto logout after 15 minutes inactivity.
+- Global App Control, Firebase & Storage Analytics, Security Activity Log.
+- No fake analytics/demo data.
+- Global App Enable/Disable Firebase Function is ON HOLD.
+- User can unpublish GitHub Pages in emergency.
+- Do not work on this dashboard during translation-only tasks or other unrelated work.
+
+============================================================
+11. HOW TO CONTINUE SAFELY
+============================================================
+
+Before changing code:
+1. Confirm the exact user-reported issue or requested feature.
+2. Inspect only the relevant files and current main branch.
+3. Keep the change narrowly scoped.
+4. Preserve all locked screens, credentials, auth flows, data services, and working behavior.
+5. Do not introduce Cloud Functions.
+6. For UI text, use T("తెలుగు", "English") consistently.
+7. Run the relevant syntax/workflow checks.
+8. Create a focused PR and merge when appropriate (routine PR merges are authorized).
+9. Check GitHub Pages deployment status before saying changes are live.
+10. Never claim browser or Firebase runtime testing unless actually performed.
+
+Current latest known main commit: ee17e7e2bcde7104fa850bf10e3fd15be6600b04
+Current latest change: PR #103 merged; Pages deployment successful.
