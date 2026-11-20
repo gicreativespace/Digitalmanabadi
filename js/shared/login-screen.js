@@ -2,7 +2,7 @@ import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHead
 import { auth } from "../firebase-client.js";
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
-import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
+import { getLocalTeacherPinRecord, saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
  async function renderHmPinGate(){
