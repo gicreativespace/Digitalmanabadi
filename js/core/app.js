@@ -73,9 +73,9 @@ const main=document.querySelector("#mainView");
 function selectWelcomeRole(role){
  if(!roleNames[role])return;
  state.role=role;state.authenticated=false;
- if(role==="teacher"&&auth.currentUser?.uid?.startsWith("teacher_")&&getLocalTeacherPinRecord(auth.currentUser.uid)){
-  state.teacherPinMode="unlock";
-  state.teacherLoginStep="id";
+ if(role==="teacher"&&auth.currentUser?.email?.toLowerCase().endsWith("@dagguluruschool.in")){
+  state.teacherPinMode=getLocalTeacherPinRecord(auth.currentUser.uid)?"unlock":"setup";
+  state.teacherLoginStep=state.teacherPinMode==="setup"?"pin":"id";
   state.view="login";
   localStorage.setItem("gim_role","teacher");localStorage.removeItem("gim_authenticated");
   render();return;
@@ -209,20 +209,18 @@ onAuthStateChanged(auth,async user=>{
   }
   try{
    const profile=await getTeacherProfile();
-   if(!profile||!profile.linked||!getLocalTeacherPinRecord(user.uid)){
-    await signOut(auth);
-    state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
-    state.teacherLoginNotice=T("ఈ పరికరం Teacher PINతో లింక్ కాలేదు. Head Master‌ను సంప్రదించండి.","This device is not linked with a Teacher PIN. Please contact the Head Master.");
-    localStorage.removeItem("gim_authenticated");
-    state.view="login";render();return;
-   }
+   if(!profile||!profile.linked)throw new Error("Teacher profile is not active.");
    state.teacherProfile=profile;
-   state.teacherPinMode="unlock";
+   if(getLocalTeacherPinRecord(user.uid)){
+    state.teacherPinMode="unlock";state.teacherLoginStep="id";
+   }else{
+    state.teacherPinMode="setup";state.teacherLoginStep="pin";
+   }
    state.authenticated=false;state.view="login";render();
   }catch(error){
    try{await signOut(auth);}catch{}
    state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
-   state.teacherLoginNotice=T("Teacher Session ధృవీకరణ కాలేదు. Head Master‌ను సంప్రదించండి.","Teacher session could not be verified. Please contact the Head Master.");
+   state.teacherLoginNotice=T("ఈ Teacher ఖాతా క్రియాశీలంగా లేదు లేదా వివరాలు ధృవీకరించబడలేదు. Head Master‌ను సంప్రదించండి.","This teacher account is inactive or could not be verified. Please contact the Head Master.");
    localStorage.removeItem("gim_authenticated");
    state.view="login";render();
   }
