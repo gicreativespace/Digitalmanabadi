@@ -6,13 +6,13 @@ import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js"
 export function createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection}) {
 function toDisplayDob(value){
  const dob=String(value??"");
- if(/^\\d{8}$/.test(dob))return dob;
- if(/^\\d{4}-\\d{2}-\\d{2}$/.test(dob))return dob.slice(8,10)+dob.slice(5,7)+dob.slice(0,4);
+ if(/^\d{8}$/.test(dob))return dob;
+ if(/^\d{4}-\d{2}-\d{2}$/.test(dob))return dob.slice(8,10)+dob.slice(5,7)+dob.slice(0,4);
  return "";
 }
 function bindDobInputs(root){
  root.querySelectorAll("[data-dob-input]").forEach(input=>{
-  input.addEventListener("input",()=>{input.value=input.value.replace(/\\D/g,"").slice(0,8)});
+  input.addEventListener("input",()=>{input.value=input.value.replace(/\D/g,"").slice(0,8)});
  });
 }
 function managementLandingMarkup(){
