@@ -1,4 +1,4 @@
-import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue, normalizeMobile, generateSecretCode, encryptSecretCode, hmac } from "../../../lib/backend/admin.js";
+import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue, normalizeMobile, generateSecretCode, encryptSecretCode, decryptSecretCode, hmac } from "../../../lib/backend/admin.js";
 import { classNumberFromId, currentAcademicYearCode, validateDob } from "../../../lib/backend/ids.js";
 import crypto from "node:crypto";
 
@@ -18,14 +18,11 @@ export default async function handler(req, res) {
         .where("schoolId", "==", hm.schoolId)
         .where("classId", "==", classId).get();
       const students = [];
-      const batch = db.batch();
-      for (const doc of snap.docs) {
+      const orderedDocs = snap.docs.sort((a, b) => String(a.data().studentId || "").localeCompare(String(b.data().studentId || "")));
+      for (const doc of orderedDocs) {
         const data = doc.data();
         let secretCode = null;
-        if (data.secretCodeCiphertext && data.secretCodeIv && data.secretCodeTag) {
-          const { decryptSecretCode } = await import("../../../lib/backend/admin.js");
-          secretCode = decryptSecretCode(data);
-        }
+        if (data.secretCodeCiphertext && data.secretCodeIv && data.secretCodeTag) secretCode = decryptSecretCode(data);
         students.push({
           studentRecordId: doc.id,
           name: data.name,
@@ -42,15 +39,20 @@ export default async function handler(req, res) {
           secretCode,
           status: data.status || "active"
         });
-        batch.set(db.collection("securityAudit").doc(), {
-          action: "HEAD_MASTER_VIEWED_STUDENT_SECRET",
-          actorUid: hm.uid,
-          schoolId: hm.schoolId,
-          studentRecordId: doc.id,
-          createdAt: FieldValue.serverTimestamp()
-        });
       }
-      if (students.length) await batch.commit();
+      for (let offset = 0; offset < orderedDocs.length; offset += 450) {
+        const batch = db.batch();
+        for (const doc of orderedDocs.slice(offset, offset + 450)) {
+          batch.set(db.collection("securityAudit").doc(), {
+            action: "HEAD_MASTER_VIEWED_STUDENT_SECRET",
+            actorUid: hm.uid,
+            schoolId: hm.schoolId,
+            studentRecordId: doc.id,
+            createdAt: FieldValue.serverTimestamp()
+          });
+        }
+        await batch.commit();
+      }
       return json(res, 200, { students });
     }
 
