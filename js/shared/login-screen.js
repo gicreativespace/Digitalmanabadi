@@ -109,8 +109,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      const code=error?.code||"";
      const message=code.includes("invalid-credential")||code.includes("user-not-found")||code.includes("wrong-password")
       ?T("Teacher ID లేదా Password సరిపోలలేదు.","Teacher ID or password is incorrect.")
-      :code.includes("user-disabled")
-       ?T("ఈ Teacher ఖాతా నిలిపివేయబడింది. Head Master‌ను సంప్రదించండి.","This teacher account is deactivated. Please contact the Head Master.")
+      :code.includes("user-disabled")||code.includes("permission-denied")
+       ?T("ఈ Teacher ఖాతా క్రియాశీలంగా లేదు. Head Master‌ను సంప్రదించండి.","This teacher account is inactive. Please contact the Head Master.")
        :error?.message||T("Login పూర్తి కాలేదు. మళ్లీ ప్రయత్నించండి.","Unable to sign in. Please try again.");
      show(message);
      button.disabled=false;button.textContent=T("ప్రవేశించండి","Sign In");
