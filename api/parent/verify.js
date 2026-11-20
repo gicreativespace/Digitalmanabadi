@@ -30,7 +30,7 @@ export default async function handler(req, res) {
       const attempt = attemptSnap.exists ? attemptSnap.data() : {};
       if (Number(attempt.lockUntilMs || 0) > now) return { kind: "locked" };
       if (!studentSnap.exists) {
-        const failures = Number(attempt.failures || 0) + 1;
+        const failures = (Number(attempt.lockUntilMs || 0) > 0 && Number(attempt.lockUntilMs || 0) <= now ? 0 : Number(attempt.failures || 0)) + 1;
         tx.set(attemptRef, { failures, lockUntilMs: failures >= 5 ? now + 60000 : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
         return { kind: "invalid" };
       }
