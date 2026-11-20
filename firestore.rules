@@ -6,15 +6,29 @@ service cloud.firestore {
   function isSuperAdmin(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="GI_SUPER_ADMIN" && get(adminPath()).data.status=="active";}
   function hmPath(){return /databases/$(database)/documents/headMasters/$(request.auth.uid);}
   function isActiveHeadMasterFor(schoolId){return signedIn() && exists(hmPath()) && get(hmPath()).data.role=="HEAD_MASTER" && get(hmPath()).data.status=="active" && get(hmPath()).data.schoolId==schoolId;}
+  function isActiveHeadMaster(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="HEAD_MASTER" && get(adminPath()).data.status=="active";}
   match /platformAdmins/{adminUid}{allow get: if signedIn() && request.auth.uid==adminUid;allow list,create,update,delete: if false;}
   match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
   match /headMasters/{headMasterUid}{allow read: if isSuperAdmin() || (signedIn() && request.auth.uid==headMasterUid);allow write: if isSuperAdmin();}
   match /adminAudit/{auditId}{allow read,write: if isSuperAdmin();}
 
-  // Teacher records contain DOB and verification hashes. All client access is
-  // routed through authenticated callable functions; Admin SDK bypasses rules.
-  match /teachers/{teacherId}{allow read,write: if false;}
-  match /teacherCounters/{counterId}{allow read,write: if false;}
+  // Teacher profiles are managed only by an active Head Master.
+  // A teacher may read only their own active profile; inactive profiles are blocked.
+  match /teachers/{teacherId}{
+   allow get: if isActiveHeadMaster() || (signedIn() && resource.data.authUid==request.auth.uid && resource.data.status=="active");
+   allow list: if isActiveHeadMaster();
+   allow create: if isActiveHeadMaster()
+    && request.resource.data.teacherId==teacherId
+    && request.resource.data.createdBy==request.auth.uid
+    && request.resource.data.status=="active"
+    && request.resource.data.authUid==null;
+   allow update: if isActiveHeadMaster()
+    && request.resource.data.teacherId==resource.data.teacherId
+    && request.resource.data.createdBy==resource.data.createdBy
+    && request.resource.data.createdAt==resource.data.createdAt;
+   allow delete: if false;
+  }
+  match /teacherCounters/{counterId}{allow read,write: if isActiveHeadMaster();}
   match /teacherAccessAttempts/{attemptId}{allow read,write: if false;}
 
   match /{document=**}{allow read,write: if false;}
