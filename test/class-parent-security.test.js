@@ -20,7 +20,7 @@ test("DOB accepts valid DDMMYYYY and rejects impossible dates", () => {
 
 test("Permanent Secret Codes are 12 digits and encrypt/decrypt without storing plaintext", () => {
   const code = generateSecretCode();
-  assert.match(code, /^\\d{12}$/);
+  assert.match(code, /^\d{12}$/);
   const encrypted = encryptSecretCode(code);
   assert.equal(encrypted.ciphertext.includes(code), false);
   assert.equal(decryptSecretCode({
