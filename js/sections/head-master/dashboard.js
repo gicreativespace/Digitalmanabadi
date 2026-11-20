@@ -35,7 +35,12 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  .hm-eyebrow{font-size:11px;letter-spacing:.12em;color:#68816b;font-weight:800}
  .hm-welcome h1{margin:8px 0 4px;color:#244b32;font-size:clamp(24px,4vw,32px);line-height:1.2}
  [data-theme=dark] .hm-welcome h1{color:#d7ead9}
- .hm-welcome p{margin:0;color:var(--hm-muted);font-size:13px}\n .hm-motivation{margin-top:15px;padding:13px 15px;border-left:3px solid var(--hm-gold);border-radius:0 13px 13px 0;background:rgba(255,255,255,.72)}\n [data-theme=dark] .hm-motivation{background:rgba(255,255,255,.05)}\n .hm-motivation-label{font-size:10px;letter-spacing:.1em;font-weight:800;color:var(--hm-gold);margin-bottom:5px}\n .hm-motivation blockquote{margin:0;color:var(--hm-deep);font-size:14px;font-weight:650;line-height:1.55}\n [data-theme=dark] .hm-motivation blockquote{color:#e1eee2}
+ .hm-welcome p{margin:0;color:var(--hm-muted);font-size:13px}
+ .hm-motivation{margin-top:15px;padding:13px 15px;border-left:3px solid var(--hm-gold);border-radius:0 13px 13px 0;background:rgba(255,255,255,.72)}
+ [data-theme=dark] .hm-motivation{background:rgba(255,255,255,.05)}
+ .hm-motivation-label{font-size:10px;letter-spacing:.1em;font-weight:800;color:var(--hm-gold);margin-bottom:5px}
+ .hm-motivation blockquote{margin:0;color:var(--hm-deep);font-size:14px;font-weight:650;line-height:1.55}
+ [data-theme=dark] .hm-motivation blockquote{color:#e1eee2}
  .hm-section-title{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 0 10px}
  .hm-section-title h2{font-size:17px;margin:0;color:var(--text)}
  .hm-section-title p{font-size:12px;color:var(--hm-muted);margin:3px 0 0}
