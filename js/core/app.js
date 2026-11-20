@@ -204,7 +204,7 @@ onAuthStateChanged(auth,async user=>{
    if(!profile||!profile.linked||!getLocalTeacherPinRecord(user.uid)){
     await signOut(auth);
     state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
-    state.teacherLoginNotice=T("ఈ పరికరం Teacher PINతో இணைக்கబడలేదు. Head Master‌ను సంప్రదించండి.","This device is not linked with a Teacher PIN. Please contact the Head Master.");
+    state.teacherLoginNotice=T("ఈ పరికరం Teacher PINతో లింక్ కాలేదు. Head Master‌ను సంప్రదించండి.","This device is not linked with a Teacher PIN. Please contact the Head Master.");
     localStorage.removeItem("gim_authenticated");
     state.view="login";render();return;
    }
