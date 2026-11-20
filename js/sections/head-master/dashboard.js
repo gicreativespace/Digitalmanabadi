@@ -18,12 +18,12 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  const dayOfYear=Math.floor((new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())-new Date(new Date().getFullYear(),0,0))/86400000);
  const dailyQuote=roleQuotes[dayOfYear%roleQuotes.length];
  const modules=[
-  ["users","Class & Teacher Management","తరగతులు, విద్యార్థులు మరియు ఉపాధ్యాయులు","Class & Teacher Management"],
-  ["book-open","Diary","విషయాల వారీగా Class Work & Home Work","Diary"],
-  ["megaphone","Notice Board","ఆమోదించిన పాఠశాల నోటీసులు","Notice Board"],
-  ["calendar-days","Events & Calendar","సెలవులు, పుట్టినరోజులు, కార్యక్రమాలు","Events & Calendar"],
-  ["lightbulb","Great People & Quotes","ప్రేరణ మరియు విజ్ఞానం","Great People & Quotes"],
-  ["hand-heart","Alumni & Donor Management","సహాయం, దాతలు, వాలంటీర్లు","Alumni & Donor Management"],
+  ["users","తరగతులు & ఉపాధ్యాయుల నిర్వహణ","Class & Teacher Management","తరగతులు, విద్యార్థులు మరియు ఉపాధ్యాయులు","Classes, students and teachers","Class & Teacher Management"],
+  ["book-open","డైరీ","Diary","విషయాల వారీగా తరగతి పని మరియు ఇంటి పని","Class Work and Home Work by subject","Diary"],
+  ["megaphone","నోటీసు బోర్డు","Notice Board","ఆమోదించిన పాఠశాల నోటీసులు","Approved school notices","Notice Board"],
+  ["calendar-days","కార్యక్రమాలు & క్యాలెండర్","Events & Calendar","సెలవులు, పుట్టినరోజులు మరియు కార్యక్రమాలు","Holidays, birthdays and events","Events & Calendar"],
+  ["lightbulb","గొప్ప వ్యక్తులు & సూక్తులు","Great People & Quotes","ప్రేరణ మరియు విజ్ఞానం","Inspiration and knowledge","Great People & Quotes"],
+  ["hand-heart","పూర్వ విద్యార్థులు & దాతల నిర్వహణ","Alumni & Donor Management","సహాయం, దాతలు మరియు వాలంటీర్లు","Support, donors and volunteers","Alumni & Donor Management"],
  ];
  const icons={users:"♧","book-open":"▤",megaphone:"◖","calendar-days":"▦",lightbulb:"✦","hand-heart":"♡",globe:"◎",utensils:"♨",calendar:"▣",clipboard:"☷"};
  return `
@@ -76,11 +76,12 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  @media(min-width:760px){.hm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hm-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hm-module{min-height:140px;padding:18px}}
  @media(max-width:380px){.hm-action-list{gap:6px}.hm-action{padding:10px 7px}.hm-action strong{font-size:12px}.hm-knowledge{align-items:flex-start;flex-direction:column}}
  </style>
- <div class="hm-dashboard">
+ <div class="hm-dashboard" data-translation-managed="true">
   <section class="hm-welcome">
-   <div class="hm-eyebrow">HEAD MASTER DASHBOARD</div>
-   <h1>${t("శుభోదయం!","Good Morning!")}</h1>
+   <div class="hm-eyebrow">${t("ప్రధానోపాధ్యాయుల డ్యాష్‌బోర్డ్","HEAD MASTER DASHBOARD")}</div>
+   <h1>${t(greeting[0],greeting[1])}</h1>
    <p>${escapeHtml?escapeHtml(school):school} · ${t("ఈరోజు పాఠశాల స్థితిగతులు","Your school at a glance")}</p>
+   <div class="hm-motivation"><div class="hm-motivation-label">${t("నేటి ప్రేరణ","TODAY’S INSPIRATION")}</div><blockquote>${t(dailyQuote[0],dailyQuote[1])}</blockquote></div>
   </section>
   <section>
    <div class="hm-section-title"><div><h2>${t("ఈరోజు హాజరు","Today's Attendance")}</h2><p>${t("మొత్తం పాఠశాల మరియు తరగతి వారీగా","Whole school and class-wise")}</p></div></div>
@@ -106,7 +107,7 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
   <section>
    <div class="hm-section-title"><div><h2>${t("పాఠశాల విభాగాలు","School Sections")}</h2><p>${t("అవసరమైన పనిని విభాగం ద్వారా తెరవండి","Open each area when needed")}</p></div></div>
    <div class="hm-module-grid">
-    ${modules.map(([icon,title,desc,key])=>`<button class="hm-module" type="button" data-module="${key}"><span class="hm-module-icon">${icons[icon]||"•"}</span><strong>${t(title,title)}</strong><small>${t(desc,desc)}</small><span class="hm-module-arrow">↗</span></button>`).join("")}
+    ${modules.map(([icon,teTitle,enTitle,teDesc,enDesc,key])=>`<button class="hm-module" type="button" data-module="${key}"><span class="hm-module-icon">${icons[icon]||"•"}</span><strong>${t(teTitle,enTitle)}</strong><small>${t(teDesc,enDesc)}</small><span class="hm-module-arrow">↗</span></button>`).join("")}
    </div>
   </section>
   <section class="hm-knowledge">
