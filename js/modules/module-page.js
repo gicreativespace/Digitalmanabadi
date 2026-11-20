@@ -46,7 +46,7 @@ function classManagementMarkup(){
  '<div class="field"><label for="studentDob">'+T("పుట్టిన తేదీ (DD/MM/YYYY)","Date of Birth (DD/MM/YYYY)")+'</label><input id="studentDob" name="dob" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" required></div>'+
  '<div class="field"><label for="guardianName">'+T("తల్లిదండ్రి / సంరక్షకుని పేరు","Parent / Guardian Name")+'</label><input id="guardianName" name="guardianName" maxlength="100" required></div>'+
  '<div class="field"><label for="guardianRelationship">'+T("విద్యార్థితో సంబంధం","Relationship")+'</label><select id="guardianRelationship" name="relationship" required><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Father">'+T("తండ్రి","Father")+'</option><option value="Mother">'+T("తల్లి","Mother")+'</option><option value="Guardian">'+T("సంరక్షకుడు","Guardian")+'</option></select></div>'+
- '<div class="field"><label for="parentMobile">'+T("Parent Mobile Number","Parent Mobile Number")+'</label><input id="parentMobile" name="parentMobile" type="tel" inputmode="numeric" maxlength="10" required></div>'+
+ '<div class="field"><label for="parentMobile">'+T("తల్లిదండ్రి మొబైల్ నంబర్","Parent Mobile Number")+'</label><input id="parentMobile" name="parentMobile" type="tel" inputmode="numeric" maxlength="10" required></div>'+
  '<div class="field"><label for="studentSection">'+T("సెక్షన్ (ఐచ్ఛికం)","Section (optional)")+'</label><input id="studentSection" name="section" maxlength="1" placeholder="A"></div>'+
  '</div><div class="class-student-actions"><button type="submit" class="btn" id="createStudentButton">+ '+T("విద్యార్థిని చేర్చండి","Add Student")+'</button></div></form>'+
  '<div id="classStudentList" class="class-student-list"><div class="class-admin-empty">'+T("తరగతిని ఎంచుకోండి.","Choose a class.")+'</div></div></section></div>';
@@ -85,7 +85,7 @@ async function bindClassManagement(){
  form.onsubmit=async event=>{
   event.preventDefault();if(!activeClassId)return;
   const button=form.querySelector("#createStudentButton");button.disabled=true;button.textContent=T("సృష్టిస్తోంది…","Creating…");
-  const payload={name:form.elements.name.value.trim(),gender:form.elements.gender.value,dob:form.elements.dob.value.trim(),guardianName:form.elements.guardianName.value.trim(),relationship:form.elements.relationship.value,parentMobile:form.elements.parentMobile.value.trim(),section:form.elements.section.value.trim()};
+  const payload={name:form.querySelector('[name="name"]').value.trim(),gender:form.querySelector('[name="gender"]').value,dob:form.querySelector('[name="dob"]').value.trim(),guardianName:form.querySelector('[name="guardianName"]').value.trim(),relationship:form.querySelector('[name="relationship"]').value,parentMobile:form.querySelector('[name="parentMobile"]').value.trim(),section:form.querySelector('[name="section"]').value.trim()};
   try{
    const result=await createClassStudent(activeClassId,payload);
    say(T("విద్యార్థి నమోదు పూర్తయింది. Secret Codeను Head Master మాత్రమే చూడగలరు.","Student created. Only the Head Master can view the Secret Code."));
