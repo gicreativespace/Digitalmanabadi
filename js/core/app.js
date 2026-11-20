@@ -73,6 +73,13 @@ const main=document.querySelector("#mainView");
 function selectWelcomeRole(role){
  if(!roleNames[role])return;
  state.role=role;state.authenticated=false;
+ if(role==="teacher"&&auth.currentUser?.uid?.startsWith("teacher_")&&getLocalTeacherPinRecord(auth.currentUser.uid)){
+  state.teacherPinMode="unlock";
+  state.teacherLoginStep="id";
+  state.view="login";
+  localStorage.setItem("gim_role","teacher");localStorage.removeItem("gim_authenticated");
+  render();return;
+ }
  localStorage.setItem("gim_role",role);localStorage.removeItem("gim_authenticated");
  state.view="login";render();
 }
