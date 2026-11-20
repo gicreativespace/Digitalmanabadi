@@ -82,27 +82,33 @@ function matchesSecretCode(code, storedSalt, storedHash) {
 
 async function applyRateLimit(request, teacherId, action, maximum, windowMs) {
   const ip = cleanText(request.rawRequest?.ip || "unknown", 80);
-  const key = createHash("sha256").update(ip + "|" + teacherId + "|" + action).digest("hex");
-  const ref = db.collection(ATTEMPTS).doc(key);
+  const keys = [
+    createHash("sha256").update(ip + "|" + action).digest("hex"),
+    createHash("sha256").update(ip + "|" + teacherId + "|" + action).digest("hex"),
+    createHash("sha256").update("teacher|" + teacherId + "|" + action).digest("hex")
+  ];
+  const refs = keys.map(key => db.collection(ATTEMPTS).doc(key));
   const now = Date.now();
   let blocked = false;
 
   await db.runTransaction(async transaction => {
-    const snapshot = await transaction.get(ref);
-    const current = snapshot.exists ? snapshot.data() : {};
-    const started = Number(current.windowStartedAt || 0);
-    const inWindow = started > 0 && now - started < windowMs;
-    const count = inWindow ? Number(current.count || 0) : 0;
-    if (count >= maximum) {
+    const snapshots = await transaction.getAll(...refs);
+    const windows = snapshots.map(snapshot => {
+      const current = snapshot.exists ? snapshot.data() : {};
+      const started = Number(current.windowStartedAt || 0);
+      const inWindow = started > 0 && now - started < windowMs;
+      return { started: inWindow ? started : now, count: inWindow ? Number(current.count || 0) : 0 };
+    });
+    if (windows.some(window => window.count >= maximum)) {
       blocked = true;
       return;
     }
-    transaction.set(ref, {
+    refs.forEach((ref, index) => transaction.set(ref, {
       action,
-      windowStartedAt: inWindow ? started : now,
-      count: count + 1,
+      windowStartedAt: windows[index].started,
+      count: windows[index].count + 1,
       updatedAt: FieldValue.serverTimestamp()
-    });
+    }));
   });
 
   if (blocked) fail("resource-exhausted", "Too many attempts. Please wait and try again.");
