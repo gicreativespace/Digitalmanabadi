@@ -19,7 +19,7 @@ function dashboard(){
   return;
  }
  const meta=roleMeta[state.role],list=modules[state.role]||[];
- main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.titleTe||meta.title,meta.titleEn||meta.title)}</h1><p>${state.role==="hm"&&state.headMasterProfile?.school?.schoolName?escapeHtml(state.headMasterProfile.school.schoolName):T(meta.sub,meta.sub)}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
+ main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T(meta.titleTe||meta.title,meta.titleEn||meta.title)}</h1><p>${state.role==="hm"&&state.headMasterProfile?.school?.schoolName?escapeHtml(state.headMasterProfile.school.schoolName):T(meta.subTe||meta.sub,meta.subEn||meta.sub)}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
  ${roleDashboardIntro[state.role]?.({state,T,escapeHtml})||""}
  <div class="section-head"><div><h2>${T("మీ విభాగాలు","Your Sections")}</h2><p>${T("మీ పాత్రకు అనుమతించిన సేవలు","Services available for your role")}</p></div></div><section class="module-grid">${list.map(m=>`<button class="module-card" data-module="${m[2]}"><span class="card-icon">${iconSvg(m[0])}</span><strong>${T(m[1],m[2])}</strong><small>${T(m[3],m[4]||m[3])}</small><span class="module-arrow">›</span></button>`).join("")}</section>
  ${commonHighlights()}`;
