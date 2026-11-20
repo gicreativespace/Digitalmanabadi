@@ -3,6 +3,7 @@ import { auth } from "../firebase-client.js";
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { getLocalTeacherPinRecord, saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
+import { verifyParentPin, getParentChildren } from "../sections/parent/parent-service.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
  async function renderHmPinGate(){
@@ -163,7 +164,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   main.querySelector("#forgotAccess").onclick=async()=>{
    clear();
    if(state.role==="teacher"){show(T("Teacher PIN Recovery ప్రస్తుతం అందుబాటులో లేదు. సురక్షిత ధృవీకరణ అనుసంధానం అయ్యే వరకు Head Master‌ను సంప్రదించండి.","Teacher PIN recovery is not available yet. Please contact the Head Master until secure verification is connected."),"info");return}
-   if(state.role==="parent"){show(T("Parent PIN Recovery ప్రస్తుతం అందుబాటులో లేదు. సురక్షిత ధృవీకరణ అనుసంధానం అయ్యే వరకు Head Master‌ను సంప్రదించండి.","Parent PIN recovery is not available yet. Please contact the Head Master until secure verification is connected."),"info");return}
+   if(state.role==="parent"){state.view="link";render();return}
    const email=main.querySelector("#loginId").value.trim();
    if(!email){show(T("ముందుగా మీ అధికారిక School Email నమోదు చేయండి.","Enter your official school email first."),"warning");main.querySelector("#loginId").focus();return}
    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show(T("దయచేసి సరైన Email నమోదు చేయండి.","Please enter a valid email address."),"warning");return}
@@ -193,8 +194,26 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.role==="parent"){
-    if(!state.parentLinked){show(T("ముందుగా మీ పిల్లల వివరాలను Link చేయండి.","Please link your child before signing in."),"warning");return}
-    show(T("Parent Login ప్రస్తుతం Preview Modeలో ఉంది. పిల్లల వివరాల ధృవీకరణ, Mobile + PIN Authentication ఇంకా సురక్షితంగా అనుసంధానం కాలేదు.","Parent login is currently in Preview Mode. Secure child verification and mobile + PIN authentication are not connected yet."),"info");
+    const mobile=id.replace(/\D/g,"").slice(-10),user=auth.currentUser;
+    if(!user||!/^\d{10}$/.test(mobile)||localStorage.getItem("gim_parent_mobile")!==mobile){
+     show(T("ఈ పరికరంలో Parent Verification చేయాలి. మొదటిసారి? పిల్లలను లింక్ చేయండి.","Parent Verification is required on this device. First time? Link your child."),"warning");return;
+    }
+    const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("ధృవీకరిస్తోంది…","Verifying…");
+    try{
+     const token=await user.getIdTokenResult();
+     if(token.claims.role!=="parent")throw new Error("Parent session is not valid.");
+     const valid=await verifyParentPin(user.uid,pin);
+     if(!valid)throw new Error("PIN does not match.");
+     const children=await getParentChildren();
+     if(!children.length)throw new Error("No linked students were found.");
+     state.parentChildren=children;state.linkedStudent=children[0];state.parentMobile=mobile;
+     state.parentLinked=true;state.authenticated=true;
+     localStorage.setItem("gim_role","parent");localStorage.setItem("gim_authenticated","true");
+     state.view="dashboard";render();
+    }catch(error){
+     show(error.message==="PIN does not match."?T("Parent PIN సరిపోలలేదు.","Incorrect Parent PIN."):T("Parent Session ధృవీకరించబడలేదు. మళ్లీ పిల్లల వివరాలు Verify చేయండి.","Parent session could not be verified. Please verify your child again."));
+     b.disabled=false;b.textContent=T("ప్రవేశించండి","Sign In");
+    }
     return;
    }
    show(T("ఈ Roleకు సురక్షిత Login ఇంకా అందుబాటులో లేదు.","Secure sign-in is not available for this role yet."),"info");
