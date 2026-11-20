@@ -1,44 +1,64 @@
 import { renderCalendarMarkup } from "./calendar.js";
-import { createTeacherRecord, listTeacherRecords } from "../sections/teacher/teacher-service.js";
+import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
 export function createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection}) {
 function teacherManagementMarkup(){
+ const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
+ const subjects=["Telugu","English","Mathematics","EVS"];
+ const choiceGroup=(name,label,values,selected=[])=>'<fieldset class="teacher-choice-group"><legend>'+label+'</legend><div class="teacher-choice-grid">'+values.map(value=>'<label class="teacher-choice"><input type="checkbox" name="'+name+'" value="'+escapeHtml(value)+'" '+(selected.includes(value)?"checked":"")+'><span>'+escapeHtml(value)+'</span></label>').join("")+'</div></fieldset>';
  return '<style>'+
- '.teacher-admin{display:grid;gap:16px;margin-top:18px}'+
- '.teacher-admin-card{border:1px solid var(--border);border-radius:16px;padding:16px;background:var(--surface)}'+
- '.teacher-admin-card h3{margin:0 0 12px;font-size:17px;color:var(--text)}'+
+ '.teacher-admin{display:grid;gap:17px;margin-top:18px;color:var(--text)}'+
+ '.teacher-admin *{box-sizing:border-box}'+
+ '.teacher-admin-hero{padding:20px;border:1px solid #d8e8db;border-radius:20px;background:linear-gradient(125deg,#eff8f0,#e5f1e6 62%,#faf8ee);color:#294d35;display:flex;justify-content:space-between;align-items:center;gap:12px}'+
+ '.teacher-admin-kicker{font-size:10px;letter-spacing:.15em;font-weight:850;color:#66866d}.teacher-admin-hero h3{margin:5px 0;font-size:22px;color:#294d35}.teacher-admin-hero p{margin:0;color:#6c8572;font-size:12px;line-height:1.5}'+
+ '.teacher-admin-mark{width:48px;height:48px;flex:none;border-radius:15px;background:#d9eadb;color:#356f50;display:grid;place-items:center;font-size:23px;font-weight:900}'+
+ '.teacher-admin-card{border:1px solid var(--border);border-radius:18px;padding:17px;background:var(--surface);box-shadow:0 7px 20px rgba(45,83,54,.045)}'+
+ '.teacher-admin-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.teacher-admin-card-head h3{margin:0;font-size:17px;color:var(--text)}'+
  '.teacher-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'+
- '.teacher-admin .field{display:grid;gap:6px;margin:0}.teacher-admin .field label{font-size:13px;font-weight:700;color:var(--text)}'+
- '.teacher-admin input,.teacher-admin select{width:100%;min-height:45px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit}'+
- '.teacher-admin-help{font-size:12px;color:var(--muted);line-height:1.5;margin:6px 0 0}'+
- '.teacher-admin-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}'+
- '.teacher-admin-result{display:none;margin-top:12px;padding:13px;border:1px solid var(--green);border-radius:12px;background:var(--surface2);overflow-wrap:anywhere}'+
- '.teacher-admin-result.is-visible{display:block}.teacher-admin-result strong{display:block;margin:4px 0;font-size:20px;letter-spacing:.06em}'+
- '.teacher-admin-list{display:grid;gap:10px}.teacher-admin-row{padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--surface2)}'+
+ '.teacher-admin .field{display:grid;gap:6px;margin:0}.teacher-admin .field label,.teacher-choice-group legend{font-size:12px;font-weight:750;color:var(--text)}'+
+ '.teacher-admin input:not([type=checkbox]),.teacher-admin select,.teacher-admin textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:11px;background:var(--surface2);color:var(--text);font:inherit}'+
+ '.teacher-admin textarea{min-height:72px;resize:vertical}'+
+ '.teacher-choice-group{border:0;padding:0;margin:14px 0 0;min-width:0}.teacher-choice-group legend{margin-bottom:8px}'+
+ '.teacher-choice-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}'+
+ '.teacher-choice{display:flex!important;align-items:center;gap:8px;padding:10px;border:1px solid var(--border);border-radius:11px;background:var(--surface2);font-size:12px!important;font-weight:650!important;cursor:pointer}'+
+ '.teacher-choice input{width:16px;height:16px;min-height:0;accent-color:var(--green);flex:none}'+
+ '.teacher-admin-help{font-size:12px;color:var(--muted);line-height:1.55;margin:8px 0 0}'+
+ '.teacher-admin-action{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:15px}'+
+ '.teacher-admin-action .btn,.teacher-admin-row .btn,.teacher-admin-result .btn{min-height:39px;border-radius:10px;padding:8px 13px;font-size:12px}'+
+ '.teacher-admin-result{display:none;margin-top:14px;padding:15px;border:1px solid #b9d8bf;border-radius:14px;background:var(--surface2);overflow-wrap:anywhere}'+
+ '.teacher-admin-result.is-visible{display:block}.teacher-admin-result h4{margin:0 0 5px;font-size:15px}.teacher-admin-credential{margin-top:10px;padding:11px;border-radius:11px;background:var(--surface);border:1px solid var(--border)}'+
+ '.teacher-admin-credential small{display:block;color:var(--muted);font-size:11px;margin:5px 0}.teacher-admin-credential strong{display:block;font-size:17px;letter-spacing:.02em;overflow-wrap:anywhere}'+
+ '.teacher-password-row{display:flex;gap:7px;align-items:center}.teacher-password-row input{flex:1;min-width:0}.teacher-password-row button{flex:none}'+
+ '.teacher-admin-share{display:inline-flex;align-items:center;justify-content:center;margin-top:12px;min-height:40px;padding:9px 14px;border-radius:10px;background:#16834b;color:#fff;text-decoration:none;font-size:12px;font-weight:800}'+
+ '.teacher-admin-list{display:grid;gap:11px}.teacher-admin-row{padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface2)}'+
  '.teacher-admin-row-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.teacher-admin-row strong{color:var(--text)}'+
  '.teacher-admin-row small{display:block;color:var(--muted);font-size:12px;line-height:1.55;margin-top:5px}'+
- '.teacher-admin-id{font-size:12px;font-weight:800;color:var(--green);letter-spacing:.06em}'+
- '.teacher-admin-empty{padding:14px;border:1px dashed var(--border);border-radius:12px;color:var(--muted);font-size:13px}'+
- '@media(max-width:560px){.teacher-admin-grid{grid-template-columns:1fr}.teacher-admin-card{padding:13px}}'+
+ '.teacher-admin-id{font-size:12px;font-weight:850;color:var(--green);letter-spacing:.06em;white-space:nowrap}'+
+ '.teacher-admin-status{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800;background:#e7f3e9;color:#28613b;margin-top:8px}.teacher-admin-status.inactive{background:#f8e9e5;color:#984633}'+
+ '.teacher-admin-row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.teacher-admin-row details{margin-top:10px;border-top:1px solid var(--border);padding-top:9px}.teacher-admin-row summary{font-size:12px;font-weight:750;color:var(--green);cursor:pointer;padding:5px 0}'+
+ '.teacher-admin-subform{padding:10px 0}.teacher-admin-subform .teacher-admin-action{margin-top:12px}'+
+ '.teacher-admin-empty{padding:16px;border:1px dashed var(--border);border-radius:13px;color:var(--muted);font-size:13px;text-align:center}'+
+ '@media(max-width:560px){.teacher-admin-grid{grid-template-columns:1fr}.teacher-admin-card{padding:13px}.teacher-admin-hero{padding:16px}.teacher-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.teacher-admin-mark{width:42px;height:42px}}'+
  '</style>'+
  '<div class="teacher-admin">'+
-  '<section class="teacher-admin-card"><h3>కొత్త ఉపాధ్యాయుడిని చేర్చండి</h3>'+
+  '<header class="teacher-admin-hero"><div><div class="teacher-admin-kicker">MPMPS SCHOOL · STAFF DIRECTORY</div><h3>Teacher Management</h3><p>Manage teacher profiles, class assignments and secure login access</p></div><div class="teacher-admin-mark" aria-hidden="true">TM</div></header>'+
+  '<section class="teacher-admin-card"><div class="teacher-admin-card-head"><h3>కొత్త ఉపాధ్యాయుడిని చేర్చండి</h3><span class="teacher-admin-id">NEW PROFILE</span></div>'+
    '<form id="teacherCreateForm">'+
     '<div class="teacher-admin-grid">'+
-     '<div class="field"><label for="teacherName">Teacher Name</label><input id="teacherName" name="name" maxlength="100" required autocomplete="name"></div>'+
+     '<div class="field"><label for="teacherName">Teacher Name</label><input id="teacherName" name="name" maxlength="100" required autocomplete="name" placeholder="Enter full name"></div>'+
      '<div class="field"><label for="teacherDob">Date of Birth</label><input id="teacherDob" name="dob" type="date" required></div>'+
      '<div class="field"><label for="teacherGender">Gender</label><select id="teacherGender" name="gender" required><option value="">Select Gender</option><option value="Female">Female</option><option value="Male">Male</option><option value="Other">Other</option></select></div>'+
-     '<div class="field"><label for="teacherClasses">Assigned Classes</label><input id="teacherClasses" name="classes" placeholder="ఉదా: Class 1, Class 2" required></div>'+
-     '<div class="field"><label for="teacherSubjects">Teaching Subjects</label><input id="teacherSubjects" name="subjects" placeholder="ఉదా: Telugu, Maths" required></div>'+
     '</div>'+
-    '<p class="teacher-admin-help">Classes, Subjects‌ను commaతో వేరు చేసి నమోదు చేయండి.</p>'+
+    choiceGroup("classes","Assigned Classes",classes)+
+    choiceGroup("subjects","Teaching Subjects",subjects)+
+    '<p class="teacher-admin-help">Select all classes and subjects assigned to this teacher. Teacher ID will be generated automatically.</p>'+
     '<div class="teacher-admin-action"><button class="btn" id="teacherCreateButton" type="submit">Create Teacher</button><span id="teacherCreateStatus" class="teacher-admin-help" role="status"></span></div>'+
    '</form>'+
    '<div id="teacherCreateResult" class="teacher-admin-result" aria-live="polite"></div>'+
   '</section>'+
-  '<section class="teacher-admin-card"><h3>ఉపాధ్యాయుల జాబితా</h3><div id="teacherList" class="teacher-admin-list"><div class="teacher-admin-empty">ఉపాధ్యాయుల వివరాలను లోడ్ చేస్తోంది…</div></div></section>'+
+  '<section class="teacher-admin-card"><div class="teacher-admin-card-head"><h3>ఉపాధ్యాయుల జాబితా</h3><span class="teacher-admin-id">TEACHER DIRECTORY</span></div><div id="teacherList" class="teacher-admin-list"><div class="teacher-admin-empty">ఉపాధ్యాయుల వివరాలను లోడ్ చేస్తోంది…</div></div></section>'+
  '</div>';
 }
 async function bindTeacherManagement(){
@@ -47,33 +67,67 @@ async function bindTeacherManagement(){
  const status=main.querySelector("#teacherCreateStatus");
  const resultBox=main.querySelector("#teacherCreateResult");
  const listBox=main.querySelector("#teacherList");
+ const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
+ const subjects=["Telugu","English","Mathematics","EVS"];
+ const esc=value=>escapeHtml(String(value??""));
+ const checkedValues=(root,name)=>[...root.querySelectorAll('input[name="'+name+'"]:checked')].map(input=>input.value);
+ const choiceGroup=(name,label,values,selected=[])=>'<fieldset class="teacher-choice-group"><legend>'+label+'</legend><div class="teacher-choice-grid">'+values.map(value=>'<label class="teacher-choice"><input type="checkbox" name="'+name+'" value="'+esc(value)+'" '+(selected.includes(value)?"checked":"")+'><span>'+esc(value)+'</span></label>').join("")+'</div></fieldset>';
  const showError=error=>{status.textContent=error?.message||"ఉపాధ్యాయుడిని నమోదు చేయలేకపోయాం. మళ్లీ ప్రయత్నించండి.";};
+ const shareMessage=credentials=>"Welcome to Digital Mana Badi!\n\nYour Teacher Login Details:\n\nTeacher ID: "+credentials.teacherId+"\nLogin ID: "+credentials.loginId+"\nTemporary Password: "+credentials.password+"\n\nPlease log in and complete your first-time setup.\n\nSecurity Notice:\nDo not share your Login ID or Password with anyone. Keep your login credentials strictly confidential.\n\n– MPMPS School, Dagguluru";
+ const renderCredentials=credentials=>{
+  resultBox.innerHTML='<h4>Teacher login created successfully</h4><p class="teacher-admin-help">Share these temporary credentials privately. The password is shown now and cannot be retrieved later.</p><div class="teacher-admin-credential"><small>Teacher ID</small><strong>'+esc(credentials.teacherId)+'</strong><small>Login ID</small><strong>'+esc(credentials.loginId)+'</strong><small>Temporary Password</small><div class="teacher-password-row"><input id="teacherGeneratedPassword" type="password" readonly value="'+esc(credentials.password)+'" aria-label="Temporary password"><button type="button" class="btn secondary" id="teacherTogglePassword">Show</button></div></div><a class="teacher-admin-share" id="teacherShareWhatsApp" target="_blank" rel="noopener noreferrer">Share via WhatsApp ↗</a>';
+  resultBox.classList.add("is-visible");
+  main.querySelector("#teacherTogglePassword").onclick=()=>{
+   const input=main.querySelector("#teacherGeneratedPassword"),toggle=main.querySelector("#teacherTogglePassword");
+   const visible=input.type==="password";input.type=visible?"text":"password";toggle.textContent=visible?"Hide":"Show";
+  };
+  main.querySelector("#teacherShareWhatsApp").href="https://wa.me/?text="+encodeURIComponent(shareMessage(credentials));
+ };
+ const renderTeacherRow=teacher=>{
+  const id=esc(teacher.teacherId),active=teacher.status==="active";
+  const selectedClasses=teacher.assignedClasses||[],selectedSubjects=teacher.teachingSubjects||[];
+  const editForm='<details><summary>Edit Teacher Profile</summary><form class="teacher-admin-subform" data-edit-teacher="'+id+'"><div class="teacher-admin-grid"><div class="field"><label>Teacher Name</label><input name="name" maxlength="100" required value="'+esc(teacher.name)+'"></div><div class="field"><label>Date of Birth</label><input name="dob" type="date" required value="'+esc(teacher.dob)+'"></div><div class="field"><label>Gender</label><select name="gender" required><option value="Female" '+(teacher.gender==="Female"?"selected":"")+'>Female</option><option value="Male" '+(teacher.gender==="Male"?"selected":"")+'>Male</option><option value="Other" '+(teacher.gender==="Other"?"selected":"")+'>Other</option></select></div></div>'+choiceGroup("classes","Assigned Classes",classes,selectedClasses)+choiceGroup("subjects","Teaching Subjects",subjects,selectedSubjects)+'<div class="teacher-admin-action"><button class="btn" type="submit">Save Changes</button></div></form></details>';
+  const loginAction=active&&!teacher.authUid?'<button type="button" class="btn" data-create-login="'+id+'">Create Login</button>':teacher.loginId?'<small>Login ID: '+esc(teacher.loginId)+'</small>':'';
+  const statusAction=active?'<details><summary>Deactivate Teacher</summary><form class="teacher-admin-subform" data-deactivate-teacher="'+id+'"><div class="field"><label>Reason for Deactivation</label><select name="reason" required><option value="">Select Reason</option><option value="school_transfer">School Transfer</option><option value="retired">Retired</option><option value="other">Other Reason</option></select></div><div class="field" style="margin-top:10px"><label>Additional Note (optional)</label><textarea name="note" maxlength="240" placeholder="Add a short note"></textarea></div><div class="teacher-admin-action"><button class="btn secondary" type="submit">Confirm Deactivation</button></div></form></details>':'<button type="button" class="btn" data-reactivate-teacher="'+id+'">Reactivate</button>';
+  return '<article class="teacher-admin-row"><div class="teacher-admin-row-top"><div><strong>'+esc(teacher.name)+'</strong><small>Classes: '+esc(selectedClasses.join(", "))+'</small><small>Subjects: '+esc(selectedSubjects.join(", "))+'</small><small>Teacher ID: '+id+'</small><span class="teacher-admin-status '+(active?"":"inactive")+'">'+(active?"ACTIVE":"DEACTIVATED")+'</span></div><span class="teacher-admin-id">'+id+'</span></div><div class="teacher-admin-row-actions">'+loginAction+statusAction+'</div>'+editForm+'</article>';
+ };
  const refreshList=async()=>{
   listBox.innerHTML='<div class="teacher-admin-empty">ఉపాధ్యాయుల వివరాలను లోడ్ చేస్తోంది…</div>';
   try{
-   const response=await listTeacherRecords();
-   const teachers=response.teachers||[];
-   listBox.innerHTML=teachers.length?teachers.map(teacher=>'<article class="teacher-admin-row"><div class="teacher-admin-row-top"><strong>'+escapeHtml(teacher.name)+'</strong><span class="teacher-admin-id">'+escapeHtml(teacher.teacherId)+'</span></div><small>Classes: '+escapeHtml((teacher.assignedClasses||[]).join(", "))+'</small><small>Subjects: '+escapeHtml((teacher.teachingSubjects||[]).join(", "))+'</small><small>Status: '+(teacher.linked?"Linked":"Not yet linked")+'</small></article>').join(""):'<div class="teacher-admin-empty">ఇంకా ఉపాధ్యాయులు నమోదు కాలేదు.</div>';
-  }catch(error){listBox.innerHTML='<div class="teacher-admin-empty">'+escapeHtml(error?.message||"ఉపాధ్యాయుల జాబితాను లోడ్ చేయలేకపోయాం.")+'</div>';}
+   const response=await listTeacherRecords(),teachers=response.teachers||[];
+   listBox.innerHTML=teachers.length?teachers.map(renderTeacherRow).join(""):'<div class="teacher-admin-empty">ఇంకా ఉపాధ్యాయులు నమోదు కాలేదు.</div>';
+   listBox.querySelectorAll("[data-create-login]").forEach(action=>action.onclick=async()=>{
+    action.disabled=true;action.textContent="Creating Login…";
+    try{const credentials=await createTeacherLogin(action.dataset.createLogin);renderCredentials(credentials);await refreshList();resultBox.scrollIntoView({behavior:"smooth",block:"nearest"});}
+    catch(error){status.textContent=error?.message||"Login creation failed.";action.disabled=false;action.textContent="Create Login";}
+   });
+   listBox.querySelectorAll("[data-edit-teacher]").forEach(editForm=>editForm.onsubmit=async event=>{
+    event.preventDefault();const submit=editForm.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent="Saving…";
+    const payload={name:editForm.elements.name.value.trim(),dob:editForm.elements.dob.value,gender:editForm.elements.gender.value,assignedClasses:checkedValues(editForm,"classes"),teachingSubjects:checkedValues(editForm,"subjects")};
+    try{await updateTeacherRecord(editForm.dataset.editTeacher,payload);status.textContent="Teacher profile updated.";await refreshList();}
+    catch(error){status.textContent=error?.message||"Could not update teacher.";submit.disabled=false;submit.textContent="Save Changes";}
+   });
+   listBox.querySelectorAll("[data-deactivate-teacher]").forEach(deactivateForm=>deactivateForm.onsubmit=async event=>{
+    event.preventDefault();const submit=deactivateForm.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent="Deactivating…";
+    try{await setTeacherStatus(deactivateForm.dataset.deactivateTeacher,"inactive",deactivateForm.elements.reason.value,deactivateForm.elements.note.value);status.textContent="Teacher deactivated. Historical records are retained.";await refreshList();}
+    catch(error){status.textContent=error?.message||"Could not deactivate teacher.";submit.disabled=false;submit.textContent="Confirm Deactivation";}
+   });
+   listBox.querySelectorAll("[data-reactivate-teacher]").forEach(action=>action.onclick=async()=>{
+    action.disabled=true;action.textContent="Reactivating…";
+    try{await setTeacherStatus(action.dataset.reactivateTeacher,"active");status.textContent="Teacher reactivated.";await refreshList();}
+    catch(error){status.textContent=error?.message||"Could not reactivate teacher.";action.disabled=false;action.textContent="Reactivate";}
+   });
+  }catch(error){listBox.innerHTML='<div class="teacher-admin-empty">'+esc(error?.message||"ఉపాధ్యాయుల జాబితాను లోడ్ చేయలేకపోయాం.")+'</div>';}
  };
  if(form)form.onsubmit=async event=>{
   event.preventDefault();status.textContent="";resultBox.classList.remove("is-visible");
-  const split=value=>value.split(",").map(item=>item.trim()).filter(Boolean);
-  const payload={
-   name:main.querySelector("#teacherName").value.trim(),
-   dob:main.querySelector("#teacherDob").value,
-   gender:main.querySelector("#teacherGender").value,
-   assignedClasses:split(main.querySelector("#teacherClasses").value),
-   teachingSubjects:split(main.querySelector("#teacherSubjects").value)
-  };
-  if(!payload.assignedClasses.length||!payload.teachingSubjects.length){status.textContent="Classes మరియు Subjects నమోదు చేయండి.";return;}
+  const payload={name:main.querySelector("#teacherName").value.trim(),dob:main.querySelector("#teacherDob").value,gender:main.querySelector("#teacherGender").value,assignedClasses:checkedValues(form,"classes"),teachingSubjects:checkedValues(form,"subjects")};
+  if(!payload.assignedClasses.length||!payload.teachingSubjects.length){status.textContent="Classes మరియు Subjects ఎంచుకోండి.";return;}
   button.disabled=true;button.textContent="Creating…";
   try{
    const created=await createTeacherRecord(payload);
-   resultBox.innerHTML='<span class="teacher-admin-help">Teacher నమోదు పూర్తయింది. ఈ Secret Code‌ను ఉపాధ్యాయుడికి వ్యక్తిగతంగా అందించండి. ఇది మళ్లీ చూపించబడదు.</span><small>Teacher ID</small><strong>'+escapeHtml(created.teacherId)+'</strong><small>Secret Code</small><strong>'+escapeHtml(created.secretCode)+'</strong><button type="button" class="btn secondary" id="teacherCopyCredentials">Copy Teacher ID & Secret Code</button>';
-   resultBox.classList.add("is-visible");
-   main.querySelector("#teacherCopyCredentials").onclick=async()=>{try{await navigator.clipboard.writeText("Teacher ID: "+created.teacherId+"\nSecret Code: "+created.secretCode);status.textContent="Credentials copied.";}catch{status.textContent="Copy unavailable. Please copy the details manually.";}};
-   form.reset();await refreshList();
+   resultBox.innerHTML='<h4>Teacher profile created</h4><p class="teacher-admin-help">Teacher ID: <strong>'+esc(created.teacherId)+'</strong>. Next, select <b>Create Login</b> from this teacher card to generate Login ID and Password.</p>';
+   resultBox.classList.add("is-visible");form.reset();await refreshList();
   }catch(error){showError(error);}
   finally{button.disabled=false;button.textContent="Create Teacher";}
  };
