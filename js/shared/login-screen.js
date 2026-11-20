@@ -50,7 +50,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   const renderStage=()=>{
    clear();
    if(state.teacherPinMode==="unlock"){
-    flow.innerHTML='<h3>'+T("Teacher PIN","Teacher PIN")+'</h3><p class="teacher-flow-hint">'+T("మీ Firebase Session సక్రియంగా ఉంది. కొనసాగడానికి మీ PIN నమోదు చేయండి.","Your secure session is active. Enter your PIN to continue.")+'</p>'+inputField("teacherUnlockPin",T("4 అంకెల PIN","4-digit PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••")+'<button type="button" class="btn full role-login-submit" id="teacherUnlock">'+T("కొనసాగించండి","Continue")+'</button>';
+    flow.innerHTML='<h3>'+T("Teacher PIN","Teacher PIN")+'</h3><p class="teacher-flow-hint">'+T("మీ Firebase Session సక్రియంగా ఉంది. కొనసాగడానికి మీ PIN నమోదు చేయండి.","Your secure session is active. Enter your PIN to continue.")+'</p>'+inputField("teacherUnlockPin",T("4 అంకెల PIN","4-digit PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherUnlock">'+T("కొనసాగించండి","Continue")+'</button>';
     main.querySelector("#teacherUnlock").onclick=async()=>{
      const pin=main.querySelector("#teacherUnlockPin").value,button=main.querySelector("#teacherUnlock");
      if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter your 4-digit PIN."),"warning");return;}
@@ -70,7 +70,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    }
    if(state.teacherLoginStep==="verify"){
     const teacher=state.teacherLoginRecord||{};
-    flow.innerHTML='<div class="teacher-name-confirm"><small>'+T("Teacher Name","Teacher Name")+'</small><strong>'+String(teacher.name||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</strong></div>'+inputField("teacherSecretCode",T("Secret Code","Secret Code"),"password",'inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••") + inputField("teacherDob",T("Date of Birth","Date of Birth"),"date",'autocomplete="bday"')+'<button type="button" class="btn full role-login-submit" id="teacherVerify">'+T("ధృవీకరించండి","Verify Identity")+'</button><button type="button" class="text-link" id="teacherChangeId">'+T("Teacher ID మార్చండి","Change Teacher ID")+'</button>';
+    flow.innerHTML='<div class="teacher-name-confirm"><small>'+T("Teacher Name","Teacher Name")+'</small><strong>'+String(teacher.name||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))+'</strong></div>'+inputField("teacherSecretCode",T("Secret Code","Secret Code"),"password",'inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"') + inputField("teacherDob",T("Date of Birth","Date of Birth"),"date",'autocomplete="bday"')+'<button type="button" class="btn full role-login-submit" id="teacherVerify">'+T("ధృవీకరించండి","Verify Identity")+'</button><button type="button" class="text-link" id="teacherChangeId">'+T("Teacher ID మార్చండి","Change Teacher ID")+'</button>';
     main.querySelector("#teacherChangeId").onclick=()=>{state.teacherLoginStep="id";state.teacherLoginRecord=null;renderStage();};
     main.querySelector("#teacherVerify").onclick=async()=>{
      const secretCode=main.querySelector("#teacherSecretCode").value.trim(),dob=main.querySelector("#teacherDob").value,button=main.querySelector("#teacherVerify");
@@ -93,7 +93,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.teacherLoginStep==="pin"){
-    flow.innerHTML='<h3>'+T("మీ 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN")+'</h3><p class="teacher-flow-hint">'+T("తదుపరి సారి ఈ పరికరంలో త్వరగా ప్రవేశించడానికి PIN ఉపయోగించండి.","Use this PIN for quick access on this device next time.")+'</p>'+inputField("teacherNewPin",T("కొత్త PIN","New PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••") + inputField("teacherConfirmPin",T("PIN మళ్లీ నమోదు చేయండి","Confirm PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••")+'<button type="button" class="btn full role-login-submit" id="teacherSavePin">'+T("PIN సేవ్ చేయండి","Save PIN")+'</button>';
+    flow.innerHTML='<h3>'+T("మీ 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN")+'</h3><p class="teacher-flow-hint">'+T("తదుపరి సారి ఈ పరికరంలో త్వరగా ప్రవేశించడానికి PIN ఉపయోగించండి.","Use this PIN for quick access on this device next time.")+'</p>'+inputField("teacherNewPin",T("కొత్త PIN","New PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"') + inputField("teacherConfirmPin",T("PIN మళ్లీ నమోదు చేయండి","Confirm PIN"),"password",'inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••"')+'<button type="button" class="btn full role-login-submit" id="teacherSavePin">'+T("PIN సేవ్ చేయండి","Save PIN")+'</button>';
     main.querySelector("#teacherSavePin").onclick=async()=>{
      const pin=main.querySelector("#teacherNewPin").value,confirm=main.querySelector("#teacherConfirmPin").value,button=main.querySelector("#teacherSavePin");
      if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter a 4-digit PIN."),"warning");return;}
