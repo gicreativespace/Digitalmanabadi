@@ -6,7 +6,6 @@ export default async function handler(req, res) {
     if (req.method !== "POST") { res.setHeader("Allow", "POST, OPTIONS"); return json(res, 405, { error: "Method not allowed." }); }
     const mobile = normalizeMobile(req.body?.mobile);
     const db = adminDb();
-    const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
     const lookupId = hmac("lookup:" + mobile);
     const attemptRef = db.collection("parentLookupAttempts").doc(lookupId);
     const result = await db.runTransaction(async tx => {
