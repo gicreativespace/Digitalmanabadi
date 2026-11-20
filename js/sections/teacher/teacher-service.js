@@ -8,8 +8,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import {
+  arrayUnion,
   collection,
-  deleteField,
   doc,
   getDoc,
   getDocs,
@@ -207,6 +207,7 @@ export async function setTeacherStatus(teacherId, status, reason = "", note = ""
       status: "inactive",
       deactivationReason: reason,
       deactivationNote: cleanText(note, 240),
+      deactivationHistory: arrayUnion({ reason, note: cleanText(note, 240), at: new Date().toISOString(), by: user.uid }),
       deactivatedAt: serverTimestamp(),
       deactivatedBy: user.uid,
       updatedAt: serverTimestamp()
@@ -216,11 +217,7 @@ export async function setTeacherStatus(teacherId, status, reason = "", note = ""
       status: "active",
       lastReactivatedAt: serverTimestamp(),
       lastReactivatedBy: user.uid,
-      updatedAt: serverTimestamp(),
-      deactivationReason: deleteField(),
-      deactivationNote: deleteField(),
-      deactivatedAt: deleteField(),
-      deactivatedBy: deleteField()
+      updatedAt: serverTimestamp()
     });
   } else {
     throw new Error("Invalid teacher status.");
