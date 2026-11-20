@@ -55,8 +55,8 @@ export const modules={
   ["trophy","విద్యార్థుల ప్రతిభ","Merit & Excellence Awards","మీ పిల్లల ఆమోదిత విజయాలు","Your child’s approved achievements"]
  ],
  community:[
-  ["book-heart","గొప్ప వ్యక్తులు","Great People","View Only"],
-  ["quote","గొప్ప సూక్తులు","Great Quotes","View Only"],
+  ["book-heart","గొప్ప వ్యక్తులు","Great People","చూడటానికి మాత్రమే","View only"],
+  ["quote","గొప్ప సూక్తులు","Great Quotes","చూడటానికి మాత్రమే","View only"],
   ["calendar-days","క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు మరియు ముఖ్యమైన తేదీలు","School events and important dates"],
   ["school","నా పాఠశాల","My School","పాఠశాల సమాచారం మరియు తాజా విషయాలు","School information and updates"],
   ["message-circle","Head Masterను సంప్రదించండి","Contact Head Master","మీ పాఠశాలకు సందేశం పంపండి","Send a message to your school"],
