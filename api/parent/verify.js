@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       if (!studentSnap.exists) {
         const failures = (Number(attempt.lockUntilMs || 0) > 0 && Number(attempt.lockUntilMs || 0) <= now ? 0 : Number(attempt.failures || 0)) + 1;
         tx.set(attemptRef, { failures, lockUntilMs: failures >= 5 ? now + 60000 : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-        return { kind: "invalid" };
+        return { kind: "invalid", lockedAfter: failures >= 5 };
       }
       const student = studentSnap.data();
       const valid = student.status === "active"
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
         && String(student.dob || "") === dob
         && sameHash(student.secretCodeHash, hmac("secret:" + secretCode));
       if (!valid) {
-        const failures = Number(attempt.failures || 0) + 1;
+        const failures = (Number(attempt.lockUntilMs || 0) > 0 && Number(attempt.lockUntilMs || 0) <= now ? 0 : Number(attempt.failures || 0)) + 1;
         tx.set(attemptRef, { failures, lockUntilMs: failures >= 5 ? now + 60000 : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
         return { kind: "invalid", lockedAfter: failures >= 5 };
       }
