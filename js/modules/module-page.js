@@ -103,13 +103,13 @@ async function bindTeacherManagement(){
    });
    listBox.querySelectorAll("[data-edit-teacher]").forEach(editForm=>editForm.onsubmit=async event=>{
     event.preventDefault();const submit=editForm.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent="Saving…";
-    const payload={name:editForm.elements.name.value.trim(),dob:editForm.elements.dob.value,gender:editForm.elements.gender.value,assignedClasses:checkedValues(editForm,"classes"),teachingSubjects:checkedValues(editForm,"subjects")};
+    const payload={name:editForm.querySelector('[name="name"]').value.trim(),dob:editForm.querySelector('[name="dob"]').value,gender:editForm.querySelector('[name="gender"]').value,assignedClasses:checkedValues(editForm,"classes"),teachingSubjects:checkedValues(editForm,"subjects")};
     try{await updateTeacherRecord(editForm.dataset.editTeacher,payload);status.textContent="Teacher profile updated.";await refreshList();}
     catch(error){status.textContent=error?.message||"Could not update teacher.";submit.disabled=false;submit.textContent="Save Changes";}
    });
    listBox.querySelectorAll("[data-deactivate-teacher]").forEach(deactivateForm=>deactivateForm.onsubmit=async event=>{
     event.preventDefault();const submit=deactivateForm.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent="Deactivating…";
-    try{await setTeacherStatus(deactivateForm.dataset.deactivateTeacher,"inactive",deactivateForm.elements.reason.value,deactivateForm.elements.note.value);status.textContent="Teacher deactivated. Historical records are retained.";await refreshList();}
+    try{await setTeacherStatus(deactivateForm.dataset.deactivateTeacher,"inactive",deactivateForm.querySelector('[name="reason"]').value,deactivateForm.querySelector('[name="note"]').value);status.textContent="Teacher deactivated. Historical records are retained.";await refreshList();}
     catch(error){status.textContent=error?.message||"Could not deactivate teacher.";submit.disabled=false;submit.textContent="Confirm Deactivation";}
    });
    listBox.querySelectorAll("[data-reactivate-teacher]").forEach(action=>action.onclick=async()=>{
