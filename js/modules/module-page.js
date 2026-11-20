@@ -56,12 +56,15 @@ async function bindClassManagement(){
  if(!panel||!form)return;
  let activeClassId="";
  const esc=value=>escapeHtml(String(value??""));
+ const formatDob=value=>/^\d{8}$/.test(String(value||""))?String(value).slice(0,2)+"/"+String(value).slice(2,4)+"/"+String(value).slice(4):String(value||"—");
+ const genderLabel=value=>({Male:T("పురుషుడు","Male"),Female:T("స్త్రీ","Female"),Other:T("ఇతర","Other")}[value]||value||"—");
+ const relationshipLabel=value=>({Father:T("తండ్రి","Father"),Mother:T("తల్లి","Mother"),Guardian:T("సంరక్షకుడు","Guardian"),Other:T("ఇతర","Other")}[value]||value||"—");
  const say=(message,isError=false)=>{status.textContent=message;status.className=isError?"class-admin-error":"class-admin-status";};
  const renderStudents=students=>{
   if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ తరగతిలో ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students have been added to this class yet.")+'</div>';return;}
-  list.innerHTML=students.map(student=>'<article class="class-student-card" data-student-record="'+esc(student.studentRecordId)+'"><div class="class-student-head"><div><strong>'+esc(student.name)+'</strong><small>Student ID: '+esc(student.studentId)+' · '+T("రోల్ నంబర్","Roll No.")+' '+esc(student.rollNumber)+(student.section?" · "+T("సెక్షన్","Section")+" "+esc(student.section):"")+'</small></div><span class="class-admin-status">'+T("క్రియాశీలం","Active")+'</span></div><div class="class-student-info">'+
- '<div><span>'+T("లింగం","Gender")+'</span><b>'+esc(student.gender)+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(student.dob)+'</b></div>'+
- '<div><span>'+T("తల్లిదండ్రి / సంరక్షకుడు","Parent / Guardian")+'</span><b>'+esc(student.guardianName)+'</b></div><div><span>'+T("సంబంధం","Relationship")+'</span><b>'+esc(student.relationship)+'</b></div>'+
+  list.innerHTML=students.map(student=>'<article class="class-student-card" data-student-record="'+esc(student.studentRecordId)+'"><div class="class-student-head"><div><strong>'+esc(student.name)+'</strong><small>'+T("విద్యార్థి ID: ","Student ID: ")+esc(student.studentId)+' · '+T("రోల్ నంబర్","Roll No.")+' '+esc(student.rollNumber)+(student.section?" · "+T("సెక్షన్","Section")+" "+esc(student.section):"")+'</small></div><span class="class-admin-status">'+T("క్రియాశీలం","Active")+'</span></div><div class="class-student-info">'+
+ '<div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(student.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(student.dob))+'</b></div>'+
+ '<div><span>'+T("తల్లిదండ్రి / సంరక్షకుడు","Parent / Guardian")+'</span><b>'+esc(student.guardianName)+'</b></div><div><span>'+T("సంబంధం","Relationship")+'</span><b>'+esc(relationshipLabel(student.relationship))+'</b></div>'+
  '<div><span>'+T("Parent Mobile Number","Parent Mobile Number")+'</span><b>'+esc(student.parentMobile)+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(student.secretCode||"—")+'</b></div></div>'+
  '<div class="class-student-actions"><input type="tel" inputmode="numeric" maxlength="10" data-parent-mobile value="'+esc(student.parentMobile)+'" aria-label="'+T("కొత్త Parent Mobile Number","New Parent Mobile Number")+'"><button type="button" class="btn secondary" data-save-parent-mobile>'+T("మొబైల్ మార్చండి","Update Mobile")+'</button></div></article>').join("");
   list.querySelectorAll("[data-save-parent-mobile]").forEach(button=>button.onclick=async()=>{
