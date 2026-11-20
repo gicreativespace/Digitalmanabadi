@@ -17,22 +17,18 @@ function bindDobInputs(root){
 }
 function managementLandingMarkup(){
  const cards=[
-  {key:"Teacher Management",number:"01",icon:"♙",title:"Teacher Management",description:"Teacher profiles, class assignments and secure login access",tone:"teacher"},
-  {key:"Class Management",number:"02",icon:"▦",title:"Class Management",description:"Manage the school’s five classes and student records",tone:"class"}
+  {key:"Teacher Management",icon:"♙",title:"Teacher Management"},
+  {key:"Class Management",icon:"▦",title:"Class Management"}
  ];
  return '<style>'+
- '.hm-management-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}'+
+ '.hm-management-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;width:100%;max-width:900px;margin:0 auto}'+
  '.hm-management-entry *{box-sizing:border-box}'+
- '.hm-management-card{position:relative;display:flex;min-height:190px;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:16px;padding:21px;border:1px solid #dce9de;border-radius:20px;background:linear-gradient(145deg,#ffffff,#f1f8f1);color:#294d35;text-align:left;cursor:pointer;box-shadow:0 9px 24px rgba(38,80,48,.07);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}'+
- '.hm-management-card:hover{transform:translateY(-3px);border-color:#a9c9ae;box-shadow:0 14px 28px rgba(38,80,48,.12)}'+
- '.hm-management-card-top{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px}'+
- '.hm-management-icon{display:grid;width:52px;height:52px;place-items:center;border-radius:16px;background:#e1f0e3;color:#2d7047;font-size:26px;font-weight:800}'+
- '.hm-management-number{color:#89a68d;font-size:11px;font-weight:850;letter-spacing:.13em}'+
+ '.hm-management-card{display:flex;min-height:190px;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:26px 20px;border:1px solid #dce9de;border-radius:22px;background:linear-gradient(145deg,#ffffff,#f1f8f1);color:#294d35;text-align:center;cursor:pointer;box-shadow:0 10px 28px rgba(38,80,48,.08);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}'+
+ '.hm-management-card:hover{transform:translateY(-3px);border-color:#a9c9ae;box-shadow:0 15px 32px rgba(38,80,48,.13)}'+
+ '.hm-management-icon{display:grid;width:64px;height:64px;place-items:center;border-radius:19px;background:#e1f0e3;color:#2d7047;font-size:31px;font-weight:800}'+
  '.hm-management-card h3{margin:0;color:#284d34;font-size:19px;font-weight:850}'+
- '.hm-management-card p{margin:7px 0 0;color:#718776;font-size:12px;line-height:1.55}'+
- '.hm-management-open{display:flex;width:100%;align-items:center;justify-content:space-between;color:#39764b;font-size:12px;font-weight:850}'+
- '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr}.hm-management-card{min-height:160px;padding:18px}}'+
- '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-card-top"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><span class="hm-management-number">MANAGEMENT · '+card.number+'</span></span><span><h3>'+card.title+'</h3><p>'+card.description+'</p></span><span class="hm-management-open"><span>Open dashboard</span><span aria-hidden="true">↗</span></span></button>').join("")+'</div>';
+ '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr;gap:13px}.hm-management-card{min-height:145px;padding:20px}}'+
+ '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+card.title+'</h3></button>').join("")+'</div>';
 }
 function classManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
@@ -225,24 +221,36 @@ function modulePage(){
  };
  const groupLinks=state.role==="hm"?hmGroupLinks[title]:null;
  const groupMarkup=title==="Class & Teacher Management"&&state.role==="hm"?managementLandingMarkup():groupLinks?'<div class="detail-list hm-group-links">'+groupLinks.map(([key,label,desc])=>'<button type="button" class="detail-row" data-hm-submodule="'+escapeHtml(key)+'"><span class="detail-icon">↗</span><div><strong>'+escapeHtml(label)+'</strong><small>'+escapeHtml(desc)+'</small></div><span>›</span></button>').join("")+'</div>':title==="GI Knowledge World"&&state.role==="hm"?'<div class="detail-list"><a class="detail-row" href="'+escapeHtml(APP_CONFIG.knowledgeBlogUrl)+'" target="_blank" rel="noopener"><span class="detail-icon">◎</span><div><strong>Open GI Knowledge World Blog</strong><small>One centrally managed GI Blog</small></div><span>↗</span></a></div>':"";
+ const managementLanding=title==="Class & Teacher Management"&&state.role==="hm";
  const teacherManagement=title==="Teacher Management"&&state.role==="hm";
  const classManagement=title==="Class Management"&&state.role==="hm";
+ const managementDetail=teacherManagement||classManagement;
  const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
- const previewNote=teacherManagement||classManagement||title==="Class & Teacher Management"?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
- main.innerHTML=`<div class="backline"><button class="btn secondary" id="moduleBack">← Dashboard</button><span class="pill">${escapeHtml(title)}</span></div><section class="card module-detail"><h2>${escapeHtml(title)}</h2><p>ఈ విభాగానికి సంబంధించిన వివరాలు మరియు చర్యలు.</p>
- ${calendar?renderCalendarMarkup({state,T}):""}
- ${alumniSponsorSection.communityModuleMarkup(title)}
- ${groupMarkup}
- ${detailMarkup}
- ${title==="Mid-Day Meal"?renderMidDayMealMarkup({T}):""}
- ${title==="Poster Studio"?renderPosterStudioMarkup({T,APP_CONFIG,escapeHtml}):""}
- ${previewNote}</section>`;
- document.querySelector("#moduleBack").textContent=(teacherManagement||classManagement)?"← Class & Teacher Management":"← Dashboard";
- document.querySelector("#moduleBack").onclick=()=>{
-  if((teacherManagement||classManagement)&&state.managementReturnTo){state.module=state.managementReturnTo;state.managementReturnTo=null;state.view="module";}
-  else state.view="dashboard";
-  render();
- };
+ const previewNote=managementLanding||managementDetail?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
+ if(managementLanding){
+  main.innerHTML='<section class="management-picker-screen">'+managementLandingMarkup()+'</section>';
+ }else{
+  main.innerHTML=`<div class="backline"><button class="btn secondary" id="moduleBack">← Dashboard</button><span class="pill">${escapeHtml(title)}</span></div><section class="card module-detail">${managementDetail?"":'<h2>'+escapeHtml(title)+'</h2><p>ఈ విభాగానికి సంబంధించిన వివరాలు మరియు చర్యలు.</p>'}
+   ${calendar?renderCalendarMarkup({state,T}):""}
+   ${alumniSponsorSection.communityModuleMarkup(title)}
+   ${groupMarkup}
+   ${detailMarkup}
+   ${title==="Mid-Day Meal"?renderMidDayMealMarkup({T}):""}
+   ${title==="Poster Studio"?renderPosterStudioMarkup({T,APP_CONFIG,escapeHtml}):""}
+   ${previewNote}</section>`;
+ }
+ const moduleBack=document.querySelector("#moduleBack");
+ if(moduleBack){
+  moduleBack.textContent=managementDetail?"← Teacher & Class Selection":"← Dashboard";
+  moduleBack.onclick=()=>{
+   if(managementDetail){
+    state.module="Class & Teacher Management";
+    state.managementReturnTo=null;
+    state.view="module";
+   }else state.view="dashboard";
+   render();
+  };
+ }
  main.querySelectorAll("[data-hm-submodule]").forEach(b=>b.onclick=()=>{
   if(title==="Class & Teacher Management")state.managementReturnTo=title;
   state.module=b.dataset.hmSubmodule;state.view="module";render();
