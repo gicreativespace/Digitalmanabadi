@@ -1,5 +1,5 @@
-import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue, normalizeMobile, generateSecretCode, encryptSecretCode, hmac } from "../../_lib/admin.js";
-import { classNumberFromId, currentAcademicYearCode, validateDob } from "../../_lib/ids.js";
+import { adminDb, applyCors, json, requireHeadMaster, safeError, FieldValue, normalizeMobile, generateSecretCode, encryptSecretCode, hmac } from "../../../lib/backend/admin.js";
+import { classNumberFromId, currentAcademicYearCode, validateDob } from "../../../lib/backend/ids.js";
 import crypto from "node:crypto";
 
 function clean(value, max = 120) { return String(value ?? "").trim().slice(0, max); }
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
         const data = doc.data();
         let secretCode = null;
         if (data.secretCodeCiphertext && data.secretCodeIv && data.secretCodeTag) {
-          const { decryptSecretCode } = await import("../../_lib/admin.js");
+          const { decryptSecretCode } = await import("../../../lib/backend/admin.js");
           secretCode = decryptSecretCode(data);
         }
         students.push({
