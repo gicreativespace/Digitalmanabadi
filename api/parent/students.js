@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       return { allowed: count < 10 };
     });
     if (result.locked || !result.allowed) return json(res, 429, { error: "Too many attempts. Please try again later." });
-    const snap = await db.collection("students").where("parentMobileHash", "==", hmac(mobile)).get();
+    const snap = await db.collection("students").where("parentMobileHash", "==", hmac("mobile:" + mobile)).get();
     const students = snap.docs.map(d => {
       const s = d.data();
       return { studentRecordId: d.id, name: s.name, studentId: s.studentId, classId: s.classId, section: s.section || "", rollNumber: s.rollNumber };
