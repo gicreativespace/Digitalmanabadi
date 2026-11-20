@@ -4,6 +4,19 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  if(state.role!=="hm") return "";
  const t=(te,en)=>T?T(te,en):te;
  const school=state.headMasterProfile?.school?.schoolName || APP_CONFIG?.schoolName || "MPMPS School, Dagguluru";
+ const hour=new Date().getHours();
+ const greeting=hour>=5&&hour<12?["శుభోదయం!","Good Morning!"]:hour>=12&&hour<17?["శుభ మధ్యాహ్నం!","Good Afternoon!"]:["శుభ సాయంత్రం!","Good Evening!"];
+ const roleQuotes=[
+  ["ఒక మంచి పాఠశాల, దారిచూపే నాయకత్వంతో మరియు శ్రద్ధగల ప్రతి హృదయంతో ఎదుగుతుంది.","A good school grows through thoughtful leadership and every caring heart."],
+  ["ప్రతి విద్యార్థిలోని సామర్థ్యాన్ని గుర్తించడం గొప్ప నాయకత్వం.","Great leadership begins by recognising the potential in every student."],
+  ["ఈరోజు ఇచ్చే ప్రోత్సాహం, రేపటి విజయానికి పునాది.","The encouragement we give today becomes the foundation for tomorrow's success."],
+  ["పాఠశాల అభివృద్ధి ఒకరి పని కాదు; అందరి సమిష్టి ప్రయాణం.","A school's progress is not one person's work; it is a journey we build together."],
+  ["క్రమశిక్షణతో కూడిన ప్రేమ, విద్యార్థుల భవిష్యత్తును వెలిగిస్తుంది.","Guidance with care helps illuminate a student's future."],
+  ["ప్రతి మంచి మార్పు, ఒక చిన్న మంచి నిర్ణయంతో మొదలవుతుంది.","Every meaningful change begins with one thoughtful decision."],
+  ["ఉపాధ్యాయులకు తోడుగా నిలిచి, విద్యార్థులకు దారి చూపడమే నాయకత్వం.","Leadership means supporting teachers and creating pathways for students."]
+ ];
+ const dayOfYear=Math.floor((new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())-new Date(new Date().getFullYear(),0,0))/86400000);
+ const dailyQuote=roleQuotes[dayOfYear%roleQuotes.length];
  const modules=[
   ["users","Class & Teacher Management","తరగతులు, విద్యార్థులు మరియు ఉపాధ్యాయులు","Class & Teacher Management"],
   ["book-open","Diary","విషయాల వారీగా Class Work & Home Work","Diary"],
@@ -11,7 +24,6 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
   ["calendar-days","Events & Calendar","సెలవులు, పుట్టినరోజులు, కార్యక్రమాలు","Events & Calendar"],
   ["lightbulb","Great People & Quotes","ప్రేరణ మరియు విజ్ఞానం","Great People & Quotes"],
   ["hand-heart","Alumni & Donor Management","సహాయం, దాతలు, వాలంటీర్లు","Alumni & Donor Management"],
-  ["globe","GI Knowledge World","కేంద్రంగా నిర్వహించే GI Blog","GI Knowledge World"]
  ];
  const icons={users:"♧","book-open":"▤",megaphone:"◖","calendar-days":"▦",lightbulb:"✦","hand-heart":"♡",globe:"◎",utensils:"♨",calendar:"▣",clipboard:"☷"};
  return `
@@ -24,6 +36,11 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  .hm-welcome h1{margin:8px 0 4px;color:#244b32;font-size:clamp(24px,4vw,32px);line-height:1.2}
  [data-theme=dark] .hm-welcome h1{color:#d7ead9}
  .hm-welcome p{margin:0;color:var(--hm-muted);font-size:13px}
+ .hm-motivation{margin-top:15px;padding:13px 15px;border-left:3px solid var(--hm-gold);border-radius:0 13px 13px 0;background:rgba(255,255,255,.72)}
+ [data-theme=dark] .hm-motivation{background:rgba(255,255,255,.05)}
+ .hm-motivation-label{font-size:10px;letter-spacing:.1em;font-weight:800;color:var(--hm-gold);margin-bottom:5px}
+ .hm-motivation blockquote{margin:0;color:var(--hm-deep);font-size:14px;font-weight:650;line-height:1.55}
+ [data-theme=dark] .hm-motivation blockquote{color:#e1eee2}
  .hm-section-title{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 0 10px}
  .hm-section-title h2{font-size:17px;margin:0;color:var(--text)}
  .hm-section-title p{font-size:12px;color:var(--hm-muted);margin:3px 0 0}
