@@ -4,6 +4,50 @@ import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
 export function createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection}) {
+function toDisplayDob(value){
+ const dob=String(value??"");
+ if(/^\d{8}$/.test(dob))return dob;
+ if(/^\d{4}-\d{2}-\d{2}$/.test(dob))return dob.slice(8,10)+dob.slice(5,7)+dob.slice(0,4);
+ return "";
+}
+function bindDobInputs(root){
+ root.querySelectorAll("[data-dob-input]").forEach(input=>{
+  input.addEventListener("input",()=>{input.value=input.value.replace(/\D/g,"").slice(0,8)});
+ });
+}
+function managementLandingMarkup(){
+ const cards=[
+  {key:"Teacher Management",number:"01",icon:"♙",title:"Teacher Management",description:"Teacher profiles, class assignments and secure login access",tone:"teacher"},
+  {key:"Class Management",number:"02",icon:"▦",title:"Class Management",description:"Manage the school’s five classes and student records",tone:"class"}
+ ];
+ return '<style>'+
+ '.hm-management-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}'+
+ '.hm-management-entry *{box-sizing:border-box}'+
+ '.hm-management-card{position:relative;display:flex;min-height:190px;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:16px;padding:21px;border:1px solid #dce9de;border-radius:20px;background:linear-gradient(145deg,#ffffff,#f1f8f1);color:#294d35;text-align:left;cursor:pointer;box-shadow:0 9px 24px rgba(38,80,48,.07);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}'+
+ '.hm-management-card:hover{transform:translateY(-3px);border-color:#a9c9ae;box-shadow:0 14px 28px rgba(38,80,48,.12)}'+
+ '.hm-management-card-top{display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px}'+
+ '.hm-management-icon{display:grid;width:52px;height:52px;place-items:center;border-radius:16px;background:#e1f0e3;color:#2d7047;font-size:26px;font-weight:800}'+
+ '.hm-management-number{color:#89a68d;font-size:11px;font-weight:850;letter-spacing:.13em}'+
+ '.hm-management-card h3{margin:0;color:#284d34;font-size:19px;font-weight:850}'+
+ '.hm-management-card p{margin:7px 0 0;color:#718776;font-size:12px;line-height:1.55}'+
+ '.hm-management-open{display:flex;width:100%;align-items:center;justify-content:space-between;color:#39764b;font-size:12px;font-weight:850}'+
+ '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr}.hm-management-card{min-height:160px;padding:18px}}'+
+ '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-card-top"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><span class="hm-management-number">MANAGEMENT · '+card.number+'</span></span><span><h3>'+card.title+'</h3><p>'+card.description+'</p></span><span class="hm-management-open"><span>Open dashboard</span><span aria-hidden="true">↗</span></span></button>').join("")+'</div>';
+}
+function classManagementMarkup(){
+ const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
+ return '<style>'+
+ '.class-admin{display:grid;gap:16px;margin-top:18px}'+
+ '.class-admin-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px;border:1px solid #d8e8db;border-radius:20px;background:linear-gradient(125deg,#eff8f0,#e5f1e6 62%,#faf8ee);color:#294d35}'+
+ '.class-admin-kicker{font-size:10px;letter-spacing:.15em;font-weight:850;color:#66866d}.class-admin-hero h3{margin:5px 0;color:#294d35;font-size:22px}.class-admin-hero p{margin:0;color:#6c8572;font-size:12px;line-height:1.5}'+
+ '.class-admin-mark{display:grid;width:48px;height:48px;flex:none;place-items:center;border-radius:15px;background:#d9eadb;color:#356f50;font-size:22px;font-weight:900}'+
+ '.class-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'+
+ '.class-admin-tile{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #e0eae1;border-radius:16px;background:var(--surface);box-shadow:0 7px 20px rgba(45,83,54,.045)}'+
+ '.class-admin-number{display:grid;width:44px;height:44px;flex:none;place-items:center;border-radius:13px;background:#e9f3e9;color:#39734b;font-size:13px;font-weight:900}'+
+ '.class-admin-tile strong{display:block;color:var(--text);font-size:14px}.class-admin-tile small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}'+
+ '@media(max-width:560px){.class-admin-grid{grid-template-columns:1fr}.class-admin-hero{padding:16px}.class-admin-tile{padding:13px}}'+
+ '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>Class Management</h3><p>School class structure for Classes 1 to 5</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header><div class="class-admin-grid">'+classes.map((name,index)=>'<article class="class-admin-tile"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+name+'</strong><small>Class structure and student records</small></span></article>').join("")+'</div></div>';
+}
 function teacherManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
  const subjects=["Telugu","English","Mathematics","EVS"];
@@ -48,7 +92,7 @@ function teacherManagementMarkup(){
    '<form id="teacherCreateForm">'+
     '<div class="teacher-admin-grid">'+
      '<div class="field"><label for="teacherName">Teacher Name</label><input id="teacherName" name="name" maxlength="100" required autocomplete="name" placeholder="Enter full name"></div>'+
-     '<div class="field"><label for="teacherDob">Date of Birth</label><input id="teacherDob" name="dob" type="date" required></div>'+
+     '<div class="field"><label for="teacherDob">Date of Birth</label><input id="teacherDob" name="dob" type="text" inputmode="numeric" maxlength="8" pattern="[0-9]{8}" placeholder="DDMMYYYY" data-dob-input autocomplete="bday" required></div>'+
      '<div class="field"><label for="teacherGender">Gender</label><select id="teacherGender" name="gender" required><option value="">Select Gender</option><option value="Female">Female</option><option value="Male">Male</option><option value="Other">Other</option></select></div>'+
     '</div>'+
     choiceGroup("classes","Assigned Classes",classes)+
@@ -87,7 +131,7 @@ async function bindTeacherManagement(){
   const id=esc(teacher.teacherId),active=teacher.status==="active";
   const reasonLabel={school_transfer:"School Transfer",retired:"Retired",other:"Other Reason"}[teacher.deactivationReason]||"";
   const selectedClasses=teacher.assignedClasses||[],selectedSubjects=teacher.teachingSubjects||[];
-  const editForm='<details><summary>Edit Teacher Profile</summary><form class="teacher-admin-subform" data-edit-teacher="'+id+'"><div class="teacher-admin-grid"><div class="field"><label>Teacher Name</label><input name="name" maxlength="100" required value="'+esc(teacher.name)+'"></div><div class="field"><label>Date of Birth</label><input name="dob" type="date" required value="'+esc(teacher.dob)+'"></div><div class="field"><label>Gender</label><select name="gender" required><option value="Female" '+(teacher.gender==="Female"?"selected":"")+'>Female</option><option value="Male" '+(teacher.gender==="Male"?"selected":"")+'>Male</option><option value="Other" '+(teacher.gender==="Other"?"selected":"")+'>Other</option></select></div></div>'+choiceGroup("classes","Assigned Classes",classes,selectedClasses)+choiceGroup("subjects","Teaching Subjects",subjects,selectedSubjects)+'<div class="teacher-admin-action"><button class="btn" type="submit">Save Changes</button></div></form></details>';
+  const editForm='<details><summary>Edit Teacher Profile</summary><form class="teacher-admin-subform" data-edit-teacher="'+id+'"><div class="teacher-admin-grid"><div class="field"><label>Teacher Name</label><input name="name" maxlength="100" required value="'+esc(teacher.name)+'"></div><div class="field"><label>Date of Birth</label><input name="dob" type="text" inputmode="numeric" maxlength="8" pattern="[0-9]{8}" placeholder="DDMMYYYY" data-dob-input required value="'+esc(toDisplayDob(teacher.dob))+'"></div><div class="field"><label>Gender</label><select name="gender" required><option value="Female" '+(teacher.gender==="Female"?"selected":"")+'>Female</option><option value="Male" '+(teacher.gender==="Male"?"selected":"")+'>Male</option><option value="Other" '+(teacher.gender==="Other"?"selected":"")+'>Other</option></select></div></div>'+choiceGroup("classes","Assigned Classes",classes,selectedClasses)+choiceGroup("subjects","Teaching Subjects",subjects,selectedSubjects)+'<div class="teacher-admin-action"><button class="btn" type="submit">Save Changes</button></div></form></details>';
   const loginAction=active&&!teacher.authUid?'<button type="button" class="btn" data-create-login="'+id+'">Create Login</button>':teacher.loginId?'<small>Login ID: '+esc(teacher.loginId)+'</small>':'';
   const statusAction=active?'<details><summary>Deactivate Teacher</summary><form class="teacher-admin-subform" data-deactivate-teacher="'+id+'"><div class="field"><label>Reason for Deactivation</label><select name="reason" required><option value="">Select Reason</option><option value="school_transfer">School Transfer</option><option value="retired">Retired</option><option value="other">Other Reason</option></select></div><div class="field" style="margin-top:10px"><label>Additional Note (optional)</label><textarea name="note" maxlength="240" placeholder="Add a short note"></textarea></div><div class="teacher-admin-action"><button class="btn secondary" type="submit">Confirm Deactivation</button></div></form></details>':'<button type="button" class="btn" data-reactivate-teacher="'+id+'">Reactivate</button>';
   return '<article class="teacher-admin-row"><div class="teacher-admin-row-top"><div><strong>'+esc(teacher.name)+'</strong><small>Classes: '+esc(selectedClasses.join(", "))+'</small><small>Subjects: '+esc(selectedSubjects.join(", "))+'</small><small>Teacher ID: '+id+'</small><span class="teacher-admin-status '+(active?"":"inactive")+'">'+(active?"ACTIVE":"DEACTIVATED")+'</span>'+(active?"":'<small>Reason: '+esc(reasonLabel)+'</small>'+(teacher.deactivationNote?'<small>Note: '+esc(teacher.deactivationNote)+'</small>':""))+'</div><span class="teacher-admin-id">'+id+'</span></div><div class="teacher-admin-row-actions">'+loginAction+statusAction+'</div>'+editForm+'</article>';
@@ -97,6 +141,7 @@ async function bindTeacherManagement(){
   try{
    const response=await listTeacherRecords(),teachers=response.teachers||[];
    listBox.innerHTML=teachers.length?teachers.map(renderTeacherRow).join(""):'<div class="teacher-admin-empty">ఇంకా ఉపాధ్యాయులు నమోదు కాలేదు.</div>';
+   bindDobInputs(listBox);
    listBox.querySelectorAll("[data-create-login]").forEach(action=>action.onclick=async()=>{
     action.disabled=true;action.textContent="Creating Login…";
     try{const credentials=await createTeacherLogin(action.dataset.createLogin);renderCredentials(credentials);await refreshList();resultBox.scrollIntoView({behavior:"smooth",block:"nearest"});}
@@ -120,6 +165,7 @@ async function bindTeacherManagement(){
    });
   }catch(error){listBox.innerHTML='<div class="teacher-admin-empty">'+esc(error?.message||"ఉపాధ్యాయుల జాబితాను లోడ్ చేయలేకపోయాం.")+'</div>';}
  };
+ bindDobInputs(main);
  if(form)form.onsubmit=async event=>{
   event.preventDefault();status.textContent="";resultBox.classList.remove("is-visible");
   const payload={name:main.querySelector("#teacherName").value.trim(),dob:main.querySelector("#teacherDob").value,gender:main.querySelector("#teacherGender").value,assignedClasses:checkedValues(form,"classes"),teachingSubjects:checkedValues(form,"subjects")};
@@ -171,17 +217,18 @@ function modulePage(){
  }[title]||["విభాగ వివరాలు","డెమో సమాచారం","ఈ స్క్రీన్ UI Preview దశలో ఉంది"];
  const calendar=title==="Events & Calendar";
  const hmGroupLinks={
-  "Class & Teacher Management":[["Students","Class Management","తరగతులు, విద్యార్థుల జాబితా మరియు రోల్ వివరాలు"],["Teachers","Teacher Management","ఉపాధ్యాయుల వివరాలు మరియు తరగతి కేటాయింపులు"]],
+  "Class & Teacher Management":[["Teacher Management","Teacher Management","ఉపాధ్యాయుల వివరాలు మరియు తరగతి కేటాయింపులు"],["Class Management","Class Management","తరగతులు మరియు విద్యార్థుల నిర్వహణ"]],
   "Diary":[["Daily Diary","Class-wise Diary","ప్రతి Subjectకు Class Work వివరాలు"],["Homework","Home Work","ప్రతి Subjectకు Home Work వివరాలు"]],
   "Great People & Quotes":[["Great People","Great People","గొప్ప వ్యక్తుల జీవిత విశేషాలు"],["Great Quotes","Great Quotes","ప్రేరణాత్మక సూక్తులు"]],
   "Events & Calendar":[["Today Special","Birthdays & Special Days","పుట్టినరోజులు మరియు ప్రత్యేక దినాలు"]],
   "Alumni & Donor Management":[["Alumni / Donor Management","Login Approval Requests","నమోదు మరియు లాగిన్ అభ్యర్థనలు"],["Contact Inbox","Donor Details & Offerings","దాతల వివరాలు మరియు వారి సహాయం"],["School Requirements","School Requirements","పాఠశాల అవసరాలు"],["Student Adoption","Student Adoptions","విద్యార్థుల విద్యా సహాయం"],["School Sponsorship","Donor Offerings","ఆర్థిక మరియు వస్తు రూప సహాయం"],["Volunteer Management","Volunteers","బోధన మరియు ఇతర పాఠశాల సేవలు"],["Merit & Excellence Awards","Merit, Awards & Scholarships","మెరిట్ జాబితా, అవార్డులు, స్కాలర్‌షిప్‌లు"]]
  };
  const groupLinks=state.role==="hm"?hmGroupLinks[title]:null;
- const groupMarkup=groupLinks?'<div class="detail-list hm-group-links">'+groupLinks.map(([key,label,desc])=>'<button type="button" class="detail-row" data-hm-submodule="'+escapeHtml(key)+'"><span class="detail-icon">↗</span><div><strong>'+escapeHtml(label)+'</strong><small>'+escapeHtml(desc)+'</small></div><span>›</span></button>').join("")+'</div>':title==="GI Knowledge World"&&state.role==="hm"?'<div class="detail-list"><a class="detail-row" href="'+escapeHtml(APP_CONFIG.knowledgeBlogUrl)+'" target="_blank" rel="noopener"><span class="detail-icon">◎</span><div><strong>Open GI Knowledge World Blog</strong><small>One centrally managed GI Blog</small></div><span>↗</span></a></div>':"";
- const teacherManagement=title==="Teachers"&&state.role==="hm";
- const detailMarkup=teacherManagement?teacherManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
- const previewNote=teacherManagement?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
+ const groupMarkup=title==="Class & Teacher Management"&&state.role==="hm"?managementLandingMarkup():groupLinks?'<div class="detail-list hm-group-links">'+groupLinks.map(([key,label,desc])=>'<button type="button" class="detail-row" data-hm-submodule="'+escapeHtml(key)+'"><span class="detail-icon">↗</span><div><strong>'+escapeHtml(label)+'</strong><small>'+escapeHtml(desc)+'</small></div><span>›</span></button>').join("")+'</div>':title==="GI Knowledge World"&&state.role==="hm"?'<div class="detail-list"><a class="detail-row" href="'+escapeHtml(APP_CONFIG.knowledgeBlogUrl)+'" target="_blank" rel="noopener"><span class="detail-icon">◎</span><div><strong>Open GI Knowledge World Blog</strong><small>One centrally managed GI Blog</small></div><span>↗</span></a></div>':"";
+ const teacherManagement=title==="Teacher Management"&&state.role==="hm";
+ const classManagement=title==="Class Management"&&state.role==="hm";
+ const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
+ const previewNote=teacherManagement||classManagement||title==="Class & Teacher Management"?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
  main.innerHTML=`<div class="backline"><button class="btn secondary" id="moduleBack">← Dashboard</button><span class="pill">${escapeHtml(title)}</span></div><section class="card module-detail"><h2>${escapeHtml(title)}</h2><p>ఈ విభాగానికి సంబంధించిన వివరాలు మరియు చర్యలు.</p>
  ${calendar?renderCalendarMarkup({state,T}):""}
  ${alumniSponsorSection.communityModuleMarkup(title)}
@@ -190,8 +237,16 @@ function modulePage(){
  ${title==="Mid-Day Meal"?renderMidDayMealMarkup({T}):""}
  ${title==="Poster Studio"?renderPosterStudioMarkup({T,APP_CONFIG,escapeHtml}):""}
  ${previewNote}</section>`;
- document.querySelector("#moduleBack").onclick=()=>{state.view="dashboard";render()};
- main.querySelectorAll("[data-hm-submodule]").forEach(b=>b.onclick=()=>{state.module=b.dataset.hmSubmodule;state.view="module";render()});
+ document.querySelector("#moduleBack").textContent=(teacherManagement||classManagement)?"← Class & Teacher Management":"← Dashboard";
+ document.querySelector("#moduleBack").onclick=()=>{
+  if((teacherManagement||classManagement)&&state.managementReturnTo){state.module=state.managementReturnTo;state.managementReturnTo=null;state.view="module";}
+  else state.view="dashboard";
+  render();
+ };
+ main.querySelectorAll("[data-hm-submodule]").forEach(b=>b.onclick=()=>{
+  if(title==="Class & Teacher Management")state.managementReturnTo=title;
+  state.module=b.dataset.hmSubmodule;state.view="module";render();
+ });
  main.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{state.selectedDate=Number(b.dataset.day);render()});
   const prev=main.querySelector("#calendarPrev"),next=main.querySelector("#calendarNext");
   if(prev)prev.onclick=()=>{state.selectedMonth--;if(state.selectedMonth<0){state.selectedMonth=11;state.selectedYear--}state.selectedDate=1;render()};
