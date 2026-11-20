@@ -720,3 +720,23 @@ PR — Use matching-size Telugu and English titles on Welcome role cards
   redesigned; this is a stylesheet organization change only.
 - Source-level extraction and reference checks only; browser/device visual
   regression testing remains pending.
+
+
+2026-11-20 — LOCKED MILESTONE: Opening Splash through Login Entry
+----------------------------------------------------------------
+- User explicitly locked the complete opening-to-login design as accepted:
+  Splash, Welcome Screen, header/identity, four role cards, footer,
+  social ribbon, shared login presentation and their responsive behavior.
+- No UI/code changes are authorized in these locked areas unless the user
+  explicitly requests a specific change. Future work should begin with
+  role authentication/functionality while preserving this baseline.
+- Created docs/LOCKED-OPENING-TO-LOGIN.md as the detailed handover and
+  milestone record, including current social destinations, PR #70 baseline,
+  CSS separation, Service Worker v106, lock boundaries and verification status.
+- Five roles clarified: GI Super Admin (footer 850ms long press), Head Master,
+  Teacher, Parent, Alumni/Sponsor (combined visible entry; Alumni and
+  Donor/Sponsor are distinct account types in the target architecture).
+- The document clearly distinguishes approved target authentication from
+  current preview-only Teacher, Parent and Alumni/Sponsor flows.
+- Documentation-only change. No HTML, CSS, JavaScript, authentication,
+  navigation, modules, assets, layout, or application functionality changed.
