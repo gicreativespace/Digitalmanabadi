@@ -15,7 +15,7 @@ export function createParentSection({main,state,T,render,toast,escapeHtml}) {
   main.querySelector("#linkBack").onclick=()=>{state.view="login";render()};
   main.querySelector("#findParentStudents").onclick=async()=>{
    const mobile=main.querySelector("#parentVerifyMobile").value.trim(),button=main.querySelector("#findParentStudents");
-   if(!/^\\d{10}$/.test(mobile)){say(t("సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.","Enter a valid 10-digit mobile number."),true);return;}
+   if(!/^\d{10}$/.test(mobile)){say(t("సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.","Enter a valid 10-digit mobile number."),true);return;}
    button.disabled=true;button.textContent=t("విద్యార్థుల వివరాలు వెతుకుతోంది…","Finding students…");choices.innerHTML="";
    try{
     const result=await findParentStudents(mobile),students=result.students||[];
@@ -27,7 +27,7 @@ export function createParentSection({main,state,T,render,toast,escapeHtml}) {
     '<button class="btn full" id="verifyParentStudent">'+t("ధృవీకరించి అనుసంధానించండి","Verify & Link Child")+'</button>';
     choices.querySelector("#verifyParentStudent").onclick=async()=>{
      const studentRecordId=choices.querySelector("#parentStudentChoice").value,dob=choices.querySelector("#parentStudentDob").value.trim(),secretCode=choices.querySelector("#parentSecretCode").value.trim(),verifyButton=choices.querySelector("#verifyParentStudent");
-     if(!studentRecordId||!dob||!/^\\d{12}$/.test(secretCode)){say(t("విద్యార్థి, పుట్టిన తేదీ మరియు 12 అంకెల Secret Code నమోదు చేయండి.","Select a student and enter the date of birth and 12-digit Secret Code."),true);return;}
+     if(!studentRecordId||!dob||!/^\d{12}$/.test(secretCode)){say(t("విద్యార్థి, పుట్టిన తేదీ మరియు 12 అంకెల Secret Code నమోదు చేయండి.","Select a student and enter the date of birth and 12-digit Secret Code."),true);return;}
      verifyButton.disabled=true;verifyButton.textContent=t("ధృవీకరిస్తోంది…","Verifying…");
      try{
       await verifyParentStudent({mobile,studentRecordId,dob,secretCode});
@@ -38,7 +38,7 @@ export function createParentSection({main,state,T,render,toast,escapeHtml}) {
        '<button class="btn full" id="saveParentPin">'+t("PIN సేవ్ చేసి కొనసాగించండి","Save PIN & Continue")+'</button>';
        choices.querySelector("#saveParentPin").onclick=async()=>{
         const pin=choices.querySelector("#newParentPin").value,confirm=choices.querySelector("#confirmParentPin").value,save=choices.querySelector("#saveParentPin");
-        if(!/^\\d{4}$/.test(pin)||pin!==confirm){say(t("ఒకే 4 అంకెల PINను రెండుసార్లు నమోదు చేయండి.","Enter the same 4-digit PIN twice."),true);return;}
+        if(!/^\d{4}$/.test(pin)||pin!==confirm){say(t("ఒకే 4 అంకెల PINను రెండుసార్లు నమోదు చేయండి.","Enter the same 4-digit PIN twice."),true);return;}
         save.disabled=true;save.textContent=t("సేవ్ చేస్తోంది…","Saving…");
         try{await saveParentPin(user.uid,pin);await finishParentLogin(mobile);}
         catch(error){say(error.message||t("PIN సేవ్ కాలేదు.","Could not save PIN."),true);save.disabled=false;save.textContent=t("PIN సేవ్ చేసి కొనసాగించండి","Save PIN & Continue");}
@@ -59,7 +59,7 @@ export function createParentSection({main,state,T,render,toast,escapeHtml}) {
   const children=await getParentChildren();
   state.parentChildren=children;
   state.linkedStudent=children[0]||null;
-  state.parentMobile=String(mobile).replace(/\\D/g,"").slice(-10);
+  state.parentMobile=String(mobile).replace(/\D/g,"").slice(-10);
   state.parentLinked=children.length>0;
   state.authenticated=children.length>0;
   if(!state.authenticated)throw new Error(t("ఇంకా విద్యార్థులు అనుసంధానం కాలేదు.","No linked students were found."));
