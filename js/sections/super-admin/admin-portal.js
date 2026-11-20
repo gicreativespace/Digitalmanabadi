@@ -56,11 +56,17 @@ export async function renderSuperAdminDashboard(main,admin,{onLogout}){
  superAdminLastActivity=stamp();
  superAdminActivityHandler=()=>{
   if(superAdminLogoutStarted)return;
-  if(document.visibilityState==="visible")superAdminLastActivity=stamp();
+  superAdminLastActivity=stamp();
+  armIdleTimer();
+ };
+ const handleVisibilityChange=()=>{
+  if(superAdminLogoutStarted||document.visibilityState!=="visible")return;
+  if(stamp()-superAdminLastActivity>=idleMinutes*60*1000){beginLogout();return;}
+  superAdminLastActivity=stamp();
   armIdleTimer();
  };
  ["pointerdown","keydown","touchstart","scroll","mousemove"].forEach(type=>document.addEventListener(type,superAdminActivityHandler,{passive:true}));
- document.addEventListener("visibilitychange",superAdminActivityHandler);
+ document.addEventListener("visibilitychange",handleVisibilityChange);
  armIdleTimer();
 
  main.innerHTML=
