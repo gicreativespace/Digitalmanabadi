@@ -75,6 +75,52 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
  .hm-knowledge a{color:#34764a;font-weight:800;font-size:12px;text-decoration:none;white-space:nowrap}
  @media(min-width:760px){.hm-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.hm-module-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hm-module{min-height:140px;padding:18px}}
  @media(max-width:380px){.hm-action-list{gap:6px}.hm-action{padding:10px 7px}.hm-action strong{font-size:12px}.hm-knowledge{align-items:flex-start;flex-direction:column}}
+ /* Head Master dashboard readability: keep all dashboard copy comfortably legible. */
+ .hm-dashboard{font-size:16px;line-height:1.6}
+ .hm-eyebrow{font-size:14px;line-height:1.5;letter-spacing:.06em}
+ .hm-welcome h1{font-size:clamp(30px,4.5vw,38px);line-height:1.25}
+ .hm-welcome p{font-size:16px;line-height:1.65}
+ .hm-motivation{padding:16px 18px}
+ .hm-motivation-label{font-size:13px;line-height:1.5;letter-spacing:.06em}
+ .hm-motivation blockquote{font-size:17px;line-height:1.75;font-weight:650}
+ .hm-section-title h2{font-size:21px;line-height:1.4}
+ .hm-section-title p{font-size:15px;line-height:1.6}
+ .hm-stat{padding:17px}
+ .hm-stat-top{font-size:22px;gap:8px}
+ .hm-stat-top small{font-size:14px;line-height:1.4}
+ .hm-stat strong{font-size:32px;line-height:1.3}
+ .hm-stat span{font-size:15px;line-height:1.55}
+ .hm-panel{padding:18px}
+ .hm-action{padding:14px 12px;gap:9px;min-height:132px}
+ .hm-action-icon{font-size:24px}
+ .hm-action strong{font-size:16px;line-height:1.5}
+ .hm-action small{font-size:14px;line-height:1.55}
+ .hm-review-mark{font-size:13px;line-height:1.4;padding:4px 9px}
+ .hm-meal h3{font-size:18px;line-height:1.5}
+ .hm-meal p{font-size:15px;line-height:1.6}
+ .hm-meal button,.hm-link-button{font-size:15px;line-height:1.4;min-height:44px;padding:10px 14px}
+ .hm-module{padding:17px;gap:10px;min-height:150px}
+ .hm-module-icon{width:42px;height:42px;font-size:24px}
+ .hm-module strong{font-size:16px;line-height:1.55}
+ .hm-module small{font-size:14px;line-height:1.6}
+ .hm-module-arrow{font-size:17px}
+ .hm-knowledge{padding:18px}
+ .hm-knowledge strong{font-size:17px;line-height:1.5}
+ .hm-knowledge p{font-size:15px;line-height:1.6}
+ .hm-knowledge a{font-size:15px;line-height:1.5}
+ @media(max-width:420px){
+  .hm-dashboard{gap:16px}
+  .hm-welcome{padding:19px}
+  .hm-action-list{grid-template-columns:1fr;gap:10px}
+  .hm-action{min-height:0;padding:14px;display:grid;grid-template-columns:32px minmax(0,1fr);align-items:center;column-gap:10px}
+  .hm-action-icon{grid-row:span 2}
+  .hm-action strong,.hm-action small{min-width:0}
+  .hm-review-mark{grid-column:2}
+  .hm-meal{align-items:flex-start;flex-wrap:wrap}
+  .hm-meal button{white-space:normal}
+  .hm-module{min-height:160px;padding:14px}
+  .hm-module strong{font-size:15px}
+ }
  </style>
  <div class="hm-dashboard" data-translation-managed="true">
   <section class="hm-welcome">
