@@ -1,6 +1,8 @@
 import { APP_CONFIG } from "../../config/school-config.js";
 import { auth } from "../firebase-client.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
+import { getLocalTeacherPinRecord } from "../sections/teacher/pin-auth.js";
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord } from "../sections/head-master/pin-auth.js";
 import { showTributeSplash } from "../shared/tribute-splash.js";
 import { translationPairs } from "../shared/translations.js";
@@ -32,18 +34,18 @@ const roleDashboardIntro = {
 
 const savedRole = localStorage.getItem("gim_role") || null;
 const savedAuth = localStorage.getItem("gim_authenticated") === "true";
-// Browser-local preview flags are not authentication. Discard legacy Teacher,
-// Parent and Community preview sessions instead of restoring protected dashboards.
-const stalePreviewSession = savedAuth && ["teacher","parent","community"].includes(savedRole);
+// Browser-local preview flags are not authentication. Teacher sessions are restored only through Firebase Auth; legacy Parent and Community previews are discarded.
+const stalePreviewSession = savedAuth && ["parent","community"].includes(savedRole);
 if (stalePreviewSession) {
   localStorage.removeItem("gim_role");
   localStorage.removeItem("gim_authenticated");
 }
 const restoredRole = stalePreviewSession ? null : savedRole;
 const state = {
-  role: restoredRole === "superadmin" ? null : restoredRole, authenticated: Boolean(restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole)),
-  view: restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole) ? "dashboard" : restoredRole && restoredRole !== "superadmin" ? "login" : "welcome", module: null,
-  superAdminProfile: null, headMasterProfile: null,
+  role: restoredRole === "superadmin" ? null : restoredRole, authenticated: Boolean(restoredRole && savedAuth && !["hm","superadmin","teacher"].includes(restoredRole)),
+  view: restoredRole === "teacher" ? "login" : restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole) ? "dashboard" : restoredRole && restoredRole !== "superadmin" ? "login" : "welcome", module: null,
+  superAdminProfile: null, headMasterProfile: null, teacherProfile: null,
+  teacherPinMode: null, teacherLoginStep: "id", teacherLoginRecord: null, teacherEnrollmentInProgress: false, teacherLoginNotice: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
   selectedDate: 17, selectedMonth: 10, selectedYear: 2026, linkedStudent: null, parentLinked: false, communityType: null
@@ -189,6 +191,35 @@ let initialAuthRestoreHandled=false;
 onAuthStateChanged(auth,async user=>{
  if(initialAuthRestoreHandled)return;
  initialAuthRestoreHandled=true;
+ if(state.role==="teacher"){
+  if(state.teacherEnrollmentInProgress)return;
+  if(!user){
+   state.authenticated=false;
+   localStorage.removeItem("gim_authenticated");
+   state.view="login";
+   return;
+  }
+  try{
+   const profile=await getTeacherProfile();
+   if(!profile||!profile.linked||!getLocalTeacherPinRecord(user.uid)){
+    await signOut(auth);
+    state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
+    state.teacherLoginNotice=T("ఈ పరికరం Teacher PINతో இணைக்கబడలేదు. Head Master‌ను సంప్రదించండి.","This device is not linked with a Teacher PIN. Please contact the Head Master.");
+    localStorage.removeItem("gim_authenticated");
+    state.view="login";render();return;
+   }
+   state.teacherProfile=profile;
+   state.teacherPinMode="unlock";
+   state.authenticated=false;state.view="login";render();
+  }catch(error){
+   try{await signOut(auth);}catch{}
+   state.teacherProfile=null;state.teacherPinMode=null;state.authenticated=false;
+   state.teacherLoginNotice=T("Teacher Session ధృవీకరణ కాలేదు. Head Master‌ను సంప్రదించండి.","Teacher session could not be verified. Please contact the Head Master.");
+   localStorage.removeItem("gim_authenticated");
+   state.view="login";render();
+  }
+  return;
+ }
  if(state.role!=="hm"||state.view!=="login")return;
  if(!user){
   state.authenticated=false;
