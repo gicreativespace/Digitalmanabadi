@@ -1,3 +1,7 @@
 export function getTeacherLoginView({T}) {
- return {kind:"credentials",description:T("మీ పాఠశాల ఖాతా వివరాలతో ప్రవేశించండి.","Sign in with your school account."),formMarkup:'<div class="field"><label>'+T("నమోదిత మొబైల్ నంబర్","Registered Mobile Number")+'</label><input id="loginId" type="tel" inputmode="tel" autocomplete="username" placeholder="'+T("మీ మొబైల్ నంబర్ నమోదు చేయండి","Enter your mobile number")+'"></div><div class="field"><label>'+T("4 అంకెల PIN","4-digit PIN")+'</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••"></div><button class="btn full" id="loginGo">'+T("ప్రవేశించండి","Sign In")+'</button><div class="demo-note">'+T("Preview Mode — సురక్షిత Teacher Authentication ఇంకా అనుసంధానం కాలేదు.","Preview Mode — secure Teacher authentication is not connected yet.")+'</div>'};
+  return {
+    kind: "teacher",
+    description: T("మీ Teacher IDతో కొనసాగండి.", "Continue with your Teacher ID."),
+    formMarkup: '<div id="teacherFlow" aria-live="polite"></div>'
+  };
 }
