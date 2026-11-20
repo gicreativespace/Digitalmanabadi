@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       const linkSnap = await tx.get(linkRef);
       if (!studentSnap.exists || studentSnap.data().schoolId !== hm.schoolId) return { missing: true };
       const previousHash = studentSnap.data().parentMobileHash;
-      const nextHash = hmac(mobile);
+      const nextHash = hmac("mobile:" + mobile);
       tx.update(studentRef, { parentMobile: mobile, parentMobileHash: nextHash, parentLinked: false, updatedBy: hm.uid, updatedAt: FieldValue.serverTimestamp() });
       if (linkSnap.exists && linkSnap.data().parentMobileHash !== nextHash) tx.delete(linkRef);
       return { changed: previousHash !== nextHash };
