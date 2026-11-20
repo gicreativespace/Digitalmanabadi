@@ -46,12 +46,16 @@ export async function requireHeadMaster(req) {
   let decoded;
   try { decoded = await adminAuth().verifyIdToken(match[1], true); }
   catch { throw Object.assign(new Error("Your session is invalid. Please sign in again."), { status: 401 }); }
-  const profileSnap = await adminDb().collection("platformAdmins").doc(decoded.uid).get();
+  const db = adminDb();
+  const profileSnap = await db.collection("platformAdmins").doc(decoded.uid).get();
+  const schoolProfileSnap = await db.collection("headMasters").doc(decoded.uid).get();
   const profile = profileSnap.exists ? profileSnap.data() : null;
-  if (!profile || profile.role !== "HEAD_MASTER" || profile.status !== "active" || !profile.schoolId) {
-    throw Object.assign(new Error("Active Head Master access is required."), { status: 403 });
+  const schoolProfile = schoolProfileSnap.exists ? schoolProfileSnap.data() : null;
+  const schoolId = profile?.schoolId || profile?.school?.schoolId || profile?.school?.id || schoolProfile?.schoolId;
+  if (!profile || profile.role !== "HEAD_MASTER" || profile.status !== "active" || !schoolId) {
+    throw Object.assign(new Error("Active Head Master access is required for a school-linked account."), { status: 403 });
   }
-  return { uid: decoded.uid, schoolId: String(profile.schoolId), email: decoded.email || profile.email || "" };
+  return { uid: decoded.uid, schoolId: String(schoolId), email: decoded.email || profile.email || "" };
 }
 
 export function normalizeMobile(value) {
