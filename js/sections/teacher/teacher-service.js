@@ -89,6 +89,17 @@ function currentAcademicYearCode() {
   return parts;
 }
 
+function createTeacherSecretCode(dob) {
+  const value = String(dob ?? "");
+  if (!/^\d{8}$/.test(value)) throw new Error("A valid teacher date of birth is required to generate the login code.");
+  const dobDDMMYY = value.slice(0, 4) + value.slice(6, 8);
+  const code = 919720 - Number(dobDDMMYY);
+  if (!Number.isInteger(code) || code < 100000 || code > 999999) {
+    throw new Error("Could not generate a valid six-digit teacher code.");
+  }
+  return String(code);
+}
+
 function randomPassword(length = 16) {
   const groups = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnopqrstuvwxyz", "23456789", "!@#$%&*"];
   const all = groups.join("");
@@ -151,7 +162,8 @@ export async function createTeacherLogin(teacherId) {
   if (teacher.authUid || teacher.loginId) throw new Error("A login already exists for this teacher.");
 
   const loginId = getTeacherLoginId(teacherId);
-  const password = randomPassword();
+  const secretCode = createTeacherSecretCode(teacher.dob);
+  const password = secretCode;
   const secondaryApp = initializeApp(auth.app.options, "teacher-provision-" + teacherId + "-" + crypto.randomUUID());
   const secondaryAuth = getAuth(secondaryApp);
   let createdUser = null;
@@ -164,12 +176,13 @@ export async function createTeacherLogin(teacherId) {
     await updateDoc(teacherRef, {
       authUid: createdUser.uid,
       loginId,
+      secretCode,
       loginCreatedAt: serverTimestamp(),
       loginCreatedBy: headMaster.uid,
       updatedAt: serverTimestamp()
     });
     profileLinked = true;
-    return { teacherId: String(teacherId), loginId, password };
+    return { teacherId: String(teacherId), loginId, password, secretCode };
   } catch (error) {
     if (createdUser && !profileLinked) {
       try { await deleteUser(createdUser); } catch {}
