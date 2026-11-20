@@ -1,36 +1,120 @@
 rules_version = '2';
+
 service cloud.firestore {
- match /databases/{database}/documents {
-  function signedIn(){return request.auth != null;}
-  function adminPath(){return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);}
-  function isSuperAdmin(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="GI_SUPER_ADMIN" && get(adminPath()).data.status=="active";}
-  function hmPath(){return /databases/$(database)/documents/headMasters/$(request.auth.uid);}
-  function isActiveHeadMasterFor(schoolId){return signedIn() && exists(hmPath()) && get(hmPath()).data.role=="HEAD_MASTER" && get(hmPath()).data.status=="active" && get(hmPath()).data.schoolId==schoolId;}
-  function isActiveHeadMaster(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="HEAD_MASTER" && get(adminPath()).data.status=="active";}
-  match /platformAdmins/{adminUid}{allow get: if signedIn() && request.auth.uid==adminUid;allow list,create,update,delete: if false;}
-  match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
-  match /headMasters/{headMasterUid}{allow read: if isSuperAdmin() || (signedIn() && request.auth.uid==headMasterUid);allow write: if isSuperAdmin();}
-  match /adminAudit/{auditId}{allow read,write: if isSuperAdmin();}
+  match /databases/{database}/documents {
 
-  // Teacher profiles are managed only by an active Head Master.
-  // A teacher may read only their own active profile; inactive profiles are blocked.
-  match /teachers/{teacherId}{
-   allow get: if isActiveHeadMaster() || (signedIn() && resource.data.authUid==request.auth.uid && resource.data.status=="active");
-   allow list: if isActiveHeadMaster();
-   allow create: if isActiveHeadMaster()
-    && request.resource.data.teacherId==teacherId
-    && request.resource.data.createdBy==request.auth.uid
-    && request.resource.data.status=="active"
-    && request.resource.data.authUid==null;
-   allow update: if isActiveHeadMaster()
-    && request.resource.data.teacherId==resource.data.teacherId
-    && request.resource.data.createdBy==resource.data.createdBy
-    && request.resource.data.createdAt==resource.data.createdAt;
-   allow delete: if false;
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // GI Super Admin and Head Master identities are stored in platformAdmins.
+    function adminPath() {
+      return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);
+    }
+
+    function isSuperAdmin() {
+      return signedIn()
+        && exists(adminPath())
+        && get(adminPath()).data.role == "GI_SUPER_ADMIN"
+        && get(adminPath()).data.status == "active";
+    }
+
+    function isActiveHeadMaster() {
+      return signedIn()
+        && exists(adminPath())
+        && get(adminPath()).data.role == "HEAD_MASTER"
+        && get(adminPath()).data.status == "active";
+    }
+
+    // GI Super Admin: read only their own UID document.
+    match /platformAdmins/{adminUid} {
+      allow get: if signedIn() && request.auth.uid == adminUid;
+      allow list, create, update, delete: if false;
+    }
+
+    // Preserve the existing school and Head Master access model.
+    match /schools/{schoolId} {
+      allow read, write: if isSuperAdmin();
+      allow get: if isActiveHeadMaster()
+        && get(adminPath()).data.schoolId == schoolId;
+      allow list: if false;
+    }
+
+    match /headMasters/{headMasterUid} {
+      allow read: if isSuperAdmin()
+        || (signedIn() && request.auth.uid == headMasterUid);
+      allow write: if isSuperAdmin();
+    }
+
+    match /adminAudit/{auditId} {
+      allow read, write: if isSuperAdmin();
+    }
+
+    // Teacher profiles: active Head Masters manage records;
+    // teachers can read only their own active linked profile.
+    match /teachers/{teacherId} {
+      allow get: if isActiveHeadMaster()
+        || (signedIn()
+          && resource.data.authUid == request.auth.uid
+          && resource.data.status == "active");
+
+      allow list: if isActiveHeadMaster();
+
+      allow create: if isActiveHeadMaster()
+        && request.resource.data.teacherId == teacherId
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status == "active"
+        && request.resource.data.authUid == null
+        && request.resource.data.loginId == null
+        && request.resource.data.name is string
+        && request.resource.data.dob is string
+        && request.resource.data.gender in ["Female", "Male", "Other"]
+        && request.resource.data.assignedClasses is list
+        && request.resource.data.teachingSubjects is list;
+
+      allow update: if isActiveHeadMaster()
+        && request.resource.data.teacherId == resource.data.teacherId
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "name",
+          "dob",
+          "gender",
+          "assignedClasses",
+          "teachingSubjects",
+          "authUid",
+          "loginId",
+          "loginCreatedAt",
+          "loginCreatedBy",
+          "status",
+          "deactivationReason",
+          "deactivationNote",
+          "deactivationHistory",
+          "deactivatedAt",
+          "deactivatedBy",
+          "lastReactivatedAt",
+          "lastReactivatedBy",
+          "updatedBy",
+          "updatedAt"
+        ]);
+
+      allow delete: if false;
+    }
+
+    // Transactional Teacher ID sequence is writable only by an active HM.
+    match /teacherCounters/{counterId} {
+      allow get, create, update: if isActiveHeadMaster();
+      allow list, delete: if false;
+    }
+
+    // Reserved collection remains closed until a reviewed use case exists.
+    match /teacherAccessAttempts/{attemptId} {
+      allow read, write: if false;
+    }
+
+    // All other collections remain protected by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
-  match /teacherCounters/{counterId}{allow read,write: if isActiveHeadMaster();}
-  match /teacherAccessAttempts/{attemptId}{allow read,write: if false;}
-
-  match /{document=**}{allow read,write: if false;}
- }
 }
