@@ -65,7 +65,7 @@ export async function getCurrentHeadMasterProfile() {
   const {doc, getDoc} = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js");
   const user = auth.currentUser;
   if (!user || !user.emailVerified) return null;
-  const snapshot = await getDoc(doc(db, "headMasters", user.uid));
+  const snapshot = await getDoc(doc(db, "platformAdmins", user.uid));
   if (!snapshot.exists()) return null;
   const profile = snapshot.data();
   if (profile.role !== "HEAD_MASTER" || profile.email?.trim().toLowerCase() !== user.email?.toLowerCase() || profile.status !== "active") return null;
