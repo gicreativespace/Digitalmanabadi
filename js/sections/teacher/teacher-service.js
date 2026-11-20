@@ -1,6 +1,7 @@
 import { auth, db } from "../../firebase-client.js";
 import {
   createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   deleteUser,
   getAuth,
   updateProfile,
@@ -17,7 +18,8 @@ import {
   query,
   runTransaction,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  where
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const TEACHERS = "teachers";
@@ -190,6 +192,35 @@ export async function createTeacherLogin(teacherId) {
     profileLinked = true;
     return { teacherId: String(teacherId), loginId, password, secretCode };
   } catch (error) {
+    if (error?.code === "auth/email-already-in-use" && !createdUser) {
+      try {
+        const existingCredential = await signInWithEmailAndPassword(secondaryAuth, loginId, password);
+        const existingUser = existingCredential.user;
+        const linkedTeachers = await getDocs(query(collection(db, TEACHERS), where("authUid", "==", existingUser.uid)));
+        const linkedElsewhere = linkedTeachers.docs.some(item => item.id !== String(teacherId));
+        if (linkedElsewhere) {
+          try { await signOut(secondaryAuth); } catch {}
+          throw new Error("This Firebase Login ID is already linked to another Teacher profile. Please contact GI Support; no account or teacher record was changed.");
+        }
+        await updateProfile(existingUser, { displayName: teacher.name });
+        await updateDoc(teacherRef, {
+          authUid: existingUser.uid,
+          loginId,
+          secretCode,
+          loginCreatedAt: teacher.loginCreatedAt || serverTimestamp(),
+          loginCreatedBy: headMaster.uid,
+          updatedAt: serverTimestamp()
+        });
+        profileLinked = true;
+        return { teacherId: String(teacherId), loginId, password, secretCode };
+      } catch (reuseError) {
+        if (reuseError?.message?.includes("already linked to another Teacher profile")) throw reuseError;
+        if (reuseError?.code === "auth/invalid-credential" || reuseError?.code === "auth/wrong-password" || reuseError?.code === "auth/user-not-found") {
+          throw new Error("This Login ID already exists in Firebase Authentication, but the approved Secret Code did not match its existing password. No new account was created and no password was changed. Please contact GI Support to verify the existing account.");
+        }
+        throw new Error("Firebase already has this Login ID, but the existing account could not be safely linked. No new account was created and no password was changed. Please contact GI Support. Details: " + (reuseError?.message || reuseError?.code || "Unknown error"));
+      }
+    }
     if (createdUser && !profileLinked) {
       try { await deleteUser(createdUser); } catch {}
     }
