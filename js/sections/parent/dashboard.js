@@ -1,4 +1,5 @@
-export function renderParentDashboardIntro({state,escapeHtml}) {
+export function renderParentDashboardIntro({state,escapeHtml,T}) {
  if(state.role!=="parent") return "";
- return '<section class="feature-card blue parent-student"><div class="card-icon">♙</div><div><h3>లింక్ చేసిన విద్యార్థి</h3><p>'+(state.linkedStudent?escapeHtml(state.linkedStudent.className+" • Roll "+state.linkedStudent.roll):"విద్యార్థి వివరాలు")+'</p></div></section>';
+ const t=(te,en)=>T?T(te,en):te;
+ return '<section class="feature-card blue parent-student"><div class="card-icon">♙</div><div><h3>'+t("లింక్ చేసిన విద్యార్థి","Linked Student")+'</h3><p>'+(state.linkedStudent?escapeHtml(state.linkedStudent.className+" • "+t("రోల్ నంబర్","Roll Number")+" "+state.linkedStudent.roll):t("విద్యార్థి వివరాలు","Student Details"))+'</p></div></section>';
 }
