@@ -2,7 +2,7 @@ import { auth } from "../../firebase-client.js";
 import { APP_CONFIG } from "../../../config/school-config.js";
 import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-const apiBase = () => String(APP_CONFIG.backendApiBaseUrl || "").replace(/\\/$/, "");
+const apiBase = () => String(APP_CONFIG.backendApiBaseUrl || "").replace(/\/$/, "");
 const te = () => localStorage.getItem("gim_lang") !== "en";
 const messages = {
  "Enter a valid 10-digit mobile number.": "సరైన 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.",
@@ -33,7 +33,7 @@ export async function findParentStudents(mobile) { return publicRequest("/api/pa
 export async function verifyParentStudent(payload) {
   const result = await publicRequest("/api/parent/verify", payload);
   await signInWithCustomToken(auth, result.customToken);
-  localStorage.setItem("gim_parent_mobile", String(payload.mobile).replace(/\\D/g, "").slice(-10));
+  localStorage.setItem("gim_parent_mobile", String(payload.mobile).replace(/\D/g, "").slice(-10));
   return result;
 }
 export async function getParentChildren() {
@@ -49,7 +49,7 @@ export async function getParentChildren() {
 function bytesToBase64(bytes) { return btoa(String.fromCharCode(...new Uint8Array(bytes))); }
 function base64ToBytes(value) { return Uint8Array.from(atob(value), c => c.charCodeAt(0)); }
 export async function saveParentPin(uid, pin) {
-  if (!/^\\d{4}$/.test(String(pin))) throw new Error(te() ? "4 అంకెల PIN నమోదు చేయండి." : "Enter a 4-digit PIN.");
+  if (!/^\d{4}$/.test(String(pin))) throw new Error(te() ? "4 అంకెల PIN నమోదు చేయండి." : "Enter a 4-digit PIN.");
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const material = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt, iterations: 210000, hash: "SHA-256" }, material, 256);
@@ -57,7 +57,7 @@ export async function saveParentPin(uid, pin) {
 }
 export async function verifyParentPin(uid, pin) {
   const raw = localStorage.getItem("gim_parent_pin_v1:" + uid);
-  if (!raw || !/^\\d{4}$/.test(String(pin))) return false;
+  if (!raw || !/^\d{4}$/.test(String(pin))) return false;
   try {
     const record = JSON.parse(raw);
     const material = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]);
