@@ -13,7 +13,7 @@ export const modules={
   ["notebook-pen","డైలీ డైరీ","Daily Diary","విషయాల వారీగా సమర్పణలు, ఆమోదాలు"],
   ["book-open","హోంవర్క్","Homework","హోంవర్క్ నిర్వహణ, సమర్పణలు"],
   ["megaphone","నోటీసు బోర్డు","Notice Board","నోటీసుల పరిశీలన, ఆమోదం, ప్రచురణ"],
-  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు","School events and holidays"],
+  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు"],
   ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","తేదీ వారీగా భోజన వివరాలు"],
   ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు","Birthdays and special days"],
   ["book-heart","గొప్ప వ్యక్తులు","Great People","విద్యార్థులకు ఉపయోగకరమైన జీవిత విశేషాలు"],
