@@ -36,33 +36,33 @@ export default async function handler(req, res) {
       }
       const student = studentSnap.data();
       const valid = student.status === "active"
-        && student.parentMobileHash === hmac(mobile)
+        && student.parentMobileHash === hmac("mobile:" + mobile)
         && String(student.dob || "") === dob
-        && sameHash(student.secretCodeHash, hmac(secretCode));
+        && sameHash(student.secretCodeHash, hmac("secret:" + secretCode));
       if (!valid) {
         const failures = Number(attempt.failures || 0) + 1;
         tx.set(attemptRef, { failures, lockUntilMs: failures >= 5 ? now + 60000 : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
         return { kind: "invalid", lockedAfter: failures >= 5 };
       }
-      if (linkSnap.exists && linkSnap.data().parentMobileHash !== hmac(mobile)) return { kind: "already-linked" };
+      if (linkSnap.exists && linkSnap.data().parentMobileHash !== hmac("mobile:" + mobile)) return { kind: "already-linked" };
       tx.set(linkRef, {
         studentRecordId,
         schoolId: student.schoolId,
-        parentMobileHash: hmac(mobile),
+        parentMobileHash: hmac("mobile:" + mobile),
         parentUid: "parent_" + hmac("account:" + mobile),
         linkedAt: linkSnap.exists ? linkSnap.data().linkedAt : FieldValue.serverTimestamp(),
         lastVerifiedAt: FieldValue.serverTimestamp()
       }, { merge: true });
       tx.set(studentRef, { parentLinked: true, parentLinkedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       tx.set(attemptRef, { failures: 0, lockUntilMs: 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-      return { kind: "verified", parentUid: "parent_" + hmac("account:" + mobile), student: { studentRecordId, name: student.name, studentId: student.studentId, classId: student.classId } };
+      return { kind: "verified", parentUid: "parent_" + hmac("account:" + mobile), student: { studentRecordId, schoolId: student.schoolId, name: student.name, studentId: student.studentId, classId: student.classId } };
     });
 
     if (verification.kind === "locked") return json(res, 429, { error: "Too many incorrect attempts. Try again in 60 seconds.", retryAfterSeconds: 60 });
     if (verification.kind === "already-linked") return json(res, 409, { error: "Already Linked. This student is connected to another Parent Mobile Account." });
     if (verification.kind !== "verified") return json(res, 401, { error: verification.lockedAfter ? "Verification is locked for 60 seconds." : "Student details could not be verified.", retryAfterSeconds: verification.lockedAfter ? 60 : 0 });
 
-    const customToken = await adminAuth().createCustomToken(verification.parentUid, { role: "parent", mobileHash: hmac(mobile) });
+    const customToken = await adminAuth().createCustomToken(verification.parentUid, { role: "parent", mobileHash: hmac("mobile:" + mobile) });
     await db.collection("securityAudit").add({
       action: "PARENT_STUDENT_VERIFIED",
       studentRecordId,
