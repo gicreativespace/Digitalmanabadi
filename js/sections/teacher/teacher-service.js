@@ -42,7 +42,8 @@ function validateTeacher(payload) {
   const dob = cleanText(payload.dob, 10);
   const gender = cleanText(payload.gender, 20);
   if (name.length < 2) throw new Error("Enter the teacher's full name.");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(Date.parse(dob)) || new Date(dob + "T00:00:00") > new Date()) {
+  const parsedDob = new Date(dob + "T00:00:00");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dob) || Number.isNaN(parsedDob.getTime()) || parsedDob.toISOString().slice(0, 10) !== dob || parsedDob > new Date()) {
     throw new Error("Enter a valid date of birth.");
   }
   if (!["Female", "Male", "Other"].includes(gender)) throw new Error("Select a valid gender.");
@@ -106,7 +107,7 @@ export async function createTeacherRecord(payload) {
     if (serial > 99) throw new Error("This year's Teacher ID sequence is full.");
     const teacherId = yy + String(serial).padStart(2, "0");
     const teacherRef = doc(db, TEACHERS, teacherId);
-    transaction.create(teacherRef, {
+    transaction.set(teacherRef, {
       teacherId,
       ...teacher,
       status: "active",
