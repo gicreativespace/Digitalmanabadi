@@ -9,7 +9,7 @@ export async function authenticateHeadMaster(email,password){
  const cred=await signInWithEmailAndPassword(auth,email,password);
  try{
   if(!cred.user.emailVerified)throw Error("దయచేసి మీ అధికారిక Emailను ముందుగా Verify చేయండి.");
-  const uid=cred.user.uid,s=await getDoc(doc(db,"headMasters",uid));
+  const uid=cred.user.uid,s=await getDoc(doc(db,"platformAdmins",uid));
   if(!s.exists())throw Error("ఈ Head Master ఖాతా ఇంకా సక్రియం కాలేదు. GI Super Adminను సంప్రదించండి.");
   const profile=s.data();
   if(profile.role!=="HEAD_MASTER"||profile.email?.trim().toLowerCase()!==cred.user.email?.toLowerCase()||profile.status!=="active"){
