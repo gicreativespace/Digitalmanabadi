@@ -3,7 +3,6 @@ name: Teacher Module Syntax Check
 on:
   pull_request:
     paths:
-      - "functions/**"
       - "js/core/app.js"
       - "js/modules/module-page.js"
       - "js/sections/teacher/**"
@@ -21,11 +20,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Check Cloud Functions syntax
-        run: node --check functions/index.js
       - name: Check browser JavaScript module syntax
         shell: bash
         run: |
           for file in js/core/app.js js/modules/module-page.js js/sections/teacher/dashboard.js js/sections/teacher/login.js js/sections/teacher/pin-auth.js js/sections/teacher/teacher-service.js js/shared/login-screen.js; do
             node --input-type=module --check < "$file"
           done
+      - name: Verify Cloud Functions are not configured
+        run: |
+          test ! -d functions
+          ! grep -q '"functions"' firebase.json
