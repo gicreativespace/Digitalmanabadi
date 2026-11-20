@@ -92,7 +92,7 @@ export default async function handler(req, res) {
           studentId,
           academicYear: year,
           name, gender, dob, guardianName, relationship, parentMobile,
-          parentMobileHash: hmac(parentMobile),
+          parentMobileHash: hmac("mobile:" + parentMobile),
           secretCodeCiphertext: encrypted.ciphertext,
           secretCodeIv: encrypted.iv,
           secretCodeTag: encrypted.tag,
