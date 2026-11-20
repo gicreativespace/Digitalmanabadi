@@ -1,31 +1,40 @@
-# Digital Mana Badi Trusted Backend — Setup Notes
+# Digital Mana Badi — Backend Architecture Notes
 
-The frontend remains hosted on GitHub Pages. The API in this repository is a separate Node.js serverless deployment and is prepared for Vercel-compatible routing. No deployment has been performed.
+## Agreed repository and data plan
 
-## Required environment variables
+- Keep the complete project source in this single GitHub repository.
+- Keep the existing frontend hosted through GitHub Pages.
+- Continue using the existing Firebase project and Firestore as the database.
+- Do not move the source code to another repository.
+- No Firebase Cloud Functions have been introduced or deployed.
+- No backend hosting provider has been selected or deployed.
 
-Set these only in the backend hosting provider's encrypted Environment Variables settings. Never put them in GitHub, frontend JavaScript, or chat.
+## Important technical boundary
 
-- `FIREBASE_SERVICE_ACCOUNT_JSON`: the complete Firebase service-account JSON object as a single environment-variable value. Use the service account for the existing `digital-mana-badi` Firebase project with the minimum required Firestore and Firebase Authentication Admin permissions.
-- `STUDENT_SECRET_ENCRYPTION_KEY`: a randomly generated 32-byte key, represented as 64 hexadecimal characters. Keep it stable and back it up securely; changing it without re-encrypting records makes existing Secret Codes unreadable.
-- `PARENT_SECRET_PEPPER`: a separate random secret of at least 32 characters. Keep it stable; changing it invalidates stored mobile and Secret Code verifiers.
-- `CORS_ALLOWED_ORIGINS`: the exact HTTPS origin of the existing GitHub Pages site, without a path (for example, `https://OWNER.github.io`). Add a second exact origin only if a custom domain is also used.
+GitHub Pages serves static frontend files. It does not execute Node.js code in the repository's `api/` directory.
 
-## Frontend setting
+The Parent Verification and Class Management API routes currently in `api/` use the Firebase Admin SDK and server-only secrets. They are source code in this repository, but they do not run merely because they are committed to GitHub or because Firestore is connected.
 
-After the API is deployed and tested, set `APP_CONFIG.backendApiBaseUrl` in `config/school-config.js` to the backend's HTTPS origin, without a trailing slash. Until this is configured, the new Class Management and Parent Verification API calls intentionally report that the trusted backend is not connected.
+The frontend's `APP_CONFIG.backendApiBaseUrl` is currently empty. Do not set it to a placeholder or expose server credentials in frontend files. The new trusted API-dependent flows cannot be treated as live until a secure server-side execution method is deliberately selected and configured.
 
-## API routes added
+This distinction is important for security: Secret Code decryption, Firebase Admin custom-token creation, rate limiting, and privileged Head Master checks must not be moved into public browser JavaScript.
 
-- `GET /api/classrooms` — active Head Master classroom list.
-- `POST /api/classrooms` — save a class configuration.
-- `GET /api/classrooms/{classId}/students` — Head Master-only student list including decrypted Secret Codes; each reveal is audited.
-- `POST /api/classrooms/{classId}/students` — create a student, annual Student ID, permanent Secret Code, encrypted secret and verifier.
-- `PATCH /api/students/{studentRecordId}` — Head Master changes Parent Mobile Number; only that student's old link is removed.
-- `POST /api/parent/students` — lookup students associated with a Parent mobile, with server-side rate limiting.
-- `POST /api/parent/verify` — DOB + Secret Code verification, atomic one-parent link claim, 5-failure / 60-second lockout and Firebase custom token.
-- `GET /api/parent/children` — returns only the authenticated Parent's currently linked children.
+## Server-side secrets (only if/when a runtime is approved)
 
-## Important deployment gate
+Keep these values exclusively in the chosen server runtime's encrypted environment settings. Never commit them to GitHub, put them in frontend JavaScript, or paste them into chat.
 
-Before enabling the live frontend URL, configure the environment variables, deploy the API, verify Firebase project access, run the security tests, and confirm the exact frontend origin. The existing GitHub Pages deployment and `main` branch are not changed by this feature branch.
+- `FIREBASE_SERVICE_ACCOUNT_JSON`: Firebase service-account JSON for the existing project, with minimum required permissions.
+- `STUDENT_SECRET_ENCRYPTION_KEY`: stable 32-byte key encoded as 64 hexadecimal characters. Back it up securely; rotation requires a planned data migration.
+- `PARENT_SECRET_PEPPER`: separate stable random secret of at least 32 characters. Rotation affects existing verifiers.
+- `CORS_ALLOWED_ORIGINS`: exact HTTPS origin(s) of the approved frontend.
+
+## Current status
+
+- Frontend remains on GitHub Pages.
+- Firestore remains the database.
+- API source remains in this same repository.
+- No API backend has been deployed.
+- No Cloud Functions have been created.
+- No hosting provider or deployment credentials have been configured.
+
+Do not change the existing application modules or authentication flows as part of choosing a future backend runtime. Any architectural change must preserve the current security controls and be tested on a separate branch before merging.
