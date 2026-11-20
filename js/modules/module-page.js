@@ -57,6 +57,7 @@ async function bindClassManagement(){
  let activeClassId="";
  const esc=value=>escapeHtml(String(value??""));
  const formatDob=value=>/^\d{8}$/.test(String(value||""))?String(value).slice(0,2)+"/"+String(value).slice(2,4)+"/"+String(value).slice(4):String(value||"—");
+ const localMobile=value=>{const digits=String(value||"").replace(/\D/g,"");return digits.length>=10?digits.slice(-10):digits};
  const genderLabel=value=>({Male:T("పురుషుడు","Male"),Female:T("స్త్రీ","Female"),Other:T("ఇతర","Other")}[value]||value||"—");
  const relationshipLabel=value=>({Father:T("తండ్రి","Father"),Mother:T("తల్లి","Mother"),Guardian:T("సంరక్షకుడు","Guardian"),Other:T("ఇతర","Other")}[value]||value||"—");
  const say=(message,isError=false)=>{status.textContent=message;status.className=isError?"class-admin-error":"class-admin-status";};
@@ -66,7 +67,7 @@ async function bindClassManagement(){
  '<div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(student.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(student.dob))+'</b></div>'+
  '<div><span>'+T("తల్లిదండ్రి / సంరక్షకుడు","Parent / Guardian")+'</span><b>'+esc(student.guardianName)+'</b></div><div><span>'+T("సంబంధం","Relationship")+'</span><b>'+esc(relationshipLabel(student.relationship))+'</b></div>'+
  '<div><span>'+T("Parent Mobile Number","Parent Mobile Number")+'</span><b>'+esc(student.parentMobile)+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(student.secretCode||"—")+'</b></div></div>'+
- '<div class="class-student-actions"><input type="tel" inputmode="numeric" maxlength="10" data-parent-mobile value="'+esc(student.parentMobile)+'" aria-label="'+T("కొత్త Parent Mobile Number","New Parent Mobile Number")+'"><button type="button" class="btn secondary" data-save-parent-mobile>'+T("మొబైల్ మార్చండి","Update Mobile")+'</button></div></article>').join("");
+ '<div class="class-student-actions"><input type="tel" inputmode="numeric" maxlength="10" data-parent-mobile value="'+esc(localMobile(student.parentMobile))+'" aria-label="'+T("కొత్త Parent Mobile Number","New Parent Mobile Number")+'"><button type="button" class="btn secondary" data-save-parent-mobile>'+T("మొబైల్ మార్చండి","Update Mobile")+'</button></div></article>').join("");
   list.querySelectorAll("[data-save-parent-mobile]").forEach(button=>button.onclick=async()=>{
    const card=button.closest("[data-student-record]"),mobile=card.querySelector("[data-parent-mobile]").value.trim();
    button.disabled=true;button.textContent=T("సేవ్ చేస్తోంది…","Saving…");
