@@ -22,6 +22,7 @@ export function renderSuperAdminLogin(main,{onSuccess,onBack,onPasswordReset,T=(
 
 let superAdminIdleTimer = null;
 let superAdminActivityHandler = null;
+let superAdminVisibilityHandler = null;
 let superAdminLastActivity = 0;
 let superAdminLogoutStarted = false;
 
@@ -30,7 +31,8 @@ function stopSuperAdminIdleMonitor(){
  superAdminIdleTimer=null;
  if(superAdminActivityHandler){
   ["pointerdown","keydown","touchstart","scroll","mousemove"].forEach(type=>document.removeEventListener(type,superAdminActivityHandler,{passive:true}));
-  document.removeEventListener("visibilitychange",superAdminActivityHandler);
+  document.removeEventListener("visibilitychange",superAdminVisibilityHandler);
+  superAdminVisibilityHandler=null;
  }
  superAdminActivityHandler=null;
 }
@@ -66,7 +68,8 @@ export async function renderSuperAdminDashboard(main,admin,{onLogout}){
   armIdleTimer();
  };
  ["pointerdown","keydown","touchstart","scroll","mousemove"].forEach(type=>document.addEventListener(type,superAdminActivityHandler,{passive:true}));
- document.addEventListener("visibilitychange",handleVisibilityChange);
+ superAdminVisibilityHandler=handleVisibilityChange;
+ document.addEventListener("visibilitychange",superAdminVisibilityHandler);
  armIdleTimer();
 
  main.innerHTML=
