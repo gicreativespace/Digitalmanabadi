@@ -36,7 +36,7 @@ export function createDictionaryTranslator(getLanguage, pairs = translationPairs
       const boundary = "[A-Za-z0-9_\\u0C00-\\u0C7F]";
       const pattern = safeEntries.length
         ? new RegExp("(^|[^" + boundary.slice(1, -1) + "])(" +
-            safeEntries.map(([source]) => source.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")).join("|") +
+            safeEntries.map(([source]) => source.replace(/[.*+?^${}()|[\\]\\]/g, "\\source.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")")).join("|") +
             ")(?=$|[^" + boundary.slice(1, -1) + "])", "gu")
         : null;
       cache.set(language, { lookup, pattern });
