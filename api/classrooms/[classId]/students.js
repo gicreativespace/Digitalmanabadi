@@ -72,7 +72,7 @@ export default async function handler(req, res) {
       const recordId = crypto.randomUUID();
       const secretCode = generateSecretCode();
       const encrypted = encryptSecretCode(secretCode);
-      const secretCodeHash = hmac(secretCode);
+      const secretCodeHash = hmac("secret:" + secretCode);
       let created = null;
 
       await db.runTransaction(async tx => {
