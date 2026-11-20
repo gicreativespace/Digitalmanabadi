@@ -7,6 +7,12 @@ on:
       - "js/modules/module-page.js"
       - "js/sections/teacher/**"
       - "js/shared/login-screen.js"
+      - "js/shared/translations.js"
+      - "js/shared/dashboard-screen.js"
+      - "js/shared/account-screens.js"
+      - "js/shared/role-config.js"
+      - "js/sections/parent/**"
+      - "js/sections/alumni-sponsor/alumni-sponsor-section.js"
       - "firestore.rules"
       - "firebase.json"
 
@@ -23,7 +29,7 @@ jobs:
       - name: Check browser JavaScript module syntax
         shell: bash
         run: |
-          for file in js/core/app.js js/modules/module-page.js js/sections/teacher/dashboard.js js/sections/teacher/login.js js/sections/teacher/pin-auth.js js/sections/teacher/teacher-service.js js/shared/login-screen.js; do
+          for file in js/core/app.js js/modules/module-page.js js/sections/teacher/dashboard.js js/sections/teacher/login.js js/sections/teacher/pin-auth.js js/sections/teacher/teacher-service.js js/shared/login-screen.js js/shared/translations.js js/shared/dashboard-screen.js js/shared/account-screens.js js/shared/role-config.js js/sections/parent/dashboard.js js/sections/parent/parent-section.js js/sections/alumni-sponsor/alumni-sponsor-section.js; do
             node --input-type=module --check < "$file"
           done
       - name: Verify Cloud Functions are not configured
