@@ -15,7 +15,8 @@ export function renderHeadMasterDashboardIntro({state,T,APP_CONFIG,escapeHtml}) 
   ["ప్రతి మంచి మార్పు, ఒక చిన్న మంచి నిర్ణయంతో మొదలవుతుంది.","Every meaningful change begins with one thoughtful decision."],
   ["ఉపాధ్యాయులకు తోడుగా నిలిచి, విద్యార్థులకు దారి చూపడమే నాయకత్వం.","Leadership means supporting teachers and creating pathways for students."]
  ];
- const dayOfYear=Math.floor((new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())-new Date(new Date().getFullYear(),0,0))/86400000);\n const dailyQuote=roleQuotes[dayOfYear%roleQuotes.length];
+ const dayOfYear=Math.floor((new Date(new Date().getFullYear(),new Date().getMonth(),new Date().getDate())-new Date(new Date().getFullYear(),0,0))/86400000);
+ const dailyQuote=roleQuotes[dayOfYear%roleQuotes.length];
  const modules=[
   ["users","Class & Teacher Management","తరగతులు, విద్యార్థులు మరియు ఉపాధ్యాయులు","Class & Teacher Management"],
   ["book-open","Diary","విషయాల వారీగా Class Work & Home Work","Diary"],
