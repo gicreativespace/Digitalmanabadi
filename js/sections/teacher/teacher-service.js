@@ -124,6 +124,8 @@ export async function createTeacherRecord(payload) {
   const counterRef = doc(db, COUNTERS, yy);
   let createdTeacherId = "";
 
+  const secretCode = createTeacherSecretCode(teacher.dob);
+
   await runTransaction(db, async transaction => {
     const counterSnapshot = await transaction.get(counterRef);
     const lastSerial = counterSnapshot.exists() ? Number(counterSnapshot.data().lastSerial || 0) : 0;
@@ -134,6 +136,7 @@ export async function createTeacherRecord(payload) {
     transaction.set(teacherRef, {
       teacherId,
       ...teacher,
+      secretCode,
       status: "active",
       authUid: null,
       loginId: null,
@@ -162,7 +165,7 @@ export async function createTeacherLogin(teacherId) {
   if (teacher.authUid || teacher.loginId) throw new Error("A login already exists for this teacher.");
 
   const loginId = getTeacherLoginId(teacherId);
-  const secretCode = createTeacherSecretCode(teacher.dob);
+  const secretCode = /^\d{6}$/.test(String(teacher.secretCode || "")) ? String(teacher.secretCode) : createTeacherSecretCode(teacher.dob);
   const password = secretCode;
   const secondaryApp = initializeApp(auth.app.options, "teacher-provision-" + teacherId + "-" + crypto.randomUUID());
   const secondaryAuth = getAuth(secondaryApp);
@@ -187,10 +190,21 @@ export async function createTeacherLogin(teacherId) {
     if (createdUser && !profileLinked) {
       try { await deleteUser(createdUser); } catch {}
     }
-    if (error?.code === "auth/email-already-in-use") {
-      throw new Error("This Login ID already exists in Firebase Authentication. Please contact GI Support before retrying.");
+    const authMessages = {
+      "auth/email-already-in-use": "This Login ID already exists in Firebase Authentication. Please contact GI Support; do not create another teacher record.",
+      "auth/operation-not-allowed": "Firebase Email/Password sign-in is disabled. Enable the Email/Password provider in Firebase Authentication.",
+      "auth/weak-password": "Firebase rejected this six-digit Secret Code as a password. Check the Firebase Authentication password policy.",
+      "auth/password-does-not-meet-requirements": "Firebase password policy requires characters beyond digits. The approved six-digit Secret Code cannot satisfy that policy; review the Firebase password policy.",
+      "auth/network-request-failed": "Network connection failed while creating the teacher login. Check the connection and try again.",
+      "auth/too-many-requests": "Firebase temporarily blocked login creation due to too many attempts. Wait and try again."
+    };
+    if (error?.code && authMessages[error.code]) {
+      throw new Error(authMessages[error.code]);
     }
-    throw error;
+    if (createdUser && !profileLinked) {
+      throw new Error("Firebase created the login, but linking it to the teacher profile failed. Automatic cleanup was attempted. Please refresh the teacher list and contact GI Support before retrying. Details: " + (error?.message || "Unknown Firestore error."));
+    }
+    throw new Error("Teacher login could not be created: " + (error?.message || error?.code || "Unknown error"));
   } finally {
     try { await signOut(secondaryAuth); } catch {}
     try { await deleteApp(secondaryApp); } catch {}
