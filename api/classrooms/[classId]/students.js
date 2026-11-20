@@ -70,48 +70,59 @@ export default async function handler(req, res) {
       const year = currentAcademicYearCode();
       const counterRef = db.collection("studentCounters").doc(hm.schoolId + "_" + year + "_" + classId + (section || ""));
       const recordId = crypto.randomUUID();
-      const secretCode = generateSecretCode();
-      const encrypted = encryptSecretCode(secretCode);
-      const secretCodeHash = hmac("secret:" + secretCode);
       let created = null;
-
-      await db.runTransaction(async tx => {
-        const counterSnap = await tx.get(counterRef);
-        const lastRoll = Number(counterSnap.exists ? counterSnap.data().lastRoll || 0 : 0);
-        const roll = lastRoll + 1;
-        if (roll > 99) throw Object.assign(new Error("This class sequence is full for the current academic year."), { status: 409 });
-        const rollNumber = String(roll).padStart(2, "0");
-        const studentId = year + String(classNumber).padStart(2, "0") + rollNumber + (section || "");
-        const studentRef = db.collection("students").doc(recordId);
-        tx.create(studentRef, {
-          permanentStudentId: recordId,
-          schoolId: hm.schoolId,
-          classId,
-          section,
-          rollNumber,
-          studentId,
-          academicYear: year,
-          name, gender, dob, guardianName, relationship, parentMobile,
-          parentMobileHash: hmac("mobile:" + parentMobile),
-          secretCodeCiphertext: encrypted.ciphertext,
-          secretCodeIv: encrypted.iv,
-          secretCodeTag: encrypted.tag,
-          secretCodeHash,
-          status: "active",
-          createdBy: hm.uid,
-          createdAt: FieldValue.serverTimestamp(),
-          updatedAt: FieldValue.serverTimestamp()
-        });
-        tx.set(counterRef, { lastRoll: roll, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-        tx.set(classroomRef, {
-          schoolId: hm.schoolId,
-          classId,
-          classNumber,
-          updatedBy: hm.uid,
-          updatedAt: FieldValue.serverTimestamp()
-        }, { merge: true });
-        created = { studentRecordId: recordId, studentId, rollNumber, secretCode };
-      });
+      let collisionResolved = false;
+      for (let attempt = 0; attempt < 3 && !collisionResolved; attempt++) {
+        try {
+          await db.runTransaction(async tx => {
+            const counterSnap = await tx.get(counterRef);
+            const secretCode = generateSecretCode();
+            const encrypted = encryptSecretCode(secretCode);
+            const secretCodeHash = hmac("secret:" + secretCode);
+            const secretCodeRef = db.collection("studentSecretCodes").doc(secretCodeHash);
+            const secretCodeSnap = await tx.get(secretCodeRef);
+            if (secretCodeSnap.exists) throw Object.assign(new Error("Secret Code collision. Please retry."), { code: "SECRET_CODE_COLLISION", status: 409 });
+            const lastRoll = Number(counterSnap.exists ? counterSnap.data().lastRoll || 0 : 0);
+            const roll = lastRoll + 1;
+            if (roll > 99) throw Object.assign(new Error("This class sequence is full for the current academic year."), { status: 409 });
+            const rollNumber = String(roll).padStart(2, "0");
+            const studentId = year + String(classNumber).padStart(2, "0") + rollNumber + (section || "");
+            const studentRef = db.collection("students").doc(recordId);
+            tx.create(studentRef, {
+              permanentStudentId: recordId,
+              schoolId: hm.schoolId,
+              classId,
+              section,
+              rollNumber,
+              studentId,
+              academicYear: year,
+              name, gender, dob, guardianName, relationship, parentMobile,
+              parentMobileHash: hmac("mobile:" + parentMobile),
+              secretCodeCiphertext: encrypted.ciphertext,
+              secretCodeIv: encrypted.iv,
+              secretCodeTag: encrypted.tag,
+              secretCodeHash,
+              status: "active",
+              createdBy: hm.uid,
+              createdAt: FieldValue.serverTimestamp(),
+              updatedAt: FieldValue.serverTimestamp()
+            });
+            tx.create(secretCodeRef, { studentRecordId: recordId, schoolId: hm.schoolId, createdAt: FieldValue.serverTimestamp() });
+            tx.set(counterRef, { lastRoll: roll, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+            tx.set(classroomRef, {
+              schoolId: hm.schoolId,
+              classId,
+              classNumber,
+              updatedBy: hm.uid,
+              updatedAt: FieldValue.serverTimestamp()
+            }, { merge: true });
+            created = { studentRecordId: recordId, studentId, rollNumber, secretCode };
+          });
+          collisionResolved = true;
+        } catch (error) {
+          if (error?.code !== "SECRET_CODE_COLLISION" || attempt === 2) throw error;
+        }
+      }
       return json(res, 201, { student: created });
     }
 
