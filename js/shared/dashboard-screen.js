@@ -11,7 +11,7 @@ function dashboard(){
  // continue through the original shared dashboard rendering path unchanged.
  if(state.role==="hm"){
   const meta=roleMeta.hm;
-  main.innerHTML=`<div class="dashboard-head"><div><span class="pill">${T("నమస్కారం!","Welcome!")}</span><h1>${T("ప్రధానోపాధ్యాయుల ప్రధాన పేజీ","Head Master Dashboard")}</h1><p>${state.headMasterProfile?.school?.schoolName?escapeHtml(state.headMasterProfile.school.schoolName):T("పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ","Complete school management and supervision")}</p></div><div class="dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("Role మార్చు","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div></div>
+  main.innerHTML=`<div class="dashboard-actions hm-dashboard-actions"><button class="btn secondary" id="switchRoleHome">${T("పాత్ర మార్చండి","Switch Role")}</button><button class="btn secondary" id="profileBtn">◉ ${T("ప్రొఫైల్","Profile")}</button></div>
   ${roleDashboardIntro.hm?.({state,T,APP_CONFIG,escapeHtml})||""}`;
   main.querySelectorAll("[data-module]").forEach(button=>button.onclick=()=>{state.module=button.dataset.module;state.view="module";render()});
   document.querySelector("#switchRoleHome").onclick=async()=>{await signOutPortal();state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render()};
