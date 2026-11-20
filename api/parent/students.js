@@ -1,4 +1,4 @@
-import { adminDb, applyCors, json, safeError, normalizeMobile, hmac, FieldValue } from "../_lib/admin.js";
+import { adminDb, applyCors, json, safeError, normalizeMobile, hmac, FieldValue } from "../../lib/backend/admin.js";
 
 export default async function handler(req, res) {
   if (applyCors(req, res)) return;
