@@ -1,6 +1,6 @@
 export const roleNames={hm:["ప్రధానోపాధ్యాయులు","Head Master"],teacher:["ఉపాధ్యాయులు","Teachers"],parent:["తల్లిదండ్రులు","Parent"],community:["పూర్వ విద్యార్థులు & ప్రోత్సాహకులు","Alumni & Sponsors"]};
 export const roleMeta={
- hm:{tone:"green",icon:"school",title:"ప్రధానోపాధ్యాయుల ప్రధాన పేజీ",titleEn:"Head Master Dashboard",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ",subEn:"Complete school management and supervision"},
+ hm:{tone:"green",icon:"school",title:"ప్రధానోపాధ్యాయుల ప్రధాన పేజీ",sub:"పాఠశాల మొత్తం నిర్వహణ మరియు పర్యవేక్షణ"},
  teacher:{tone:"gold",icon:"presentation",title:"ఉపాధ్యాయుల ప్రధాన పేజీ",titleEn:"Teacher Dashboard",sub:"మీకు కేటాయించిన తరగతులు మరియు బోధనా పనులు",subEn:"Your assigned classes and teaching tasks"},
  parent:{tone:"blue",icon:"users",title:"తల్లిదండ్రుల ప్రధాన పేజీ",titleEn:"Parent Dashboard",sub:"మీ పిల్లల పాఠశాల సమాచారం",subEn:"Your child’s school information"},
  community:{tone:"green",icon:"heart-handshake",title:"Alumni / Donor Portal",titleTe:"పూర్వ విద్యార్థులు / దాతల పోర్టల్",titleEn:"Alumni / Donor Portal",sub:"మీ పాఠశాలతో అనుబంధం కొనసాగించండి • విద్యార్థులకు తోడ్పడండి • భవిష్యత్తును నిర్మించండి",subEn:"Connect with your school • Support students • Build the future"}
@@ -13,7 +13,7 @@ export const modules={
   ["notebook-pen","డైలీ డైరీ","Daily Diary","విషయాల వారీగా సమర్పణలు, ఆమోదాలు"],
   ["book-open","హోంవర్క్","Homework","హోంవర్క్ నిర్వహణ, సమర్పణలు"],
   ["megaphone","నోటీసు బోర్డు","Notice Board","నోటీసుల పరిశీలన, ఆమోదం, ప్రచురణ"],
-  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు"],
+  ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు, సెలవులు","School events and holidays"],
   ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","తేదీ వారీగా భోజన వివరాలు"],
   ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు","Birthdays and special days"],
   ["book-heart","గొప్ప వ్యక్తులు","Great People","విద్యార్థులకు ఉపయోగకరమైన జీవిత విశేషాలు"],
@@ -36,7 +36,7 @@ export const modules={
   ["megaphone","నోటీసు బోర్డు","Notice Board","పాఠశాల నోటీసులు చూడటం","View school notices"],
   ["calendar-days","ఈవెంట్స్ & క్యాలెండర్","Events & Calendar","పాఠశాల కార్యక్రమాలు చూడటం","View school events"],
   ["utensils","మధ్యాహ్న భోజనం","Mid-Day Meal","కేటాయించిన నమోదు / పరిశీలన","Assigned meal records and review"],
-  ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు"],
+  ["sun","Today Special","Today Special","పుట్టినరోజులు, ప్రత్యేక దినాలు","Birthdays and special days"],
   ["book-heart","గొప్ప వ్యక్తులు","Great People","చూడటానికి మాత్రమే","View only"],
   ["quote","గొప్ప సూక్తులు","Great Quotes","చూడటానికి మాత్రమే","View only"],
   ["palette","Poster Studio","Poster Studio","పోస్టర్ తయారీ","Create posters"]
