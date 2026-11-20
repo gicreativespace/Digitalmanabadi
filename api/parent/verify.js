@@ -1,6 +1,6 @@
-import { adminDb, adminAuth, applyCors, json, safeError, normalizeMobile, hmac, FieldValue } from "../_lib/admin.js";
+import { adminDb, adminAuth, applyCors, json, safeError, normalizeMobile, hmac, FieldValue } from "../../lib/backend/admin.js";
 import crypto from "node:crypto";
-import { validateDob } from "../_lib/ids.js";
+import { validateDob } from "../../lib/backend/ids.js";
 
 function sameHash(a, b) {
   const left = Buffer.from(String(a || ""), "hex");
