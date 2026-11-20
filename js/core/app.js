@@ -5,7 +5,7 @@ import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { getLocalTeacherPinRecord } from "../sections/teacher/pin-auth.js";
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord } from "../sections/head-master/pin-auth.js";
 import { showTributeSplash } from "../shared/tribute-splash.js";
-import { translationPairs } from "../shared/translations.js";
+import { createTranslator, createDictionaryTranslator } from "../shared/translations.js";
 import { roleNames, roleMeta, modules } from "../shared/role-config.js";
 import { authenticateHeadMaster, renderSuperAdminLogin, renderSuperAdminDashboard, signOutPortal, sendPortalPasswordReset } from "../sections/super-admin/admin-portal.js";
 import { createAlumniSponsorSection } from "../sections/alumni-sponsor/alumni-sponsor-section.js";
@@ -50,15 +50,8 @@ const state = {
   lang: localStorage.getItem("gim_lang") || "te",
   selectedDate: 17, selectedMonth: 10, selectedYear: 2026, linkedStudent: null, parentLinked: false, communityType: null
 };
-const T=(te,en)=>state.lang==="te"?te:en;
-
-function translateValue(value){
- const direction=state.lang==="te"?0:1;
- const sorted=[...translationPairs].sort((a,b)=>b[1-direction].length-a[1-direction].length);
- let out=String(value??"");
- for(const pair of sorted){const from=pair[1-direction],to=pair[direction];if(from)out=out.split(from).join(to)}
- return out;
-}
+const T=createTranslator(()=>state.lang);
+const translateValue=createDictionaryTranslator(()=>state.lang);
 function applyTranslations(){
  const walk=node=>{for(const child of [...node.childNodes]){if(child.nodeType===3)child.nodeValue=translateValue(child.nodeValue);else if(child.nodeType===1){if(child.matches?.(".role-copy,[data-translation-managed=\"true\"]"))continue;for(const attr of ["placeholder","title","aria-label"])if(child.hasAttribute(attr))child.setAttribute(attr,translateValue(child.getAttribute(attr)));walk(child)}}};
  const appRoot=document.querySelector("#app");
@@ -180,7 +173,7 @@ function render(){
 function setupBottomNavigation(){navigationController.setup();}
 function updateBottomNavigation(){navigationController.update();}
 const alumniSponsorSection = createAlumniSponsorSection({main,state,T,render,toast,escapeHtml});
-const parentSection = createParentSection({main,state,render,toast,escapeHtml});
+const parentSection = createParentSection({main,state,T,render,toast,escapeHtml});
 const { modulePage } = createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
 const loginScreen = createLoginScreen({
  main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,
