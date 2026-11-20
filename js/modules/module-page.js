@@ -1,5 +1,6 @@
 import { renderCalendarMarkup } from "./calendar.js";
 import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
+import { listClassrooms, listClassStudents, createClassStudent, updateStudentParentMobile } from "../sections/class-management/class-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
@@ -25,16 +26,71 @@ function managementLandingMarkup(){
 function classManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
  return '<style>'+
- '.class-admin{display:grid;gap:16px;margin-top:18px}'+
+ '.class-admin{display:grid;gap:16px;margin-top:18px;color:var(--text)}'+
  '.class-admin-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px;border:1px solid #d8e8db;border-radius:20px;background:linear-gradient(125deg,#eff8f0,#e5f1e6 62%,#faf8ee);color:#294d35}'+
- '.class-admin-kicker{font-size:10px;letter-spacing:.15em;font-weight:850;color:#66866d}.class-admin-hero h3{margin:5px 0;color:#294d35;font-size:22px}.class-admin-hero p{margin:0;color:#6c8572;font-size:12px;line-height:1.5}'+
+ '.class-admin-kicker{font-size:11px;letter-spacing:.12em;font-weight:850;color:#66866d}.class-admin-hero h3{margin:5px 0;color:#294d35;font-size:22px}.class-admin-hero p{margin:0;color:#6c8572;font-size:14px;line-height:1.6}'+
  '.class-admin-mark{display:grid;width:48px;height:48px;flex:none;place-items:center;border-radius:15px;background:#d9eadb;color:#356f50;font-size:22px;font-weight:900}'+
  '.class-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'+
- '.class-admin-tile{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #e0eae1;border-radius:16px;background:var(--surface);box-shadow:0 7px 20px rgba(45,83,54,.045)}'+
- '.class-admin-number{display:grid;width:44px;height:44px;flex:none;place-items:center;border-radius:13px;background:#e9f3e9;color:#39734b;font-size:13px;font-weight:900}'+
- '.class-admin-tile strong{display:block;color:var(--text);font-size:14px}.class-admin-tile small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}'+
- '@media(max-width:560px){.class-admin-grid{grid-template-columns:1fr}.class-admin-hero{padding:16px}.class-admin-tile{padding:13px}}'+
- '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>'+T("తరగతుల నిర్వహణ","Class Management")+'</h3><p>'+T("1 నుంచి 5వ తరగతి వరకు పాఠశాల తరగతుల నిర్మాణం","School class structure for Classes 1 to 5")+'</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header><div class="class-admin-grid">'+classes.map((name,index)=>'<article class="class-admin-tile"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+T(name.replace("Class ","")+"వ తరగతి",name)+'</strong><small>'+T("తరగతి నిర్మాణం మరియు విద్యార్థుల రికార్డులు","Class structure and student records")+'</small></span></article>').join("")+'</div></div>';
+ '.class-admin-tile{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #e0eae1;border-radius:16px;background:var(--surface);box-shadow:0 7px 20px rgba(45,83,54,.045);cursor:pointer;text-align:left;width:100%;color:var(--text)}'+
+ '.class-admin-tile[aria-expanded="true"]{border-color:#8eb99a;background:#f3faf4}.class-admin-number{display:grid;width:44px;height:44px;flex:none;place-items:center;border-radius:13px;background:#e9f3e9;color:#39734b;font-size:13px;font-weight:900}'+
+ '.class-admin-tile strong{display:block;color:var(--text);font-size:16px}.class-admin-tile small{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.45}'+
+ '.class-admin-panel{display:grid;gap:14px;padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--surface)}.class-admin-panel[hidden]{display:none}.class-admin-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.class-admin-panel-head h4{margin:0;font-size:18px}.class-admin-status{font-size:13px;color:var(--muted)}'+
+ '.class-admin-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.class-admin .field{display:grid;gap:5px}.class-admin .field label{font-size:13px;font-weight:700}.class-admin input,.class-admin select{width:100%;min-height:43px;padding:9px 11px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);font:inherit}.class-student-list{display:grid;gap:12px}.class-student-card{padding:14px;border:1px solid #dce9df;border-radius:15px;background:#fff}.class-student-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.class-student-head strong{font-size:16px;color:#294b32}.class-student-head small{display:block;color:#69806e;font-size:12px;margin-top:4px}.class-student-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.class-student-info div{padding:9px;border:1px solid #e5eee6;border-radius:10px;background:#fbfdfb;min-width:0}.class-student-info span{display:block;color:#708274;font-size:11px}.class-student-info b{display:block;margin-top:3px;color:#294b32;font-size:13px;overflow-wrap:anywhere}.class-secret{background:#fff8e9!important;border-color:#eadbb7!important}.class-secret b{letter-spacing:.06em}.class-student-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.class-student-actions input{flex:1;min-width:160px}.class-admin-note{font-size:12px;color:var(--muted);line-height:1.5}.class-admin-error{padding:10px 12px;border-radius:10px;background:#fff3ed;color:#984b36;font-size:13px}.class-admin-empty{padding:18px;border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}'+
+ '@media(max-width:560px){.class-admin-grid,.class-admin-form-grid,.class-student-info{grid-template-columns:1fr}.class-admin-hero{padding:16px}.class-admin-tile{padding:13px}.class-admin-panel{padding:12px}.class-student-head{flex-direction:column}}'+
+ '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>'+T("తరగతుల నిర్వహణ","Class Management")+'</h3><p>'+T("తరగతిని ఓపెన్ చేసి విద్యార్థుల పూర్తి వివరాలు నిర్వహించండి.","Open a class to manage complete student records.")+'</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header>'+
+ '<div class="class-admin-grid">'+classes.map((name,index)=>'<button type="button" class="class-admin-tile" data-class-open="class-'+(index+1)+'" aria-expanded="false"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+T(name.replace("Class ","")+"వ తరగతి",name)+'</strong><small>'+T("విద్యార్థుల వివరాలు మరియు రికార్డులు","Student details and records")+'</small></span></button>').join("")+'</div>'+
+ '<section class="class-admin-panel" id="classStudentPanel" hidden><div class="class-admin-panel-head"><h4 id="classStudentTitle"></h4><span id="classStudentStatus" class="class-admin-status" role="status" aria-live="polite"></span></div>'+
+ '<form id="classStudentCreateForm"><div class="class-admin-form-grid">'+
+ '<div class="field"><label for="studentName">'+T("విద్యార్థి పేరు","Student Name")+'</label><input id="studentName" name="name" maxlength="100" required></div>'+
+ '<div class="field"><label for="studentGender">'+T("లింగం","Gender")+'</label><select id="studentGender" name="gender" required><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Male">'+T("పురుషుడు","Male")+'</option><option value="Female">'+T("స్త్రీ","Female")+'</option><option value="Other">'+T("ఇతర","Other")+'</option></select></div>'+
+ '<div class="field"><label for="studentDob">'+T("పుట్టిన తేదీ (DD/MM/YYYY)","Date of Birth (DD/MM/YYYY)")+'</label><input id="studentDob" name="dob" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" required></div>'+
+ '<div class="field"><label for="guardianName">'+T("తల్లిదండ్రి / సంరక్షకుని పేరు","Parent / Guardian Name")+'</label><input id="guardianName" name="guardianName" maxlength="100" required></div>'+
+ '<div class="field"><label for="guardianRelationship">'+T("విద్యార్థితో సంబంధం","Relationship")+'</label><select id="guardianRelationship" name="relationship" required><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Father">'+T("తండ్రి","Father")+'</option><option value="Mother">'+T("తల్లి","Mother")+'</option><option value="Guardian">'+T("సంరక్షకుడు","Guardian")+'</option></select></div>'+
+ '<div class="field"><label for="parentMobile">'+T("Parent Mobile Number","Parent Mobile Number")+'</label><input id="parentMobile" name="parentMobile" type="tel" inputmode="numeric" maxlength="10" required></div>'+
+ '<div class="field"><label for="studentSection">'+T("సెక్షన్ (ఐచ్ఛికం)","Section (optional)")+'</label><input id="studentSection" name="section" maxlength="1" placeholder="A"></div>'+
+ '</div><div class="class-student-actions"><button type="submit" class="btn" id="createStudentButton">+ '+T("విద్యార్థిని చేర్చండి","Add Student")+'</button></div></form>'+
+ '<div id="classStudentList" class="class-student-list"><div class="class-admin-empty">'+T("తరగతిని ఎంచుకోండి.","Choose a class.")+'</div></div></section></div>';
+}
+async function bindClassManagement(){
+ const panel=main.querySelector("#classStudentPanel"),title=main.querySelector("#classStudentTitle"),status=main.querySelector("#classStudentStatus"),list=main.querySelector("#classStudentList"),form=main.querySelector("#classStudentCreateForm");
+ if(!panel||!form)return;
+ let activeClassId="";
+ const esc=value=>escapeHtml(String(value??""));
+ const say=(message,isError=false)=>{status.textContent=message;status.className=isError?"class-admin-error":"class-admin-status";};
+ const renderStudents=students=>{
+  if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ తరగతిలో ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students have been added to this class yet.")+'</div>';return;}
+  list.innerHTML=students.map(student=>'<article class="class-student-card" data-student-record="'+esc(student.studentRecordId)+'"><div class="class-student-head"><div><strong>'+esc(student.name)+'</strong><small>Student ID: '+esc(student.studentId)+' · '+T("రోల్ నంబర్","Roll No.")+' '+esc(student.rollNumber)+(student.section?" · "+T("సెక్షన్","Section")+" "+esc(student.section):"")+'</small></div><span class="class-admin-status">'+T("క్రియాశీలం","Active")+'</span></div><div class="class-student-info">'+
+ '<div><span>'+T("లింగం","Gender")+'</span><b>'+esc(student.gender)+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(student.dob)+'</b></div>'+
+ '<div><span>'+T("తల్లిదండ్రి / సంరక్షకుడు","Parent / Guardian")+'</span><b>'+esc(student.guardianName)+'</b></div><div><span>'+T("సంబంధం","Relationship")+'</span><b>'+esc(student.relationship)+'</b></div>'+
+ '<div><span>'+T("Parent Mobile Number","Parent Mobile Number")+'</span><b>'+esc(student.parentMobile)+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(student.secretCode||"—")+'</b></div></div>'+
+ '<div class="class-student-actions"><input type="tel" inputmode="numeric" maxlength="10" data-parent-mobile value="'+esc(student.parentMobile)+'" aria-label="'+T("కొత్త Parent Mobile Number","New Parent Mobile Number")+'"><button type="button" class="btn secondary" data-save-parent-mobile>'+T("మొబైల్ మార్చండి","Update Mobile")+'</button></div></article>').join("");
+  list.querySelectorAll("[data-save-parent-mobile]").forEach(button=>button.onclick=async()=>{
+   const card=button.closest("[data-student-record]"),mobile=card.querySelector("[data-parent-mobile]").value.trim();
+   button.disabled=true;button.textContent=T("సేవ్ చేస్తోంది…","Saving…");
+   try{await updateStudentParentMobile(card.dataset.studentRecord,mobile);say(T("Parent Mobile Number నవీకరించబడింది. ఈ విద్యార్థికి కొత్త Parent Verification అవసరం.","Parent mobile updated. This student must complete Parent Verification again."));await loadClass(activeClassId);}
+   catch(error){say(error.message||T("మొబైల్ నంబర్ మార్చలేకపోయాం.","Could not update mobile number."),true);button.disabled=false;button.textContent=T("మొబైల్ మార్చండి","Update Mobile");}
+  });
+ };
+ const loadClass=async classId=>{
+  activeClassId=classId;panel.hidden=false;title.textContent=T(classId.replace("class-","")+"వ తరగతి","Class "+classId.replace("class-",""));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';
+  main.querySelectorAll("[data-class-open]").forEach(button=>{button.setAttribute("aria-expanded",String(button.dataset.classOpen===classId));});
+  try{const result=await listClassStudents(classId);renderStudents(result.students||[]);say(T("విద్యార్థులు: ","Students: ")+(result.students||[]).length);}
+  catch(error){list.innerHTML='<div class="class-admin-error">'+esc(error.message||T("వివరాలు లోడ్ కాలేదు.","Could not load records."))+'</div>';say(T("డేటా లోడ్ కాలేదు.","Could not load data."),true);}
+  panel.scrollIntoView({behavior:"smooth",block:"start"});
+ };
+ main.querySelectorAll("[data-class-open]").forEach(button=>button.onclick=()=>loadClass(button.dataset.classOpen));
+ form.onsubmit=async event=>{
+  event.preventDefault();if(!activeClassId)return;
+  const button=form.querySelector("#createStudentButton");button.disabled=true;button.textContent=T("సృష్టిస్తోంది…","Creating…");
+  const payload={name:form.elements.name.value.trim(),gender:form.elements.gender.value,dob:form.elements.dob.value.trim(),guardianName:form.elements.guardianName.value.trim(),relationship:form.elements.relationship.value,parentMobile:form.elements.parentMobile.value.trim(),section:form.elements.section.value.trim()};
+  try{
+   const result=await createClassStudent(activeClassId,payload);
+   say(T("విద్యార్థి నమోదు పూర్తయింది. Secret Codeను Head Master మాత్రమే చూడగలరు.","Student created. Only the Head Master can view the Secret Code."));
+   form.reset();await loadClass(activeClassId);
+   const code=result.student?.secretCode;if(code)toast(T("కొత్త Permanent Secret Code: ","New Permanent Secret Code: ")+code);
+  }catch(error){say(error.message||T("విద్యార్థిని నమోదు చేయలేకపోయాం.","Could not create student."),true);}
+  finally{button.disabled=false;button.textContent="+ "+T("విద్యార్థిని చేర్చండి","Add Student");}
+ };
 }
 function teacherManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
@@ -280,6 +336,7 @@ function modulePage(){
  setupPosterStudio();
  alumniSponsorSection.bindCommunityModuleActions();
  if(teacherManagement)bindTeacherManagement();
+ if(classManagement)bindClassManagement();
 }
  return { modulePage };
 }
