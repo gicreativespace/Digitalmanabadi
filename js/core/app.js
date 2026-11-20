@@ -58,7 +58,7 @@ function translateValue(value){
  return out;
 }
 function applyTranslations(){
- const walk=node=>{for(const child of [...node.childNodes]){if(child.nodeType===3)child.nodeValue=translateValue(child.nodeValue);else if(child.nodeType===1){if(child.matches?.(".role-copy"))continue;for(const attr of ["placeholder","title","aria-label"])if(child.hasAttribute(attr))child.setAttribute(attr,translateValue(child.getAttribute(attr)));walk(child)}}};
+ const walk=node=>{for(const child of [...node.childNodes]){if(child.nodeType===3)child.nodeValue=translateValue(child.nodeValue);else if(child.nodeType===1){if(child.matches?.(".role-copy,[data-translation-managed=\"true\"]"))continue;for(const attr of ["placeholder","title","aria-label"])if(child.hasAttribute(attr))child.setAttribute(attr,translateValue(child.getAttribute(attr)));walk(child)}}};
  const appRoot=document.querySelector("#app");
  const footer=appRoot?.querySelector("#appFooter");
  if(footer) footer.querySelectorAll(".footer-link").forEach(el=>{el.dataset.keepEnglish=el.textContent});
