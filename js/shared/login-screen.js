@@ -1,4 +1,4 @@
-import { getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
+import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
  async function renderHmPinGate(){
@@ -20,8 +20,13 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      if(pin!==confirm){show(T("రెండు PINలు సరిపోలలేదు.","The PINs do not match."),"warning");button.disabled=false;return;}
      await saveLocalHeadMasterPin(state.headMasterProfile.uid,pin);
     }else{
-     const valid=await verifyLocalHeadMasterPin(state.headMasterProfile?.uid,pin);
-     if(!valid){show(T("PIN సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Incorrect PIN. Please try again."));button.disabled=false;return;}
+     const activeProfile=await getCurrentHeadMasterProfile();
+     if(!activeProfile||activeProfile.uid!==state.headMasterProfile?.uid){
+      state.authenticated=false;state.hmPinMode=null;state.headMasterProfile=null;
+      localStorage.removeItem("gim_authenticated");state.view="login";render();return;
+     }
+     const valid=await verifyLocalHeadMasterPin(activeProfile.uid,pin);
+     if(!valid){show(T("PIN సరిపోలలేదు. మళ్లీ ప్రయత్నించండి.","Incorrect PIN. Please try again."));button.disabled=false;return}
     }
     state.hmPinMode=null;state.hmPinReset=false;state.authenticated=true;
     localStorage.setItem("gim_role","hm");localStorage.setItem("gim_authenticated","true");
