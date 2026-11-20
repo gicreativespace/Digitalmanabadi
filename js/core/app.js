@@ -1,4 +1,7 @@
 import { APP_CONFIG } from "../../config/school-config.js";
+import { auth } from "../firebase-client.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord } from "../sections/head-master/pin-auth.js";
 import { showTributeSplash } from "../shared/tribute-splash.js";
 import { translationPairs } from "../shared/translations.js";
 import { roleNames, roleMeta, modules } from "../shared/role-config.js";
@@ -171,7 +174,7 @@ const alumniSponsorSection = createAlumniSponsorSection({main,state,T,render,toa
 const parentSection = createParentSection({main,state,render,toast,escapeHtml});
 const { modulePage } = createModulePage({main,state,T,APP_CONFIG,escapeHtml,render,alumniSponsorSection});
 const loginScreen = createLoginScreen({
- main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,
+ main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
 });
 const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,escapeHtml,renderSuperAdminDashboard,signOutPortal});
@@ -180,4 +183,35 @@ const footerController = createFooterController({state,T,render});
 const navigationController = createNavigationController({state,render});
 
 setupFooter();setupBottomNavigation();updateBottomNavigation();
+
+// Restore only a valid Firebase Head Master session, then require the device PIN.
+let initialAuthRestoreHandled=false;
+onAuthStateChanged(auth,async user=>{
+ if(initialAuthRestoreHandled)return;
+ initialAuthRestoreHandled=true;
+ if(state.role!=="hm"||state.view!=="login")return;
+ if(!user){
+  state.authenticated=false;
+  localStorage.removeItem("gim_authenticated");
+  return;
+ }
+ try{
+  const profile=await getCurrentHeadMasterProfile();
+  if(!profile){
+   state.authenticated=false;
+   localStorage.removeItem("gim_authenticated");
+   return;
+  }
+  state.headMasterProfile=profile;
+  state.authenticated=false;
+  localStorage.removeItem("gim_authenticated");
+  if(getLocalHeadMasterPinRecord(profile.uid))state.hmPinMode="unlock";
+  else state.hmPinMode=null;
+  state.view="login";
+  render();
+ }catch(error){
+  state.authenticated=false;
+  localStorage.removeItem("gim_authenticated");
+ }
+});
 showTributeSplash(render, 2000);
