@@ -1,7 +1,7 @@
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord, saveLocalHeadMasterPin, verifyLocalHeadMasterPin } from "../sections/head-master/pin-auth.js";
 import { auth } from "../firebase-client.js";
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getTeacherProfile, getTeacherLoginId } from "../sections/teacher/teacher-service.js";
+import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
@@ -86,15 +86,17 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    state.teacherLoginStep="id";
-   flow.innerHTML='<h3>'+T("Teacher Login","Teacher Login")+'</h3>'+inputField("teacherIdInput",T("Teacher ID","Teacher ID"),"text",'inputmode="numeric" maxlength="4" autocomplete="username" placeholder="ఉదా: 2601"')+inputField("teacherPassword",T("Password","Password"),"password",'autocomplete="current-password" placeholder="Enter your temporary password"')+'<button type="button" class="btn full role-login-submit" id="teacherSignIn">'+T("ప్రవేశించండి","Sign In")+'</button>';
+   flow.innerHTML='<h3>'+T("Teacher Login","Teacher Login")+'</h3>'+inputField("teacherIdInput",T("Login ID","Login ID"),"email",'inputmode="email" maxlength="40" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="2601@dagguluruschool.in"')+inputField("teacherPassword",T("Password","Password"),"password",'inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="current-password" placeholder="6-digit password"')+'<button type="button" class="btn full role-login-submit" id="teacherSignIn">'+T("ప్రవేశించండి","Sign In")+'</button>';
+   const passwordInput=main.querySelector("#teacherPassword");
+   passwordInput.addEventListener("input",()=>{passwordInput.value=passwordInput.value.replace(/\D/g,"").slice(0,6);});
    main.querySelector("#teacherSignIn").onclick=async()=>{
-    const teacherId=main.querySelector("#teacherIdInput").value.trim(),password=main.querySelector("#teacherPassword").value,button=main.querySelector("#teacherSignIn");
-    if(!/^\d{4}$/.test(teacherId)||!password){show(T("Teacher ID మరియు Password నమోదు చేయండి.","Enter your Teacher ID and Password."),"warning");return;}
+    const loginId=main.querySelector("#teacherIdInput").value.trim().toLowerCase(),password=main.querySelector("#teacherPassword").value,button=main.querySelector("#teacherSignIn");
+    if(!/^\d{4}@dagguluruschool\.in$/.test(loginId)||!/^\d{6}$/.test(password)){show(T("సరైన Login ID మరియు 6 అంకెల Password నమోదు చేయండి.","Enter a valid Login ID and a 6-digit password."),"warning");return;}
     buttonBusy(button,T("ప్రవేశిస్తోంది…","Signing in…"));
     state.teacherEnrollmentInProgress=true;
     try{
      await setPersistence(auth,browserLocalPersistence);
-     await signInWithEmailAndPassword(auth,getTeacherLoginId(teacherId),password);
+     await signInWithEmailAndPassword(auth,loginId,password);
      state.teacherProfile=await getTeacherProfile();
      state.teacherEnrollmentInProgress=false;
      if(getLocalTeacherPinRecord(auth.currentUser.uid)){
@@ -105,10 +107,10 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
      renderStage();
     }catch(error){
      state.teacherEnrollmentInProgress=false;
-     if(auth.currentUser?.email===getTeacherLoginId(teacherId)){try{await signOut(auth);}catch{}}
+     if(auth.currentUser?.email===loginId){try{await signOut(auth);}catch{}}
      const code=error?.code||"";
      const message=code.includes("invalid-credential")||code.includes("user-not-found")||code.includes("wrong-password")
-      ?T("Teacher ID లేదా Password సరిపోలలేదు.","Teacher ID or password is incorrect.")
+      ?T("Login ID లేదా Password సరిపోలలేదు.","Login ID or password is incorrect.")
       :code.includes("user-disabled")||code.includes("permission-denied")
        ?T("ఈ Teacher ఖాతా క్రియాశీలంగా లేదు. Head Master‌ను సంప్రదించండి.","This teacher account is inactive. Please contact the Head Master.")
        :error?.message||T("Login పూర్తి కాలేదు. మళ్లీ ప్రయత్నించండి.","Unable to sign in. Please try again.");
