@@ -167,6 +167,9 @@ export async function createTeacherLogin(teacherId) {
   const loginId = getTeacherLoginId(teacherId);
   const secretCode = /^\d{6}$/.test(String(teacher.secretCode || "")) ? String(teacher.secretCode) : createTeacherSecretCode(teacher.dob);
   const password = secretCode;
+  if (teacher.secretCode !== secretCode) {
+    await updateDoc(teacherRef, { secretCode, updatedAt: serverTimestamp() });
+  }
   const secondaryApp = initializeApp(auth.app.options, "teacher-provision-" + teacherId + "-" + crypto.randomUUID());
   const secondaryAuth = getAuth(secondaryApp);
   let createdUser = null;
