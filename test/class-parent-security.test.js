@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classNumberFromId, validateDob } from "../api/_lib/ids.js";
-import { generateSecretCode, encryptSecretCode, decryptSecretCode, hmac } from "../api/_lib/admin.js";
+import { classNumberFromId, validateDob } from "../lib/backend/ids.js";
+import { generateSecretCode, encryptSecretCode, decryptSecretCode, hmac } from "../lib/backend/admin.js";
 
 process.env.STUDENT_SECRET_ENCRYPTION_KEY = "a".repeat(64);
 process.env.PARENT_SECRET_PEPPER = "test-pepper-value-that-is-at-least-32-characters-long";
