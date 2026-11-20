@@ -12,6 +12,7 @@ export const APP_CONFIG = {
   academicYear: "",
   schoolLogo: "assets/branding/digital-mana-badi-logo.png",
   schoolImage: "assets/branding/school/school-building.jpg",
+  backendApiBaseUrl: "",
   demoMode: true
 };
 
