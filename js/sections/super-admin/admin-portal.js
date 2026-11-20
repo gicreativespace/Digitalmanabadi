@@ -20,99 +20,124 @@ export function renderSuperAdminLogin(main,{onSuccess,onBack,onPasswordReset,T=(
  main.querySelector("#superForgotPassword").onclick=async()=>{clear();const email=main.querySelector("#superEmail").value.trim();if(!email){show(T("ముందుగా మీ నమోదిత ఇమెయిల్ నమోదు చేయండి.","Enter your registered email first."),"warning");main.querySelector("#superEmail").focus();return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){show(T("సరైన ఇమెయిల్ నమోదు చేయండి.","Please enter a valid email address."),"warning");return}const b=main.querySelector("#superForgotPassword");b.disabled=true;b.textContent=T("పంపిస్తోంది…","Sending…");try{await onPasswordReset(email);show(T("ఖాతా నమోదై ఉంటే, Password Reset సూచనలు పంపబడతాయి.","If an account exists, password recovery instructions have been sent."),"success")}catch(e){show(T("అభ్యర్థన పూర్తి కాలేదు. మళ్లీ ప్రయత్నించండి.","Unable to complete the request. Please try again."))}finally{b.disabled=false;b.textContent=T("పాస్‌వర్డ్ మర్చిపోయారా?","Forgot Password?")}};
 }
 
-export async function renderSuperAdminDashboard(main,admin,{onLogout,onRefresh}){
- main.innerHTML =
- '<div class="admin-shell">'+
-  '<section class="admin-hero"><div class="admin-hero-copy"><span class="admin-kicker">GI SUPER ADMIN</span><h1>Welcome to your Admin Dashboard</h1><p>Signed in as <strong>'+safe(admin?.email)+'</strong></p></div><button class="btn secondary admin-logout" id="adminLogout">↪ Logout</button></section>'+
-  '<nav class="admin-quick-nav" aria-label="Dashboard sections"><a href="#adminOverview">Overview</a><a href="#adminSchoolSection">Create School</a><a href="#adminHeadMasterSection">Head Master</a><a href="#adminActivitySection">Activity</a></nav>'+
-  '<section class="admin-overview" id="adminOverview"><div class="admin-section-title"><div><span class="admin-step">OVERVIEW</span><h2>Platform Summary</h2></div><button class="btn secondary admin-refresh" id="adminRefresh">↻ Refresh</button></div><div class="admin-card-grid" id="adminStats"><div class="admin-stat"><strong>—</strong><span>Schools</span></div><div class="admin-stat"><strong>—</strong><span>Head Master Accounts</span></div><div class="admin-stat"><strong>—</strong><span>Active Head Masters</span></div></div></section>'+
-  '<section class="admin-section" id="adminSchoolSection"><div class="admin-section-title"><div><span class="admin-step">01 · SCHOOL SETUP</span><h2>Create a School</h2><p>Add the official school details to the platform.</p></div><span class="admin-section-icon" aria-hidden="true">🏫</span></div><div class="admin-form-grid">'+
-   '<div class="field"><label for="schoolName">School Name <span class="required-mark">*</span></label><input id="schoolName" autocomplete="organization" placeholder="Enter official school name"></div>'+
-   '<div class="field"><label for="schoolCode">School Code <span class="required-mark">*</span></label><input id="schoolCode" maxlength="12" autocapitalize="characters" placeholder="Example: MPMP"></div>'+
-   '<div class="field"><label for="schoolAddress">School Address <span class="required-mark">*</span></label><input id="schoolAddress" placeholder="Village, Mandal, District"></div>'+
-   '<div class="field"><label for="academicYear">Academic Year <span class="required-mark">*</span></label><input id="academicYear" placeholder="Example: 2026–2027"></div>'+
-  '</div><div class="admin-actions"><button class="btn admin-primary-action" id="createSchool">＋ Create School</button></div><p class="admin-inline-note"><strong>Note:</strong> School Code is the permanent unique identity of the school. Please check it carefully before saving.</p></section>'+
-  '<section class="admin-section" id="adminHeadMasterSection"><div class="admin-section-title"><div><span class="admin-step">02 · ACCOUNT SETUP</span><h2>Add a Head Master</h2><p>Connect an existing Firebase Authentication account to a school.</p></div><span class="admin-section-icon" aria-hidden="true">👤</span></div>'+
-   '<div class="admin-inline-note admin-instructions"><strong>Before you begin:</strong> On the Firebase Spark Free plan, create the Head Master account first in Firebase Console → Authentication → Users. Then enter its exact UID below.</div>'+
-   '<div class="admin-form-grid">'+
-    '<div class="field"><label for="hmName">Head Master Full Name <span class="required-mark">*</span></label><input id="hmName" autocomplete="name" placeholder="Enter full name"></div>'+
-    '<div class="field"><label for="hmEmail">Official School Email <span class="required-mark">*</span></label><input id="hmEmail" type="email" autocomplete="email" placeholder="Enter registered email"></div>'+
-    '<div class="field"><label for="hmUid">Firebase Authentication UID <span class="required-mark">*</span></label><input id="hmUid" autocapitalize="off" placeholder="Paste the exact Firebase UID"></div>'+
-    '<div class="field"><label for="hmSchool">Assign School <span class="required-mark">*</span></label><select id="hmSchool"><option value="">Choose a school</option></select></div>'+
-   '</div><div class="admin-actions"><button class="btn admin-primary-action" id="addHeadMaster">＋ Save Head Master Account</button></div>'+
-   '<p class="admin-inline-note"><strong>Access control:</strong> Enable / Disable changes this app’s protected school access through Firestore Rules. It does not disable the Firebase Authentication identity itself.</p></section>'+
-  '<section class="admin-section" id="adminAccountsSection"><div class="admin-section-title"><div><span class="admin-step">03 · ACCOUNT MANAGEMENT</span><h2>Head Master Accounts</h2><p>Search accounts and manage school access.</p></div><span class="admin-section-icon" aria-hidden="true">🔐</span></div>'+
-   '<div class="field admin-search-field"><label for="hmSearch">Search by name, email, or school</label><input id="hmSearch" type="search" placeholder="Type to find a Head Master…"></div>'+
-   '<div class="admin-record-list" id="hmRows" aria-live="polite"><div class="admin-empty-state">Loading Head Master accounts…</div></div></section>'+
-  '<section class="admin-section" id="adminSchoolsSection"><div class="admin-section-title"><div><span class="admin-step">04 · SCHOOL DIRECTORY</span><h2>Registered Schools</h2><p>All schools created on this platform.</p></div><span class="admin-section-icon" aria-hidden="true">📚</span></div>'+
-   '<div class="admin-record-list" id="schoolRows"><div class="admin-empty-state">Loading schools…</div></div></section>'+
-  '<section class="admin-section" id="adminActivitySection"><div class="admin-section-title"><div><span class="admin-step">05 · MONITORING</span><h2>Recent Admin Activity</h2><p>A record of recent school and account changes.</p></div><span class="admin-section-icon" aria-hidden="true">🕘</span></div><div class="admin-record-list admin-activity-list" id="adminAuditRows"><div class="admin-empty-state">Loading activity…</div></div></section>'+
- '</div>';
- main.querySelector("#adminLogout").onclick=onLogout;
- main.querySelector("#adminRefresh").onclick=onRefresh;
- const createButton=main.querySelector("#createSchool"),addButton=main.querySelector("#addHeadMaster");
- const setBusy=(button,busy,label)=>{button.disabled=busy;button.textContent=busy?"Please wait…":label;};
- let schools=[],hms=[];
- const renderSchools=()=>{
-  const box=main.querySelector("#schoolRows");
-  box.innerHTML=schools.length?schools.map(s=>'<article class="admin-record-card"><div class="admin-record-main"><strong>'+safe(s.schoolName)+'</strong><span class="admin-record-sub">'+safe(s.address||"Address not added")+'</span><div class="admin-record-meta"><span>Code: <b>'+safe(s.schoolCode||s.id)+'</b></span><span>Academic Year: <b>'+safe(s.academicYear||"—")+'</b></span></div></div><span class="admin-status '+(s.status==="active"?"active":"disabled")+'">'+safe(s.status||"active")+'</span></article>').join(""):'<div class="admin-empty-state">No schools created yet. Use “Create a School” above to get started.</div>';
-  const select=main.querySelector("#hmSchool"),selected=select.value;
-  select.innerHTML='<option value="">Choose a school</option>'+schools.map(s=>'<option value="'+safe(s.id)+'">'+safe(s.schoolName)+' · '+safe(s.schoolCode||s.id)+'</option>').join("");
-  if(schools.some(s=>s.id===selected))select.value=selected;
- };
- const renderHeadMasters=()=>{
-  const box=main.querySelector("#hmRows"),term=main.querySelector("#hmSearch").value.trim().toLowerCase();
-  const filtered=hms.filter(h=>[h.name,h.email,h.schoolName].some(v=>String(v||"").toLowerCase().includes(term)));
-  box.innerHTML=filtered.length?filtered.map(h=>'<article class="admin-record-card admin-hm-card"><div class="admin-record-main"><strong>'+safe(h.name||"Head Master")+'</strong><span class="admin-record-sub">'+safe(h.email)+'</span><div class="admin-record-meta"><span>School: <b>'+safe(h.schoolName||h.schoolId||"Not assigned")+'</b></span></div></div><div class="admin-record-controls"><span class="admin-status '+(h.status==="active"?"active":"disabled")+'">'+(h.status==="active"?"Active":"Disabled")+'</span><button type="button" class="btn '+(h.status==="active"?"danger":"secondary")+' admin-toggle" data-hm-toggle="'+safe(h.id)+'">'+(h.status==="active"?"Disable Access":"Enable Access")+'</button></div></article>').join(""):(term?'<div class="admin-empty-state">No matching Head Master accounts found.</div>':'<div class="admin-empty-state">No Head Master accounts added yet. Create a school first, then add its Head Master.</div>');
-  box.querySelectorAll("[data-hm-toggle]").forEach(button=>button.onclick=async()=>{
-   const h=hms.find(item=>item.id===button.dataset.hmToggle),next=h.status==="active"?"disabled":"active";
-   if(!confirm((next==="disabled"?"Disable":"Enable")+" this Head Master’s Digital Mana Badi school access?"))return;
-   button.disabled=true;button.textContent="Updating…";
-   try{
-    await updateDoc(doc(db,"headMasters",h.id),{status:next,updatedAt:serverTimestamp(),updatedBy:admin.uid});
-    await addDoc(collection(db,"adminAudit"),{action:next==="disabled"?"HEAD_MASTER_DISABLED":"HEAD_MASTER_ENABLED",headMasterUid:h.id,email:h.email,schoolId:h.schoolId,actorUid:admin.uid,createdAt:serverTimestamp()});
-    h.status=next;renderHeadMasters();
-    main.querySelector("#adminStats").innerHTML='<div class="admin-stat"><strong>'+schools.length+'</strong><span>Schools</span></div><div class="admin-stat"><strong>'+hms.length+'</strong><span>Head Master Accounts</span></div><div class="admin-stat"><strong>'+hms.filter(x=>x.status==="active").length+'</strong><span>Active Head Masters</span></div>';
-    alert("Head Master app access updated.");
-   }catch(e){alert(errMsg(e));button.disabled=false;button.textContent=next==="disabled"?"Disable Access":"Enable Access";}
-  });
- };
- try{
-  const results=await Promise.all([getDocs(collection(db,"schools")),getDocs(collection(db,"headMasters")),getDocs(query(collection(db,"adminAudit"),orderBy("createdAt","desc"),limit(10)))]);
-  schools=results[0].docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.schoolName||"").localeCompare(b.schoolName||""));
-  hms=results[1].docs.map(d=>({id:d.id,...d.data()}));
-  renderSchools();renderHeadMasters();
-  main.querySelector("#adminStats").innerHTML='<div class="admin-stat"><strong>'+schools.length+'</strong><span>Schools</span></div><div class="admin-stat"><strong>'+hms.length+'</strong><span>Head Master Accounts</span></div><div class="admin-stat"><strong>'+hms.filter(h=>h.status==="active").length+'</strong><span>Active Head Masters</span></div>';
-  const audit=results[2].docs;
-  main.querySelector("#adminAuditRows").innerHTML=audit.length?audit.map(d=>{const item=d.data();return '<article class="admin-activity-item"><span class="admin-activity-dot" aria-hidden="true">✓</span><div><strong>'+safe((item.action||"").replaceAll("_"," "))+'</strong><span>'+safe(item.email||item.schoolName||item.schoolId||"Platform update")+'</span></div></article>';}).join(""):'<div class="admin-empty-state">No admin activity recorded yet.</div>';
- }catch(e){
-  const notice='<div class="admin-empty-state admin-load-error">Could not load dashboard data. Please confirm that the latest Firestore Rules have been published, then refresh.</div>';
-  ["hmRows","schoolRows","adminAuditRows"].forEach(id=>{const el=main.querySelector("#"+id);if(el)el.innerHTML=notice;});
-  main.querySelector("#adminStats").innerHTML='<div class="admin-stat admin-stat-error"><strong>!</strong><span>Data unavailable</span></div>';
+let superAdminIdleTimer = null;
+let superAdminActivityHandler = null;
+let superAdminLastActivity = 0;
+let superAdminLogoutStarted = false;
+
+function stopSuperAdminIdleMonitor(){
+ if(superAdminIdleTimer)clearTimeout(superAdminIdleTimer);
+ superAdminIdleTimer=null;
+ if(superAdminActivityHandler){
+  ["pointerdown","keydown","touchstart","scroll","mousemove"].forEach(type=>document.removeEventListener(type,superAdminActivityHandler,{passive:true}));
+  document.removeEventListener("visibilitychange",superAdminActivityHandler);
  }
- main.querySelector("#hmSearch").addEventListener("input",renderHeadMasters);
- main.querySelector("#createSchool").onclick=async()=>{
-  setBusy(createButton,true,"＋ Create School");
-  try{
-   const name=main.querySelector("#schoolName").value.trim(),code=main.querySelector("#schoolCode").value.trim().toUpperCase().replace(/[^A-Z0-9]/g,""),address=main.querySelector("#schoolAddress").value.trim(),year=main.querySelector("#academicYear").value.trim();
-   if(!name||!code||!address||!year)throw Error("Please complete all four required school fields.");
-   const ref=doc(db,"schools",code);if((await getDoc(ref)).exists())throw Error("This School Code is already in use. Please choose another code.");
-   await setDoc(ref,{schoolName:name,schoolCode:code,address,academicYear:year,status:"active",createdAt:serverTimestamp(),createdBy:admin.uid});
-   await addDoc(collection(db,"adminAudit"),{action:"SCHOOL_CREATED",schoolId:code,schoolName:name,actorUid:admin.uid,createdAt:serverTimestamp()});
-   alert("School created successfully.");onRefresh();
-  }catch(e){alert(errMsg(e));setBusy(createButton,false,"＋ Create School");}
+ superAdminActivityHandler=null;
+}
+
+export async function renderSuperAdminDashboard(main,admin,{onLogout}){
+ stopSuperAdminIdleMonitor();
+ superAdminLogoutStarted=false;
+ const lang=localStorage.getItem("gim_lang")==="te"?"te":"en";
+ const T=(te,en)=>lang==="te"?te:en;
+ const idleMinutes=15;
+ const stamp=()=>Date.now();
+ const beginLogout=async()=>{
+  if(superAdminLogoutStarted)return;
+  superAdminLogoutStarted=true;
+  stopSuperAdminIdleMonitor();
+  await onLogout();
  };
- main.querySelector("#addHeadMaster").onclick=async()=>{
-  setBusy(addButton,true,"＋ Save Head Master Account");
-  try{
-   const name=main.querySelector("#hmName").value.trim(),email=main.querySelector("#hmEmail").value.trim().toLowerCase(),uid=main.querySelector("#hmUid").value.trim(),schoolId=main.querySelector("#hmSchool").value;
-   if(!name||!email||!uid||!schoolId)throw Error("Please complete all four required Head Master fields.");
-   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error("Please enter a valid official email address.");
-   if((await getDoc(doc(db,"headMasters",uid))).exists())throw Error("This Firebase UID is already assigned to a Head Master.");
-   const school=schools.find(s=>s.id===schoolId);if(!school)throw Error("Please select a valid school.");
-   await setDoc(doc(db,"headMasters",uid),{uid,email,name,role:"HEAD_MASTER",schoolId,schoolName:school.schoolName,status:"active",createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:admin.uid});
-   await addDoc(collection(db,"adminAudit"),{action:"HEAD_MASTER_CREATED",headMasterUid:uid,email,schoolId,actorUid:admin.uid,createdAt:serverTimestamp()});
-   alert("Head Master profile linked successfully. The Firebase Authentication account must already exist.");onRefresh();
-  }catch(e){alert(errMsg(e));setBusy(addButton,false,"＋ Save Head Master Account");}
+ const armIdleTimer=()=>{
+  if(superAdminIdleTimer)clearTimeout(superAdminIdleTimer);
+  const remaining=Math.max(0,idleMinutes*60*1000-(stamp()-superAdminLastActivity));
+  superAdminIdleTimer=setTimeout(()=>{if(stamp()-superAdminLastActivity>=idleMinutes*60*1000)beginLogout();else armIdleTimer();},remaining);
  };
+ superAdminLastActivity=stamp();
+ superAdminActivityHandler=()=>{
+  if(superAdminLogoutStarted)return;
+  if(document.visibilityState==="visible")superAdminLastActivity=stamp();
+  armIdleTimer();
+ };
+ ["pointerdown","keydown","touchstart","scroll","mousemove"].forEach(type=>document.addEventListener(type,superAdminActivityHandler,{passive:true}));
+ document.addEventListener("visibilitychange",superAdminActivityHandler);
+ armIdleTimer();
+
+ main.innerHTML=
+ '<style>'+
+ '.gi-admin{--ga-forest:#123d32;--ga-gold:#d6b875;--ga-line:var(--border);--ga-card:var(--surface);color:var(--text);display:grid;gap:16px}'+
+ '.gi-admin *{box-sizing:border-box}'+
+ '.gi-admin-hero{background:linear-gradient(130deg,#102f29,#1b5141);color:#fff;border:1px solid #285a49;border-radius:24px;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 16px 36px rgba(16,47,41,.16)}'+
+ '.gi-admin-brand{display:flex;align-items:center;gap:12px;min-width:0}'+
+ '.gi-admin-mark{width:48px;height:48px;flex:none;border-radius:15px;background:var(--ga-gold);color:#102f29;display:grid;place-items:center;font-size:25px;font-weight:900}'+
+ '.gi-admin-kicker{font-size:10px;letter-spacing:.16em;font-weight:800;color:#e5d19c}'+
+ '.gi-admin-hero h1{font-size:clamp(21px,4vw,29px);line-height:1.2;margin:4px 0 3px;color:#fff}'+
+ '.gi-admin-hero p{font-size:12px;color:#d2e0d9;margin:0;overflow-wrap:anywhere}'+
+ '.gi-admin-logout{flex:none;min-height:42px;border:1px solid #ffffff55!important;background:#ffffff14!important;color:#fff!important;border-radius:12px;padding:9px 13px;font-size:13px;font-weight:750}'+
+ '.gi-admin-logout:hover{background:#ffffff24!important}'+
+ '.gi-admin-overview-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 1px 0}'+
+ '.gi-admin-overview-title h2{font-size:19px;margin:0;color:var(--text)}'+
+ '.gi-admin-overview-title span{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:800}'+
+ '.gi-admin-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}'+
+ '.gi-admin-metric{min-width:0;padding:16px;border:1px solid var(--ga-line);border-radius:17px;background:var(--ga-card);box-shadow:0 7px 20px rgba(22,58,39,.035)}'+
+ '.gi-admin-metric-top{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:700}'+
+ '.gi-admin-metric-icon{width:34px;height:34px;border-radius:11px;background:var(--surface2);display:grid;place-items:center;font-size:17px;color:var(--green)}'+
+ '.gi-admin-metric-value{display:block;margin:11px 0 2px;font-size:25px;font-weight:850;letter-spacing:-.03em;color:var(--text)}'+
+ '.gi-admin-metric-note{font-size:11px;line-height:1.45;color:var(--muted)}'+
+ '.gi-admin-panel{border:1px solid var(--ga-line);border-radius:19px;background:var(--ga-card);padding:17px;box-shadow:0 7px 20px rgba(22,58,39,.035)}'+
+ '.gi-admin-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}'+
+ '.gi-admin-panel-title{display:flex;align-items:center;gap:10px;min-width:0}'+
+ '.gi-admin-panel-icon{width:38px;height:38px;flex:none;border-radius:12px;background:var(--surface2);display:grid;place-items:center;font-size:19px;color:var(--green)}'+
+ '.gi-admin-panel h2{font-size:16px;margin:0;color:var(--text)}'+
+ '.gi-admin-panel p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}'+
+ '.gi-admin-status{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;background:var(--surface2);color:var(--muted);font-size:10px;font-weight:800;white-space:nowrap}'+
+ '.gi-admin-status:before{content:"";width:7px;height:7px;border-radius:50%;background:#b58b42}'+
+ '.gi-admin-action-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--ga-line)}'+
+ '.gi-admin-disabled{min-height:40px;border:1px solid var(--ga-line);border-radius:11px;padding:8px 12px;background:var(--surface2);color:var(--muted);font-size:12px;font-weight:750;opacity:.8;cursor:not-allowed}'+
+ '.gi-admin-hint{margin-top:12px!important;padding:10px 11px;border-radius:11px;background:var(--surface2);font-size:11px!important}'+
+ '.gi-admin-audit{display:grid;gap:0;margin-top:5px}'+
+ '.gi-admin-audit-item{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-top:1px solid var(--ga-line)}'+
+ '.gi-admin-audit-item:first-child{border-top:0}'+
+ '.gi-admin-audit-dot{width:28px;height:28px;flex:none;border-radius:9px;background:var(--surface2);display:grid;place-items:center;color:var(--green);font-size:13px}'+
+ '.gi-admin-audit-copy{min-width:0;flex:1}'+
+ '.gi-admin-audit-copy strong{display:block;font-size:12px;line-height:1.4;color:var(--text);text-transform:capitalize}'+
+ '.gi-admin-audit-copy span{display:block;margin-top:3px;font-size:11px;color:var(--muted);overflow-wrap:anywhere}'+
+ '.gi-admin-empty{padding:13px;border-radius:11px;background:var(--surface2);color:var(--muted);font-size:12px;line-height:1.5}'+
+ '.gi-admin-session{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;padding:0 3px 3px}'+
+ '.gi-admin-session b{color:var(--text)}'+
+ '@media(max-width:430px){.gi-admin-hero{padding:17px;border-radius:19px;align-items:flex-start}.gi-admin-mark{width:42px;height:42px}.gi-admin-logout{padding:8px 10px;font-size:12px}.gi-admin-metric{padding:13px}.gi-admin-panel{padding:14px}.gi-admin-metric-value{font-size:22px}}'+
+ '</style>'+
+ '<div class="gi-admin">'+
+  '<header class="gi-admin-hero">'+
+   '<div class="gi-admin-brand"><div class="gi-admin-mark" aria-hidden="true">GI</div><div><div class="gi-admin-kicker">DIGITAL MANA BADI · PLATFORM CONTROL</div><h1>GI SUPER ADMIN</h1><p>'+safe(admin?.email)+'</p></div></div>'+
+   '<button type="button" class="gi-admin-logout" id="giAdminLogout">↪ '+T("Logout","Logout")+'</button>'+
+  '</header>'+
+  '<div class="gi-admin-overview-title"><h2>'+T("ప్లాట్‌ఫామ్ అవలోకనం","Platform Overview")+'</h2><span>'+T("సిస్టమ్ స్థితి","SYSTEM STATUS")+'</span></div>'+
+  '<section class="gi-admin-metrics" aria-label="Platform metrics">'+
+   '<article class="gi-admin-metric"><div class="gi-admin-metric-top"><span>'+T("స్టోరేజ్ వినియోగం","Storage Usage")+'</span><span class="gi-admin-metric-icon">▤</span></div><strong class="gi-admin-metric-value">—</strong><div class="gi-admin-metric-note">'+T("విశ్వసనీయ Storage metrics ఇంకా అనుసంధానం కాలేదు","Storage metrics are not connected yet")+'</div></article>'+
+   '<article class="gi-admin-metric"><div class="gi-admin-metric-top"><span>Firebase Usage</span><span class="gi-admin-metric-icon">◫</span></div><strong class="gi-admin-metric-value">—</strong><div class="gi-admin-metric-note">Firestore Reads / Writes · '+T("Backend అనుసంధానం అవసరం","Backend integration required")+'</div></article>'+
+  '</section>'+
+  '<section class="gi-admin-panel"><div class="gi-admin-panel-head"><div class="gi-admin-panel-title"><span class="gi-admin-panel-icon">⏻</span><h2>'+T("Global App Control","Global App Control")+'</h2></div><span class="gi-admin-status">'+T("Backend అవసరం","NOT CONNECTED")+'</span></div><p>'+T("Digital Mana Badi మొత్తం ప్లాట్‌ఫామ్ యాక్సెస్‌ను ఇక్కడి నుంచి నియంత్రించవచ్చు. ఈ నియంత్రణను సురక్షితంగా అమలు చేయడానికి కేంద్ర Backend ఇంకా సిద్ధం కాలేదు.","Control platform-wide Digital Mana Badi access here. The trusted central backend required to enforce this control is not configured yet.")+'</p><div class="gi-admin-action-row"><div><strong style="font-size:12px">'+T("Global Enable / Disable","Global Enable / Disable")+'</strong><p>'+T("Backend సిద్ధమైన తర్వాత మాత్రమే అందుబాటులో ఉంటుంది.","Available after secure backend setup.")+'</p></div><button type="button" class="gi-admin-disabled" disabled>'+T("Control Unavailable","Not Available")+'</button></div><p class="gi-admin-hint">'+T("భద్రత కోసం, పనిచేయని లేదా కేవలం Browser‌లో మాత్రమే పనిచేసే Global Switch చూపించము.","For security, a non-enforced browser-only global switch is intentionally not provided.")+'</p></section>'+
+  '<section class="gi-admin-panel"><div class="gi-admin-panel-head"><div class="gi-admin-panel-title"><span class="gi-admin-panel-icon">▥</span><h2>Firebase & Storage Analytics</h2></div></div><p>'+T("వాస్తవ వినియోగ గణాంకాలు అందుబాటులోకి రావడానికి Cloud Monitoring మరియు Storage metrics కోసం విశ్వసనీయ Backend అనుసంధానం అవసరం.","Live usage figures require trusted backend integration with Cloud Monitoring and Storage metrics.")+'</p><div class="gi-admin-action-row"><div><strong style="font-size:12px">Firestore Reads / Writes</strong><p>'+T("ఇంకా అనుసంధానం కాలేదు","Not connected")+'</p></div><span class="gi-admin-status">'+T("పెండింగ్","PENDING")+'</span></div><div class="gi-admin-action-row"><div><strong style="font-size:12px">'+T("Storage Consumption","Storage Consumption")+'</strong><p>'+T("ఇంకా అనుసంధానం కాలేదు","Not connected")+'</p></div><span class="gi-admin-status">'+T("పెండింగ్","PENDING")+'</span></div></section>'+
+  '<section class="gi-admin-panel"><div class="gi-admin-panel-head"><div class="gi-admin-panel-title"><span class="gi-admin-panel-icon">⬡</span><h2>'+T("Security Activity","Security Activity")+'</h2></div><span class="gi-admin-status">'+T("చివరి 8 చర్యలు","RECENT 8")+'</span></div><div class="gi-admin-audit" id="giAdminAudit"><div class="gi-admin-empty">'+T("కార్యకలాపాల చరిత్రను లోడ్ చేస్తోంది…","Loading recent activity…")+'</div></div></section>'+
+  '<div class="gi-admin-session"><span aria-hidden="true">◷</span><span>'+T("నిష్క్రియంగా 15 నిమిషాలు ఉంటే ఆటోమేటిక్ Logout అవుతుంది.","Automatic logout after 15 minutes of inactivity.")+'</span></div>'+
+ '</div>';
+
+ main.querySelector("#giAdminLogout").onclick=beginLogout;
+ try{
+  const result=await getDocs(query(collection(db,"adminAudit"),orderBy("createdAt","desc"),limit(8)));
+  const box=main.querySelector("#giAdminAudit");
+  if(!box)return;
+  const entries=result.docs.map(d=>({id:d.id,...d.data()}));
+  box.innerHTML=entries.length?entries.map(item=>{
+   const action=String(item.action||"Platform activity").replaceAll("_"," ").toLowerCase();
+   const subject=item.email||item.schoolName||item.schoolId||"Platform";
+   let when="";
+   try{if(item.createdAt?.toDate)when=item.createdAt.toDate().toLocaleString(lang==="te"?"te-IN":"en-IN",{dateStyle:"medium",timeStyle:"short"});}catch{}
+   return '<article class="gi-admin-audit-item"><span class="gi-admin-audit-dot" aria-hidden="true">✓</span><div class="gi-admin-audit-copy"><strong>'+safe(action)+'</strong><span>'+safe(subject)+(when?" · "+safe(when):"")+'</span></div></article>';
+  }).join(""):'<div class="gi-admin-empty">'+T("ఇంకా కార్యకలాపాల చరిత్ర లేదు.","No activity has been recorded yet.")+'</div>';
+ }catch(error){
+  const box=main.querySelector("#giAdminAudit");
+  if(box)box.innerHTML='<div class="gi-admin-empty">'+T("భద్రతా చరిత్రను లోడ్ చేయలేకపోయాం. తర్వాత మళ్లీ ప్రయత్నించండి.","Could not load security activity. Please try again later.")+'</div>';
+ }
 }
