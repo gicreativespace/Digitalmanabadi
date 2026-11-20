@@ -14,8 +14,12 @@ export default async function handler(req, res) {
       const now = Date.now();
       const data = snap.exists ? snap.data() : {};
       if (Number(data.lockUntilMs || 0) > now) return { locked: true };
-      const count = Number(data.count || 0) + 1;
-      tx.set(attemptRef, { count, windowStartedAt: data.windowStartedAt || FieldValue.serverTimestamp(), lockUntilMs: count >= 10 ? now + 15 * 60 * 1000 : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      const windowMs = 15 * 60 * 1000;
+      const started = Number(data.windowStartedAtMs || 0);
+      const priorCount = started && now - started < windowMs ? Number(data.count || 0) : 0;
+      const windowStartedAtMs = priorCount ? started : now;
+      const count = priorCount + 1;
+      tx.set(attemptRef, { count, windowStartedAtMs, lockUntilMs: count >= 10 ? now + windowMs : 0, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       return { allowed: count < 10 };
     });
     if (result.locked || !result.allowed) return json(res, 429, { error: "Too many attempts. Please try again later." });
