@@ -9,8 +9,8 @@ function fromDateInputValue(value){const dob=String(value??"").trim();if(/^\d{2}
 function bindDobInputs(root){if(!root)return;root.querySelectorAll(".teacher-dob-control").forEach(control=>{const t=control.querySelector("[data-dob-text]"),p=control.querySelector("[data-dob-picker]");if(!t||!p||control.dataset.bound==="true")return;control.dataset.bound="true";const sync=()=>{const v=t.value.trim();p.value=/^\d{2}\/\d{2}\/\d{4}$/.test(v)?v.slice(6,10)+"-"+v.slice(3,5)+"-"+v.slice(0,2):"";};t.addEventListener("input",sync);p.addEventListener("change",()=>{if(p.value)t.value=p.value.slice(8,10)+"/"+p.value.slice(5,7)+"/"+p.value.slice(0,4);t.setCustomValidity("");});t.addEventListener("blur",()=>{const v=t.value.trim(),m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);let ok=false;if(m){const d=+m[1],mo=+m[2],y=+m[3],dt=new Date(y,mo-1,d);ok=y>=1900&&dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d&&dt<=new Date();}t.setCustomValidity(v&&!ok?"Enter a valid DOB as DD/MM/YYYY.":"");});sync();});}
 function managementLandingMarkup(){
  const cards=[
-  {key:"Teacher Management",icon:"♙",title:"Teacher Management"},
-  {key:"Class Management",icon:"▦",title:"Class Management"}
+  {key:"Teacher Management",icon:"♙",title:"Teacher Management",titleTe:"ఉపాధ్యాయుల నిర్వహణ"},
+  {key:"Class Management",icon:"▦",title:"Class Management",titleTe:"తరగతుల నిర్వహణ"}
  ];
  return '<div class="backline"><button type="button" class="btn secondary" id="managementSelectionBack">← '+T("హెడ్ మాస్టర్ డాష్‌బోర్డ్","Head Master Dashboard")+'</button></div><style>'+
  '.hm-management-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;width:100%;max-width:900px;margin:0 auto}'+
@@ -20,7 +20,7 @@ function managementLandingMarkup(){
  '.hm-management-icon{display:grid;width:64px;height:64px;place-items:center;border-radius:19px;background:#e1f0e3;color:#2d7047;font-size:31px;font-weight:800}'+
  '.hm-management-card h3{margin:0;color:#284d34;font-size:19px;font-weight:850}'+
  '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr;gap:13px}.hm-management-card{min-height:145px;padding:20px}}'+
- '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+card.title+'</h3></button>').join("")+'</div>';
+ '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+T(card.titleTe,card.title)+'</h3></button>').join("")+'</div>';
 }
 function classManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
@@ -34,7 +34,7 @@ function classManagementMarkup(){
  '.class-admin-number{display:grid;width:44px;height:44px;flex:none;place-items:center;border-radius:13px;background:#e9f3e9;color:#39734b;font-size:13px;font-weight:900}'+
  '.class-admin-tile strong{display:block;color:var(--text);font-size:14px}.class-admin-tile small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}'+
  '@media(max-width:560px){.class-admin-grid{grid-template-columns:1fr}.class-admin-hero{padding:16px}.class-admin-tile{padding:13px}}'+
- '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>Class Management</h3><p>School class structure for Classes 1 to 5</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header><div class="class-admin-grid">'+classes.map((name,index)=>'<article class="class-admin-tile"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+name+'</strong><small>Class structure and student records</small></span></article>').join("")+'</div></div>';
+ '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>'+T("తరగతుల నిర్వహణ","Class Management")+'</h3><p>'+T("1 నుంచి 5వ తరగతి వరకు పాఠశాల తరగతుల నిర్మాణం","School class structure for Classes 1 to 5")+'</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header><div class="class-admin-grid">'+classes.map((name,index)=>'<article class="class-admin-tile"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+T(name.replace("Class ","")+"వ తరగతి",name)+'</strong><small>'+T("తరగతి నిర్మాణం మరియు విద్యార్థుల రికార్డులు","Class structure and student records")+'</small></span></article>').join("")+'</div></div>';
 }
 function teacherManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
