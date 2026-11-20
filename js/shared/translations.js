@@ -17,6 +17,7 @@ export function createTranslator(getLanguage) {
 
 export function createDictionaryTranslator(getLanguage, pairs = translationPairs) {
   const cache = new Map();
+  const isWordCharacter = character => Boolean(character && /[A-Za-z0-9_\u0C00-\u0C7F]/.test(character));
   return value => {
     const language = getLanguage?.() === "en" ? "en" : "te";
     if (!cache.has(language)) {
@@ -29,21 +30,30 @@ export function createDictionaryTranslator(getLanguage, pairs = translationPairs
         if (!candidates.has(source)) candidates.set(source, target);
         else if (candidates.get(source) !== target) ambiguous.add(source);
       }
-      const safeEntries = [...candidates]
+      const entries = [...candidates]
         .filter(([source]) => !ambiguous.has(source))
         .sort((a, b) => b[0].length - a[0].length);
-      const lookup = new Map(safeEntries);
-      const boundary = "[A-Za-z0-9_\\u0C00-\\u0C7F]";
-      const pattern = safeEntries.length
-        ? new RegExp("(^|[^" + boundary.slice(1, -1) + "])(" +
-            safeEntries.map(([source]) => source.replace(/[.*+?^${}()|[\\]\\]/g, "\\source.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")")).join("|") +
-            ")(?=$|[^" + boundary.slice(1, -1) + "])", "gu")
-        : null;
-      cache.set(language, { lookup, pattern });
+      cache.set(language, entries);
     }
-    const { lookup, pattern } = cache.get(language);
-    if (!pattern) return String(value ?? "");
-    return String(value ?? "").replace(pattern, (match, prefix, phrase) => prefix + lookup.get(phrase));
+    const entries = cache.get(language);
+    const input = String(value ?? "");
+    let output = "";
+    let index = 0;
+    while (index < input.length) {
+      let matched = false;
+      for (const [source, target] of entries) {
+        if (!input.startsWith(source, index)) continue;
+        const previous = index > 0 ? input[index - 1] : "";
+        const next = input[index + source.length] || "";
+        if (isWordCharacter(previous) || isWordCharacter(next)) continue;
+        output += target;
+        index += source.length;
+        matched = true;
+        break;
+      }
+      if (!matched) output += input[index++];
+    }
+    return output;
   };
 }
 
