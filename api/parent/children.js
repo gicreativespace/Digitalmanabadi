@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   try {
     if (req.method !== "GET") { res.setHeader("Allow", "GET, OPTIONS"); return json(res, 405, { error: "Method not allowed." }); }
     const header = String(req.headers.authorization || "");
-    const match = /^Bearer\\s+(.+)$/i.exec(header);
+    const match = /^Bearer\s+(.+)$/i.exec(header);
     if (!match) return json(res, 401, { error: "Parent sign-in is required." });
     let decoded;
     try { decoded = await adminAuth().verifyIdToken(match[1], true); }
