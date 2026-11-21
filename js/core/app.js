@@ -144,7 +144,8 @@ function roleCard(ic,te,en,role,tone){
 function login(){loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
 function linking(){parentSection.renderLinking();}
-function dashboard(){dashboardScreen.render();}
+function parentAddChild(){parentSection.renderAddChild();}
+function dashboard(){dashboardScreen.render();if(state.role==="parent"){const add=main.querySelector("#parentAddChild");if(add)add.onclick=()=>{state.view="parentAddChild";render();};}}
 function profilePage(){accountScreens.profilePage();}
 function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
@@ -166,7 +167,7 @@ function render(){
  document.querySelector("#languageToggle").textContent=state.lang==="te"?"అ":"A";
  document.querySelector("#languageToggle").setAttribute("aria-label",state.lang==="te"?"Switch to English":"తెలుగులోకి మార్చండి");
  theme.setAttribute("aria-label",state.theme==="light"?"Switch to dark theme":"Switch to light theme");
- if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="communityRegister")communityRegister();else if(state.view==="link")linking();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
+ if(state.view==="welcome")welcome();else if(state.view==="login")login();else if(state.view==="communityRegister")communityRegister();else if(state.view==="link")linking();else if(state.view==="parentAddChild")parentAddChild();else if(state.view==="dashboard")dashboard();else if(state.view==="module")modulePage();else if(state.view==="profile")profilePage();else if(state.view==="settings")settingsPage();else if(state.view==="superadmin")superAdmin();
  applyTranslations();
  updateBottomNavigation();
 }
@@ -253,3 +254,15 @@ onAuthStateChanged(auth,async user=>{
  }
 });
 showTributeSplash(render, 2000);
+
+
+// Parent's four-digit PIN is a device-local screen lock only.
+let parentWasBackgrounded=false;
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden && state.role==="parent" && state.authenticated){
+  parentWasBackgrounded=true;state.authenticated=false;state.view="login";
+  localStorage.removeItem("gim_authenticated");
+ }else if(!document.hidden && parentWasBackgrounded){
+  parentWasBackgrounded=false;render();
+ }
+});

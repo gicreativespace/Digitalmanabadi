@@ -194,25 +194,19 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.role==="parent"){
-    const mobile=id.replace(/\D/g,"").slice(-10),user=auth.currentUser;
-    if(!user||!/^\d{10}$/.test(mobile)||localStorage.getItem("gim_parent_mobile")!==mobile){
-     show(T("ఈ పరికరంలో Parent Verification చేయాలి. మొదటిసారి? పిల్లలను లింక్ చేయండి.","Parent Verification is required on this device. First time? Link your child."),"warning");return;
-    }
-    const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("ధృవీకరిస్తోంది…","Verifying…");
+    const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("అన్‌లాక్ చేస్తోంది…","Unlocking…");
     try{
-     const token=await user.getIdTokenResult();
-     if(token.claims.role!=="parent")throw new Error("Parent session is not valid.");
-     const valid=await verifyParentPin(user.uid,pin);
-     if(!valid)throw new Error("PIN does not match.");
+     const {verifyParentPin,hasParentPin,getParentChildren}=await import("../sections/parent/parent-service.js");
+     if(!hasParentPin())throw new Error("DEVICE_REGISTRATION_REQUIRED");
+     if(!await verifyParentPin(pin))throw new Error("PIN does not match.");
      const children=await getParentChildren();
-     if(!children.length)throw new Error("No linked students were found.");
-     state.parentChildren=children;state.linkedStudent=children[0];state.parentMobile=mobile;
-     state.parentLinked=true;state.authenticated=true;
-     localStorage.setItem("gim_role","parent");localStorage.setItem("gim_authenticated","true");
-     state.view="dashboard";render();
+     if(!children.length)throw new Error("DEVICE_REGISTRATION_REQUIRED");
+     state.parentChildren=children;state.linkedStudent=children[0];state.parentName=localStorage.getItem("gim_parent_name")||"";
+     state.parentLinked=true;state.authenticated=true;localStorage.setItem("gim_role","parent");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
     }catch(error){
-     show(error.message==="PIN does not match."?T("Parent PIN సరిపోలలేదు.","Incorrect Parent PIN."):T("Parent Session ధృవీకరించబడలేదు. మళ్లీ పిల్లల వివరాలు Verify చేయండి.","Parent session could not be verified. Please verify your child again."));
-     b.disabled=false;b.textContent=T("ప్రవేశించండి","Sign In");
+     if(error.message==="DEVICE_REGISTRATION_REQUIRED"){state.view="link";render();return;}
+     show(error.message==="PIN does not match."?T("App Lock PIN సరిపోలలేదు.","Incorrect App Lock PIN."):T("Parent వివరాలు లోడ్ కాలేదు. మళ్లీ నమోదు చేయండి.","Parent details could not be loaded. Please register again."));
+     b.disabled=false;b.textContent=T("యాప్‌ను అన్‌లాక్ చేయండి","Unlock App");
     }
     return;
    }
