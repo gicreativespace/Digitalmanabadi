@@ -2,6 +2,15 @@
   "name": "digital-mana-badi-static",
   "private": true,
   "type": "module",
-  "engines": {"node": ">=20"},
-  "scripts": {"test": "node --test"}
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^12.6.0",
+    "firebase-tools": "^14.0.0"
+  }
 }
