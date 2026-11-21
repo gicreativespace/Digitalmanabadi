@@ -18,7 +18,7 @@ export async function bindClassManagement({main,T,escapeHtml}){
  let activeClassId="",targetStrength=0,existingCount=0;
  const esc=v=>escapeHtml(String(v??""));
  const say=(message,bad=false)=>{status.textContent=message;status.className=bad?"class-admin-error":"class-admin-status";};
- const dobText=v=>/^\\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"");
+ const dobText=v=>/^\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"");
  const strengthSetup=main.querySelector("#classStrengthSetup"),workspace=main.querySelector("#classSheetWorkspace"),strengthInput=main.querySelector("#classStrengthInput"),summary=main.querySelector("#classSheetSummary");
  const renderStudents=students=>{
   if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students registered yet.")+'</div>';return;}
@@ -54,14 +54,14 @@ export async function bindClassManagement({main,T,escapeHtml}){
  main.querySelector("#submitClass").onclick=async()=>{
   if(!activeClassId||!targetStrength)return;
   const entries=[...rowsBox.querySelectorAll("tr")].map(row=>({name:row.querySelector("[data-student-name]").value.trim(),gender:row.querySelector("[data-student-gender]").value,dob:row.querySelector("[data-student-dob]").value.trim()}));
-  if(entries.length!==targetStrength-existingCount||entries.some(r=>r.name.length<2||!["Male","Female","Other"].includes(r.gender)||!/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(r.dob))){say(T("ప్రతి Rowలో పేరు, లింగం, సరైన DD/MM/YYYY పుట్టిన తేదీ నమోదు చేయండి.","Every row needs a name, gender and valid DD/MM/YYYY date of birth."),true);return;}
+  if(entries.length!==targetStrength-existingCount||entries.some(r=>r.name.length<2||!["Male","Female","Other"].includes(r.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(r.dob))){say(T("ప్రతి Rowలో పేరు, లింగం, సరైన DD/MM/YYYY పుట్టిన తేదీ నమోదు చేయండి.","Every row needs a name, gender and valid DD/MM/YYYY date of birth."),true);return;}
   const button=main.querySelector("#submitClass");button.disabled=true;button.textContent=T("తరగతి నమోదు అవుతోంది…","Submitting class…");
   try{
-   const response=await createClassStudents(activeClassId,entries),failed=response.failed||[];
+   const response=entries.length?await createClassStudents(activeClassId,entries):{failed:[]},failed=response.failed||[];
    const {students}=await refresh();const saved=await saveClassDetails(activeClassId,targetStrength,students.length);
    if(failed.length){
     rowsBox.innerHTML="";
-    for(const item of failed){const r=entries[item.index],roll=String(students.length+1).padStart(2,"0");rowsBox.insertAdjacentHTML("beforeend",'<tr><td><span class="class-sheet-roll">'+roll+'</span></td><td><input data-student-name value="'+esc(r.name)+'"></td><td><select data-student-gender><option value="Male" '+(r.gender==="Male"?"selected":"")+' >Male</option><option value="Female" '+(r.gender==="Female"?"selected":"")+' >Female</option><option value="Other" '+(r.gender==="Other"?"selected":"")+' >Other</option></select></td><td><input data-student-dob value="'+esc(r.dob)+'" maxlength="10"></td></tr>');}
+    for(let failedIndex=0;failedIndex<failed.length;failedIndex++){const item=failed[failedIndex],r=entries[item.index],roll=String(students.length+failedIndex+1).padStart(2,"0");rowsBox.insertAdjacentHTML("beforeend",'<tr><td><span class="class-sheet-roll">'+roll+'</span></td><td><input data-student-name value="'+esc(r.name)+'"></td><td><select data-student-gender><option value="Male" '+(r.gender==="Male"?"selected":"")+' >Male</option><option value="Female" '+(r.gender==="Female"?"selected":"")+' >Female</option><option value="Other" '+(r.gender==="Other"?"selected":"")+' >Other</option></select></td><td><input data-student-dob value="'+esc(r.dob)+'" maxlength="10"></td></tr>');}
     say(T("కొన్ని Rows సేవ్ కాలేదు. మిగిలిన వివరాలను సరిచేసి మళ్లీ Submit చేయండి.","Some rows failed. Correct the remaining details and submit again."),true);
    }else{
     workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value=String(targetStrength);
