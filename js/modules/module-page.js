@@ -52,7 +52,7 @@ async function bindClassManagement(){
  if(!panel||!form)return;
  let activeClassId="";
  const esc=v=>escapeHtml(String(v??""));
- const formatDob=v=>/^\\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"—");
+ const formatDob=v=>/^\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"—");
  const genderLabel=v=>({Male:T("పురుషుడు","Male"),Female:T("స్త్రీ","Female"),Other:T("ఇతర","Other")}[v]||v||"—");
  const say=(v,bad=false)=>{status.textContent=v;status.className=bad?"class-admin-error":"class-admin-status";};
  const renderStudents=students=>{
