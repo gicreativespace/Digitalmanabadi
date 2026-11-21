@@ -50,6 +50,10 @@ test("Class register supports explicit Submit Class, persisted strength and safe
   assert.match(register, /Submit Class/);
   assert.match(register, /saveClassDetails/);
   assert.match(register, /updateClassStudent/);
+  assert.match(register, /const created=response.created\|\|\[\]/);
+  assert.match(register, /studentId:item.studentId,rollNumber:item.rollNumber/);
+  assert.match(register, /secretCode:item.secretCode/);
+  assert.match(register, /renderStudents\(currentStudents\)/);
   assert.match(service, /status:complete\?"complete":"draft"/);
   assert.match(service, /updateDoc\(studentRef,\{name,gender,dob,updatedAt/);
   assert.match(page, /classManagementMarkup, bindClassManagement/);
