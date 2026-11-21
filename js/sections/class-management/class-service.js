@@ -5,7 +5,7 @@ const CLASSES = new Set(["class-1","class-2","class-3","class-4","class-5"]);
 const text = value => String(value ?? "").trim();
 function normalizeDob(value) {
   const raw=text(value).replaceAll("/","");
-  if(!/^\\d{8}$/.test(raw)) throw new Error("Enter DOB in DD/MM/YYYY format.");
+  if(!/^\d{8}$/.test(raw)) throw new Error("Enter DOB in DD/MM/YYYY format.");
   const day=Number(raw.slice(0,2)),month=Number(raw.slice(2,4)),year=Number(raw.slice(4));
   const date=new Date(year,month-1,day);
   if(year<1900||date.getFullYear()!==year||date.getMonth()!==month-1||date.getDate()!==day||date>new Date()) throw new Error("Enter a valid date of birth.");
