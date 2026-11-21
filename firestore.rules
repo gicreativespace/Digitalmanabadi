@@ -117,7 +117,7 @@ service cloud.firestore {
   }
   // A Parent may resolve a known Student ID, but this lookup has no name, DOB or Secret Code.
   match /studentLookup/{studentId} {
-   allow get: if anonymousParent() || isActiveHeadMasterForSchool(resource.data.schoolId);
+   allow get: if anonymousParent() || (isActiveHeadMaster() && (!exists(/databases/$(database)/documents/studentLookup/$(studentId)) || isActiveHeadMasterForSchool(resource.data.schoolId)));
    allow list: if false;
    allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId);
    allow update: if isActiveHeadMasterForSchool(resource.data.schoolId)
