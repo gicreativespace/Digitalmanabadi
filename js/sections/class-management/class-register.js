@@ -57,12 +57,23 @@ export async function bindClassManagement({main,T,escapeHtml}){
   if(entries.length!==targetStrength-existingCount||entries.some(r=>r.name.length<2||!["Male","Female","Other"].includes(r.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(r.dob))){say(T("ప్రతి Rowలో పేరు, లింగం, సరైన DD/MM/YYYY పుట్టిన తేదీ నమోదు చేయండి.","Every row needs a name, gender and valid DD/MM/YYYY date of birth."),true);return;}
   const button=main.querySelector("#submitClass");button.disabled=true;button.textContent=T("తరగతి నమోదు అవుతోంది…","Submitting class…");
   try{
-   const response=entries.length?await createClassStudents(activeClassId,entries):{failed:[]},failed=response.failed||[];
-   const {students}=await refresh();const saved=await saveClassDetails(activeClassId,targetStrength,students.length);
+   const response=entries.length?await createClassStudents(activeClassId,entries):{created:[],failed:[]};
+   const created=response.created||[],failed=response.failed||[];
+   // Use the exact values returned by the Firestore transaction. Do not depend
+   // on a second read to reveal Student ID, Roll Number or the one-time Secret Code.
+   const createdStudents=created.map(item=>({
+    studentRecordId:item.studentRecordId,studentId:item.studentId,rollNumber:item.rollNumber,
+    secretCode:item.secretCode,...entries[item.index]
+   }));
+   const totalRegistered=existingCount+createdStudents.length;
+   existingCount=totalRegistered;
+   const currentStudents=[...createdStudents];
+   renderStudents(currentStudents);
+   const saved=await saveClassDetails(activeClassId,targetStrength,totalRegistered);
    if(failed.length){
     rowsBox.innerHTML="";
     for(let failedIndex=0;failedIndex<failed.length;failedIndex++){const item=failed[failedIndex],r=entries[item.index],roll=String(students.length+failedIndex+1).padStart(2,"0");rowsBox.insertAdjacentHTML("beforeend",'<tr><td><span class="class-sheet-roll">'+roll+'</span></td><td><input data-student-name value="'+esc(r.name)+'"></td><td><select data-student-gender><option value="Male" '+(r.gender==="Male"?"selected":"")+' >Male</option><option value="Female" '+(r.gender==="Female"?"selected":"")+' >Female</option><option value="Other" '+(r.gender==="Other"?"selected":"")+' >Other</option></select></td><td><input data-student-dob value="'+esc(r.dob)+'" maxlength="10"></td></tr>');}
-    say(T("కొన్ని Rows సేవ్ కాలేదు. మిగిలిన వివరాలను సరిచేసి మళ్లీ Submit చేయండి.","Some rows failed. Correct the remaining details and submit again."),true);
+    say(T("కొన్ని Rows సేవ్ కాలేదు. ఇప్పటికే సృష్టించిన విద్యార్థుల Student ID, Roll Number, Secret Code క్రింద చూపించబడ్డాయి. మిగిలిన Rows మళ్లీ Submit చేయండి.","Some rows failed. Generated Student IDs, Roll Numbers and Secret Codes for successful rows are shown below. Submit the remaining rows again."),true);
    }else{
     workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value=String(targetStrength);
     say(saved.status==="complete"?T("Class Created Successfully","Class Created Successfully"):T("విద్యార్థులు సేవ్ అయ్యారు. మిగిలిన Strength పూర్తి చేయండి.","Students saved. Complete the remaining strength."),saved.status!=="complete");
