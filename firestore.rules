@@ -2,35 +2,64 @@ rules_version = '2';
 service cloud.firestore {
  match /databases/{database}/documents {
   function signedIn(){return request.auth != null;}
+  function anonymousParent(){return signedIn() && request.auth.token.firebase.sign_in_provider == "anonymous";}
   function adminPath(){return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);}
   function isSuperAdmin(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="GI_SUPER_ADMIN" && get(adminPath()).data.status=="active";}
   function hmPath(){return /databases/$(database)/documents/headMasters/$(request.auth.uid);}
   function isActiveHeadMasterFor(schoolId){return signedIn() && exists(hmPath()) && get(hmPath()).data.role=="HEAD_MASTER" && get(hmPath()).data.status=="active" && get(hmPath()).data.schoolId==schoolId;}
   function isActiveHeadMaster(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="HEAD_MASTER" && get(adminPath()).data.status=="active";}
+  function linkedParent(studentRecordId){return anonymousParent() && exists(/databases/$(database)/documents/parentLinks/$(studentRecordId)) && get(/databases/$(database)/documents/parentLinks/$(studentRecordId)).data.parentUid==request.auth.uid;}
   match /platformAdmins/{adminUid}{allow get: if signedIn() && request.auth.uid==adminUid;allow list,create,update,delete: if false;}
   match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
   match /headMasters/{headMasterUid}{allow read: if isSuperAdmin() || (signedIn() && request.auth.uid==headMasterUid);allow write: if isSuperAdmin();}
   match /adminAudit/{auditId}{allow read,write: if isSuperAdmin();}
-
-  // Teacher profiles are managed only by an active Head Master.
-  // A teacher may read only their own active profile; inactive profiles are blocked.
   match /teachers/{teacherId}{
    allow get: if isActiveHeadMaster() || (signedIn() && resource.data.authUid==request.auth.uid && resource.data.status=="active");
    allow list: if isActiveHeadMaster();
-   allow create: if isActiveHeadMaster()
-    && request.resource.data.teacherId==teacherId
-    && request.resource.data.createdBy==request.auth.uid
-    && request.resource.data.status=="active"
-    && request.resource.data.authUid==null;
-   allow update: if isActiveHeadMaster()
-    && request.resource.data.teacherId==resource.data.teacherId
-    && request.resource.data.createdBy==resource.data.createdBy
-    && request.resource.data.createdAt==resource.data.createdAt;
+   allow create: if isActiveHeadMaster() && request.resource.data.teacherId==teacherId && request.resource.data.createdBy==request.auth.uid && request.resource.data.status=="active" && request.resource.data.authUid==null;
+   allow update: if isActiveHeadMaster() && request.resource.data.teacherId==resource.data.teacherId && request.resource.data.createdBy==resource.data.createdBy && request.resource.data.createdAt==resource.data.createdAt;
    allow delete: if false;
   }
   match /teacherCounters/{counterId}{allow read,write: if isActiveHeadMaster();}
   match /teacherAccessAttempts/{attemptId}{allow read,write: if false;}
 
+  // Head Master-managed class and student records.
+  match /classrooms/{classroomId}{allow read,write: if isActiveHeadMaster();}
+  match /studentCounters/{counterId}{allow read,write: if isActiveHeadMaster();}
+  match /students/{studentRecordId}{
+   allow get: if isActiveHeadMaster() || linkedParent(studentRecordId);
+   allow list: if isActiveHeadMaster() || (anonymousParent() && resource.data.studentRecordId in get(/databases/$(database)/documents/parentLinks/$(resource.data.studentRecordId)).data.keys());
+   allow create: if isActiveHeadMaster() && request.resource.data.createdBy==request.auth.uid && request.resource.data.status=="active";
+   allow update: if isActiveHeadMaster() && request.resource.data.schoolId==resource.data.schoolId && request.resource.data.studentRecordId==resource.data.studentRecordId;
+   allow delete: if false;
+  }
+  match /studentSecrets/{studentRecordId}{allow get,list: if isActiveHeadMaster();allow create,update,delete: if isActiveHeadMaster();}
+  match /studentLookup/{studentId}{allow get: if anonymousParent() || isActiveHeadMaster();allow list: if false;allow write: if isActiveHeadMaster();}
+  match /parentProfiles/{uid}{
+   allow get: if anonymousParent() && request.auth.uid==uid;
+   allow list: if false;
+   allow create: if anonymousParent() && request.auth.uid==uid && request.resource.data.uid==uid && request.resource.data.parentName is string && request.resource.data.parentName.size()>=2;
+   allow update: if anonymousParent() && request.auth.uid==uid && request.resource.data.uid==uid && request.resource.data.parentName==resource.data.parentName;
+   allow delete: if false;
+  }
+  match /parentClaims/{claimId}{
+   allow create: if anonymousParent()
+    && request.resource.data.parentUid==request.auth.uid
+    && exists(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId))
+    && exists(/databases/$(database)/documents/studentSecrets/$(request.resource.data.studentRecordId))
+    && request.resource.data.dob==get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.dob
+    && request.resource.data.secretCodeHash==get(/databases/$(database)/documents/studentSecrets/$(request.resource.data.studentRecordId)).data.secretCodeHash;
+   allow read,update,delete: if false;
+  }
+  match /parentLinks/{studentRecordId}{
+   allow get,list: if isActiveHeadMaster() || (anonymousParent() && resource.data.parentUid==request.auth.uid);
+   allow create,update: if anonymousParent()
+    && request.resource.data.parentUid==request.auth.uid
+    && request.resource.data.studentRecordId==studentRecordId
+    && exists(/databases/$(database)/documents/parentClaims/$(request.auth.uid+"_"+studentRecordId))
+    && get(/databases/$(database)/documents/parentClaims/$(request.auth.uid+"_"+studentRecordId)).data.parentUid==request.auth.uid;
+   allow delete: if isActiveHeadMaster();
+  }
   match /{document=**}{allow read,write: if false;}
  }
 }
