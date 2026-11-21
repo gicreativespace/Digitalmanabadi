@@ -21,7 +21,7 @@ export async function findParentStudent(studentId){
   if(!snap.exists()||snap.data().status!=="active") throw msg("Student record was not found.","విద్యార్థి వివరాలు కనబడలేదు.");
   return snap.data();
 }
-export async function registerParent({studentRecordId,studentId,dob,secretCode,parentName,relationship}){
+export async function registerParent({studentRecordId,studentId,classId,rollNumber,dob,secretCode,parentName,relationship}){
   const user=await ensureParentSession();
   const name=t(parentName).slice(0,80),relation=t(relationship);
   if(name.length<2||!["Father","Mother","Guardian","Other"].includes(relation)) throw msg("Enter your name and relationship.","మీ పేరు మరియు విద్యార్థితో సంబంధం నమోదు చేయండి.");
@@ -32,11 +32,9 @@ export async function registerParent({studentRecordId,studentId,dob,secretCode,p
   const claimRef=doc(db,"parentClaims",user.uid+"_"+studentRecordId);
   const linkRef=doc(db,"parentLinks",studentRecordId);
   await runTransaction(db,async tx=>{
-    const studentRef=doc(db,"students",studentRecordId),studentSnap=await tx.get(studentRef);
-    if(!studentSnap.exists()||studentSnap.data().studentId!==studentId||studentSnap.data().dob!==normalizedDob) throw msg("Student details could not be verified.","విద్యార్థి వివరాలు సరిపోలలేదు.");
     tx.set(profileRef,{uid:user.uid,parentName:name,createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
     tx.set(claimRef,{parentUid:user.uid,studentRecordId,studentId,dob:normalizedDob,secretCodeHash,createdAt:serverTimestamp()});
-    tx.set(linkRef,{parentUid:user.uid,studentRecordId,studentId,classId:studentSnap.data().classId,rollNumber:studentSnap.data().rollNumber,relationship:relation,linkedAt:serverTimestamp()});
+    tx.set(linkRef,{parentUid:user.uid,studentRecordId,studentId,classId,rollNumber,relationship:relation,linkedAt:serverTimestamp()});
   });
   localStorage.setItem("gim_parent_name",name);
   return await getParentChildren();
@@ -46,7 +44,7 @@ export async function addParentChild({studentId,dob,secretCode,relationship}){
   const lookup=await findParentStudent(studentId);
   const profile=await getDoc(doc(db,"parentProfiles",user.uid));
   if(!profile.exists()) throw msg("Parent registration is required.","ముందుగా Parent Registration పూర్తి చేయండి.");
-  return registerParent({studentRecordId:lookup.studentRecordId,studentId:lookup.studentId,dob,secretCode,parentName:profile.data().parentName,relationship});
+  return registerParent({studentRecordId:lookup.studentRecordId,studentId:lookup.studentId,classId:lookup.classId,rollNumber:lookup.rollNumber,dob,secretCode,parentName:profile.data().parentName,relationship});
 }
 export async function getParentChildren(){
   const user=await ensureParentSession();
