@@ -80,3 +80,20 @@ export async function createClassStudent(classId,payload){
   });
   return {student:created};
 }
+
+
+// Save a class register row-by-row through the existing transactional student
+// creation path. Successful rows are retained if another row fails.
+export async function createClassStudents(classId, entries){
+  if(!Array.isArray(entries)||!entries.length) throw new Error("Add at least one student.");
+  const created=[],failed=[];
+  for(let index=0;index<entries.length;index++){
+    try{
+      const result=await createClassStudent(classId,entries[index]);
+      created.push({...result.student,index});
+    }catch(error){
+      failed.push({index,payload:entries[index],message:error?.message||"Could not create student."});
+    }
+  }
+  return {created,failed};
+}
