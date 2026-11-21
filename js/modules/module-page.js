@@ -1,6 +1,6 @@
 import { renderCalendarMarkup } from "./calendar.js";
 import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
-import { listClassrooms, listClassStudents, createClassStudents } from "../sections/class-management/class-service.js";
+import { classManagementMarkup, bindClassManagement } from "../sections/class-management/class-register.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
@@ -22,97 +22,6 @@ function managementLandingMarkup(){
  '.hm-management-card h3{margin:0;color:#284d34;font-size:19px;font-weight:850}'+
  '@media(max-width:560px){.hm-management-entry{grid-template-columns:1fr;gap:13px}.hm-management-card{min-height:145px;padding:20px}}'+
  '</style><div class="hm-management-entry">'+cards.map(card=>'<button type="button" class="hm-management-card" data-hm-submodule="'+card.key+'"><span class="hm-management-icon" aria-hidden="true">'+card.icon+'</span><h3>'+T(card.titleTe,card.title)+'</h3></button>').join("")+'</div>';
-}
-function classManagementMarkup(){
- const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
- return '<style>'+
- '.class-admin{display:grid;gap:16px;margin-top:18px;color:var(--text)}'+
- '.class-admin *{box-sizing:border-box}'+
- '.class-admin-hero{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:20px;border:1px solid #d8e8db;border-radius:20px;background:linear-gradient(125deg,#eff8f0,#e5f1e6 62%,#faf8ee);color:#294d35}'+
- '.class-admin-kicker{font-size:11px;letter-spacing:.12em;font-weight:850;color:#66866d}.class-admin-hero h3{margin:5px 0;color:#294d35;font-size:22px}.class-admin-hero p{margin:0;color:#6c8572;font-size:14px;line-height:1.6}'+
- '.class-admin-mark{display:grid;width:48px;height:48px;flex:none;place-items:center;border-radius:15px;background:#d9eadb;color:#356f50;font-size:22px;font-weight:900}'+
- '.class-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}'+
- '.class-admin-tile{display:flex;align-items:center;gap:13px;padding:16px;border:1px solid #e0eae1;border-radius:16px;background:var(--surface);box-shadow:0 7px 20px rgba(45,83,54,.045);cursor:pointer;text-align:left;width:100%;color:var(--text);min-width:0}'+
- '.class-admin-tile[aria-expanded="true"]{border-color:#8eb99a;background:#f3faf4}.class-admin-number{display:grid;width:44px;height:44px;flex:none;place-items:center;border-radius:13px;background:#e9f3e9;color:#39734b;font-size:13px;font-weight:900}'+
- '.class-admin-tile strong{display:block;color:var(--text);font-size:16px}.class-admin-tile small{display:block;margin-top:4px;color:var(--muted);font-size:13px;line-height:1.45}'+
- '.class-admin-panel{display:grid;gap:14px;padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--surface);min-width:0}.class-admin-panel[hidden]{display:none}.class-admin-panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.class-admin-panel-head h4{margin:0;font-size:18px}.class-admin-status{font-size:13px;color:var(--muted)}'+
- '.class-strength-setup{display:grid;gap:9px;padding:15px;border:1px solid #dce9df;border-radius:14px;background:var(--surface2)}.class-strength-setup label{font-size:13px;font-weight:800;color:var(--text)}.class-strength-controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.class-strength-controls input{width:140px;max-width:100%;min-height:44px;padding:9px 11px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font:inherit}.class-strength-setup small{font-size:11px;color:var(--muted);line-height:1.5}'+
- '.class-sheet-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.class-sheet-toolbar p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}.class-sheet-actions{display:flex;gap:8px;flex-wrap:wrap}.class-sheet-actions .btn{min-height:40px}'+
- '.class-sheet-wrap{width:100%;min-width:0;overflow:visible;border:1px solid var(--border);border-radius:13px}.class-student-sheet{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}.class-student-sheet th{padding:11px 9px;background:#edf5ee;color:#365d40;text-align:left;font-size:12px;font-weight:800;border-bottom:1px solid #dce9df}.class-student-sheet td{padding:8px;border-bottom:1px solid var(--border);vertical-align:middle}.class-student-sheet tr:last-child td{border-bottom:0}.class-student-sheet th:first-child,.class-student-sheet td:first-child{width:74px;text-align:center}.class-student-sheet th:last-child,.class-student-sheet td:last-child{width:76px;text-align:center}.class-student-sheet input,.class-student-sheet select{width:100%;min-width:0;min-height:42px;padding:8px 9px;border:1px solid var(--border);border-radius:9px;background:var(--surface2);color:var(--text);font:inherit;font-size:14px}.class-sheet-roll{display:inline-grid;place-items:center;min-width:36px;min-height:34px;border-radius:9px;background:#edf5ee;color:#356b45;font-weight:850;font-size:13px}.class-sheet-remove{width:34px;height:34px;border:1px solid #ead8d3;border-radius:9px;background:#fff7f5;color:#9a4b3b;font-size:18px;cursor:pointer}.class-sheet-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.class-sheet-footer small{color:var(--muted);font-size:12px}.class-admin-error{padding:10px 12px;border-radius:10px;background:#fff3ed;color:#984b36;font-size:13px}.class-admin-empty{padding:18px;border:1px dashed var(--border);border-radius:12px;text-align:center;color:var(--muted);font-size:13px}.class-student-list{display:grid;gap:10px}.class-student-card{padding:14px;border:1px solid #dce9df;border-radius:15px;background:var(--surface)}.class-student-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.class-student-head strong{font-size:16px;color:var(--text)}.class-student-head small{display:block;color:var(--muted);font-size:12px;margin-top:4px}.class-student-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.class-student-info div{padding:9px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);min-width:0}.class-student-info span{display:block;color:var(--muted);font-size:11px}.class-student-info b{display:block;margin-top:3px;color:var(--text);font-size:13px;overflow-wrap:anywhere}.class-secret{background:#fff8e9!important;border-color:#eadbb7!important}.class-secret b{letter-spacing:.06em}'+
- '@media(max-width:640px){.class-admin-grid{grid-template-columns:1fr}.class-admin-hero{padding:15px}.class-admin-panel{padding:11px}.class-admin-panel-head{align-items:flex-start}.class-sheet-toolbar{align-items:stretch}.class-sheet-actions{width:100%}.class-sheet-actions .btn{flex:1}.class-student-sheet,.class-student-sheet tbody{display:block;width:100%}.class-student-sheet thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.class-student-sheet tr{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:11px;border-bottom:1px solid var(--border)}.class-student-sheet tr:last-child{border-bottom:0}.class-student-sheet td,.class-student-sheet td:first-child,.class-student-sheet td:last-child{display:grid;grid-template-columns:78px minmax(0,1fr);align-items:center;gap:7px;width:auto;padding:0;text-align:left;border:0;min-width:0}.class-student-sheet td:before{content:attr(data-label);font-size:11px;font-weight:750;color:var(--muted)}.class-student-sheet td:first-child{grid-column:1/-1;grid-template-columns:78px minmax(0,1fr)}.class-student-sheet td:last-child{grid-column:1/-1;grid-template-columns:78px minmax(0,1fr)}.class-sheet-roll{justify-self:start}.class-sheet-remove{justify-self:start}.class-student-sheet input,.class-student-sheet select{font-size:16px;min-height:44px}.class-student-info{grid-template-columns:1fr 1fr}.class-student-head{flex-direction:column}.class-sheet-footer{align-items:stretch}.class-sheet-footer .btn{width:100%}}'+
- '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>'+T("తరగతుల నిర్వహణ","Class Management")+'</h3><p>'+T("తరగతిని ఎంచుకుని విద్యార్థుల వివరాలను ఒకే Sheet‌లో నమోదు చేయండి.","Choose a class and enter all student details in one sheet.")+'</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header>'+
- '<div class="class-admin-grid">'+classes.map((name,index)=>'<button type="button" class="class-admin-tile" data-class-open="class-'+(index+1)+'" aria-expanded="false"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+T(name.replace("Class ","")+"వ తరగతి",name)+'</strong><small>'+T("తరగతి Sheet తెరవండి · విద్యార్థుల రికార్డులు","Open class sheet · Student records")+'</small></span></button>').join("")+'</div>'+
- '<section class="class-admin-panel" id="classStudentPanel" hidden><div class="class-admin-panel-head"><h4 id="classStudentTitle"></h4><span id="classStudentStatus" class="class-admin-status" role="status" aria-live="polite"></span></div>'+
- '<div id="classStrengthSetup" class="class-strength-setup"><label for="classStrengthInput">'+T("ఈ తరగతి మొత్తం విద్యార్థుల సంఖ్య (Strength)","Total number of students in this class (Strength)")+'</label><div class="class-strength-controls"><input id="classStrengthInput" type="number" min="1" max="99" inputmode="numeric" placeholder="'+T("ఉదా: 35","e.g. 35")+'"><button type="button" class="btn" id="createClassSheet">'+T("Create Class Sheet","Create Class Sheet")+'</button></div><small>'+T("Strength 1 నుంచి 99 మధ్య నమోదు చేయండి. ఇప్పటికే ఉన్న విద్యార్థుల రికార్డులు అలాగే ఉంటాయి.","Enter a strength between 1 and 99. Existing student records will be preserved.")+'</small></div>'+
- '<div id="classSheetWorkspace" hidden>'+
- '<div class="class-sheet-toolbar"><p>'+T("ప్రతి Row ఒక విద్యార్థి. Save చేసినప్పుడు Roll Number, Student ID మరియు Secret Code ఆటోమేటిక్‌గా రూపొందుతాయి.","Each row is one student. Roll Number, Student ID and Secret Code are generated automatically when saved.")+'</p><div class="class-sheet-actions"><button type="button" class="btn secondary" id="addStudentRows">+ '+T("5 Rows జోడించండి","Add 5 Rows")+'</button><button type="button" class="btn" id="saveAllStudents">'+T("అన్ని వివరాలు సేవ్ చేయండి","Save All Students")+'</button></div></div>'+
- '<div class="class-sheet-wrap"><table class="class-student-sheet"><thead><tr><th>'+T("Roll No.","Roll No.")+'</th><th>'+T("విద్యార్థి పేరు","Student Name")+'</th><th>'+T("లింగం","Gender")+'</th><th>'+T("పుట్టిన తేదీ","Date of Birth")+'</th><th>'+T("తొలగించు","Remove")+'</th></tr></thead><tbody id="studentEntryRows"></tbody></table></div>'+
- '<div class="class-sheet-footer"><small>'+T("పేరు, లింగం, పుట్టిన తేదీ తప్పనిసరి. ఖాళీ Rows సేవ్ కావు.","Name, gender and date of birth are required. Empty rows are ignored.")+'</small><button type="button" class="btn secondary" id="addOneStudentRow">+ '+T("ఒక Row","Add One Row")+'</button></div></div>'+
- '<div id="classStudentList" class="class-student-list"><div class="class-admin-empty">'+T("విద్యార్థుల రికార్డులు లోడ్ అవుతాయి.","Student records will appear here.")+'</div></div></section></div>';
-}
-async function bindClassManagement(){
- const panel=main.querySelector("#classStudentPanel"),title=main.querySelector("#classStudentTitle"),status=main.querySelector("#classStudentStatus"),list=main.querySelector("#classStudentList"),rowsBox=main.querySelector("#studentEntryRows");
- if(!panel||!rowsBox)return;
- let activeClassId="",rowSequence=0,targetStrength=0,existingCount=0;
- const esc=v=>escapeHtml(String(v??""));
- const formatDob=v=>/^\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"—");
- const genderLabel=v=>({Male:T("పురుషుడు","Male"),Female:T("స్త్రీ","Female"),Other:T("ఇతర","Other")}[v]||v||"—");
- const say=(v,bad=false)=>{status.textContent=v;status.className=bad?"class-admin-error":"class-admin-status";};
- const addRow=(values={})=>{
-  const key=String(++rowSequence);
-  const row='<tr data-entry-row="'+key+'"><td data-label="'+T("Roll No.","Roll No.")+'"><span class="class-sheet-roll">Auto</span></td>'+
-   '<td data-label="'+T("పేరు","Name")+'"><input data-student-name maxlength="100" autocomplete="off" placeholder="'+T("విద్యార్థి పూర్తి పేరు","Student full name")+'" value="'+esc(values.name||"")+'"></td>'+
-   '<td data-label="'+T("లింగం","Gender")+'"><select data-student-gender><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Male" '+(values.gender==="Male"?"selected":"")+'>'+T("పురుషుడు","Male")+'</option><option value="Female" '+(values.gender==="Female"?"selected":"")+'>'+T("స్త్రీ","Female")+'</option><option value="Other" '+(values.gender==="Other"?"selected":"")+'>'+T("ఇతర","Other")+'</option></select></td>'+
-   '<td data-label="'+T("పుట్టిన తేదీ","Date of Birth")+'"><input data-student-dob inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" value="'+esc(values.dob||"")+'"></td>'+
-   '<td data-label="'+T("తొలగించు","Remove")+'"><button type="button" class="class-sheet-remove" data-remove-row aria-label="'+T("ఈ Row తొలగించు","Remove this row")+'">×</button></td></tr>';
-  rowsBox.insertAdjacentHTML("beforeend",row);
- };
- const emptyRows=(count=0)=>{rowsBox.innerHTML="";for(let i=0;i<count;i++)addRow();};
- const renderStudents=students=>{
-  if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ తరగతిలో ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students have been added to this class yet.")+'</div>';return;}
-  list.innerHTML='<h4>'+T("ఇప్పటికే నమోదైన విద్యార్థులు","Registered Students")+'</h4>'+students.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>'+T("Student ID: ","Student ID: ")+esc(st.studentId)+' · '+T("Roll No.","Roll No.")+' '+esc(st.rollNumber)+'</small></div><span class="class-admin-status">'+T("క్రియాశీలం","Active")+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(st.dob))+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(st.secretCode||"—")+'</b></div></div></article>').join("");
- };
- const strengthSetup=main.querySelector("#classStrengthSetup"),workspace=main.querySelector("#classSheetWorkspace"),strengthInput=main.querySelector("#classStrengthInput");
- const loadClass=async classId=>{
-  activeClassId=classId;targetStrength=0;existingCount=0;panel.hidden=false;workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value="";title.textContent=T(classId.slice(-1)+"వ తరగతి","Class "+classId.slice(-1));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';rowsBox.innerHTML="";
-  main.querySelectorAll("[data-class-open]").forEach(btn=>btn.setAttribute("aria-expanded",String(btn.dataset.classOpen===classId)));
-  try{const result=await listClassStudents(classId);const students=result.students||[];existingCount=students.length;renderStudents(students);say(T("ఇప్పటికే నమోదైన విద్యార్థులు: ","Existing students: ")+existingCount);}
-  catch(error){list.innerHTML='<div class="class-admin-error">'+esc(error.message||T("వివరాలు లోడ్ కాలేదు.","Could not load records."))+'</div>';say(T("డేటా లోడ్ కాలేదు.","Could not load data."),true);}
-  panel.scrollIntoView({behavior:"smooth",block:"start"});
- };
- main.querySelectorAll("[data-class-open]").forEach(btn=>btn.onclick=()=>loadClass(btn.dataset.classOpen));
- main.querySelector("#createClassSheet").onclick=()=>{
-  const strength=Number(strengthInput.value);
-  if(!Number.isInteger(strength)||strength<1||strength>99){say(T("దయచేసి 1 నుంచి 99 మధ్య సరైన Strength నమోదు చేయండి.","Enter a valid class strength between 1 and 99."),true);strengthInput.focus();return;}
-  if(strength<existingCount){say(T("ఈ తరగతిలో ఇప్పటికే ","This class already has ")+existingCount+T(" మంది విద్యార్థులు ఉన్నారు. Strength అంతకంటే తక్కువగా ఉండకూడదు."," students. Strength cannot be lower than the existing count."),true);return;}
-  targetStrength=strength;workspace.hidden=false;strengthSetup.hidden=true;emptyRows(Math.max(0,targetStrength-existingCount));say(T("Class Strength: ","Class Strength: ")+targetStrength+" · "+T("ఇప్పటికే నమోదు: ","Already registered: ")+existingCount+" · "+T("కొత్త Rows: ","New rows: ")+(targetStrength-existingCount));
- };
- const addRowsWithinStrength=count=>{const remaining=Math.max(0,targetStrength-existingCount-rowsBox.querySelectorAll("[data-entry-row]").length);for(let i=0;i<Math.min(count,remaining);i++)addRow();if(remaining===0)say(T("నమోదు చేసిన Class Strength‌కు సరిపడా Rows ఇప్పటికే ఉన్నాయి.","All rows for the selected class strength are already present."),true);};
- main.querySelector("#addStudentRows").onclick=()=>addRowsWithinStrength(5);
- main.querySelector("#addOneStudentRow").onclick=()=>addRowsWithinStrength(1);
- rowsBox.addEventListener("click",event=>{const remove=event.target.closest("[data-remove-row]");if(remove){remove.closest("tr").remove();}});
- main.querySelector("#saveAllStudents").onclick=async()=>{
-  if(!activeClassId)return;
-  const entries=[...rowsBox.querySelectorAll("[data-entry-row]")].map(row=>({key:row.dataset.entryRow,name:row.querySelector("[data-student-name]").value.trim(),gender:row.querySelector("[data-student-gender]").value,dob:row.querySelector("[data-student-dob]").value.trim()}));
-  const filled=entries.filter(row=>row.name||row.gender||row.dob);
-  if(!filled.length){say(T("ముందుగా కనీసం ఒక విద్యార్థి వివరాలు నమోదు చేయండి.","Enter at least one student before saving."),true);return;}
-  const invalid=filled.filter(row=>row.name.length<2||!["Male","Female","Other"].includes(row.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(row.dob));
-  if(invalid.length){say(T("పేరు, లింగం మరియు DD/MM/YYYY పుట్టిన తేదీ అన్ని Rows‌లో సరిచూడండి.","Check name, gender and DD/MM/YYYY date of birth in every filled row."),true);return;}
-  if(filled.length>Math.max(0,targetStrength-existingCount)){say(T("నమోదు చేయబోయే విద్యార్థుల సంఖ్య Class Strength‌లో మిగిలిన స్థానాలకంటే ఎక్కువగా ఉంది.","The number of students exceeds the remaining class strength."),true);return;}
-  const button=main.querySelector("#saveAllStudents"),addButtons=[main.querySelector("#addStudentRows"),main.querySelector("#addOneStudentRow")];
-  button.disabled=true;addButtons.forEach(b=>b.disabled=true);button.textContent=T("విద్యార్థులను సేవ్ చేస్తోంది…","Saving students…");
-  const response=await createClassStudents(activeClassId,filled.map(row=>({name:row.name,gender:row.gender,dob:row.dob})));
-  const created=response.created||[];
-  const failed=(response.failed||[]).map(item=>({row:filled[item.index],error:{message:item.message}}));
-  try{
-   const result=await listClassStudents(activeClassId);existingCount=(result.students||[]).length;renderStudents(result.students||[]);
-  }catch(error){say(T("కొన్ని రికార్డులు సేవ్ అయ్యాయి, కానీ జాబితాను రీలోడ్ చేయలేకపోయాం.","Some records were saved, but the list could not be reloaded."),true);}
-  rowsBox.innerHTML="";
-  if(failed.length){failed.forEach(item=>addRow(item.row));say(T("విజయవంతంగా సేవ్: ","Saved successfully: ")+created.length+" · "+T("మళ్లీ ప్రయత్నించాల్సినవి: ","Need retry: ")+failed.length,true);}
-  else{emptyRows(Math.max(0,targetStrength-existingCount));say(T("విజయవంతంగా సేవ్: ","Saved successfully: ")+created.length+" · "+T("ఇంకా ఖాళీ స్థానాలు: ","Remaining seats: ")+Math.max(0,targetStrength-existingCount));}
-  if(created.length){const ids=created.map(item=>item.studentId).join(", ");toast(T("Student IDs: ","Student IDs: ")+ids);}
-  button.disabled=false;addButtons.forEach(b=>b.disabled=false);button.textContent=T("అన్ని వివరాలు సేవ్ చేయండి","Save All Students");
- };
 }
 function teacherManagementMarkup(){
  const classes=["Class 1","Class 2","Class 3","Class 4","Class 5"];
@@ -318,7 +227,7 @@ function modulePage(){
  const teacherManagement=title==="Teacher Management"&&state.role==="hm";
  const classManagement=title==="Class Management"&&state.role==="hm";
  const managementDetail=teacherManagement||classManagement;
- const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
+ const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup({T}):`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
  const previewNote=managementLanding||managementDetail?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
  if(managementLanding){
   main.innerHTML='<section class="management-picker-screen">'+managementLandingMarkup()+'</section>';
@@ -358,7 +267,7 @@ function modulePage(){
  setupPosterStudio();
  alumniSponsorSection.bindCommunityModuleActions();
  if(teacherManagement)bindTeacherManagement();
- if(classManagement)bindClassManagement();
+ if(classManagement)bindClassManagement({main,T,escapeHtml});
 }
  return { modulePage };
 }

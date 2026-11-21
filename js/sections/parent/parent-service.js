@@ -27,7 +27,7 @@ export async function registerParent({studentRecordId,studentId,classId,rollNumb
   const name=t(parentName).slice(0,80),relation=t(relationship);
   if(name.length<2||!["Father","Mother","Guardian","Other"].includes(relation)) throw msg("Enter your name and relationship.","మీ పేరు మరియు విద్యార్థితో సంబంధం నమోదు చేయండి.");
   const normalizedDob=t(dob).replaceAll("/","");
-  if(!/^\d{8}$/.test(normalizedDob)||!/^\d{12}$/.test(t(secretCode))) throw msg("Enter DOB and the 12-digit Permanent Secret Code.","పుట్టిన తేదీ మరియు 12 అంకెల Permanent Secret Code నమోదు చేయండి.");
+  if(!/^\d{8}$/.test(normalizedDob)||!/^\d{6}$/.test(t(secretCode))) throw msg("Enter DOB and the 6-digit Permanent Secret Code.","పుట్టిన తేదీ మరియు 6 అంకెల Permanent Secret Code నమోదు చేయండి.");
   const secretCodeHash=await sha256(t(secretCode));
   const profileRef=doc(db,"parentProfiles",user.uid);
   const claimRef=doc(db,"parentClaims",user.uid+"_"+studentRecordId);

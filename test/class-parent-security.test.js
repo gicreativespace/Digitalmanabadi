@@ -41,3 +41,38 @@ test("Legacy API and Firebase Admin source are not present", async () => {
   await assert.rejects(access(new URL("../api", import.meta.url)));
   await assert.rejects(access(new URL("../lib/backend", import.meta.url)));
 });
+
+
+test("Class register supports explicit Submit Class, persisted strength and safe student edits", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  const register = await read("../js/sections/class-management/class-register.js");
+  const page = await read("../js/modules/module-page.js");
+  assert.match(register, /Submit Class/);
+  assert.match(register, /saveClassDetails/);
+  assert.match(register, /updateClassStudent/);
+  assert.match(register, /const created=response.created\|\|\[\]/);
+  assert.match(register, /studentId:item.studentId,rollNumber:item.rollNumber/);
+  assert.match(register, /secretCode:item.secretCode/);
+  assert.match(register, /renderStudents\(currentStudents\)/);
+  assert.match(service, /status:complete\?"complete":"draft"/);
+  assert.match(service, /updateDoc\(studentRef,\{name,gender,dob,updatedAt/);
+  assert.match(page, /classManagementMarkup, bindClassManagement/);
+});
+
+
+test("Student Secret Code generator creates a six-digit numeric code", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  assert.match(service, /function randomSecretCode\(\)/);
+  assert.match(service, /const range=900000/);
+  assert.match(service, /return String\(100000\+\(value%range\)\)/);
+  assert.doesNotMatch(service, /padStart\(12/);
+});
+
+
+test("Parent verification accepts six-digit student Secret Codes", async () => {
+  const parentService = await read("../js/sections/parent/parent-service.js");
+  const parentSection = await read("../js/sections/parent/parent-section.js");
+  assert.ok(parentService.includes("!/\\d{6}$/.test(t(secretCode))"));
+  assert.match(parentSection, /id="parentSecretCode" type="password" inputmode="numeric" maxlength="6"/);
+  assert.doesNotMatch(parentService, /12-digit Permanent Secret Code/);
+});
