@@ -143,7 +143,8 @@ function roleCard(ic,te,en,role,tone){
 }
 function login(){loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
-function linking(){parentSection.renderLinking();}\nfunction parentAddChild(){parentSection.renderAddChild();}
+function linking(){parentSection.renderLinking();}
+function parentAddChild(){parentSection.renderAddChild();}
 function dashboard(){dashboardScreen.render();if(state.role==="parent"){const add=main.querySelector("#parentAddChild");if(add)add.onclick=()=>{state.view="parentAddChild";render();};}}
 function profilePage(){accountScreens.profilePage();}
 function settingsPage(){accountScreens.settingsPage();}
