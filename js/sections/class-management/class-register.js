@@ -15,12 +15,13 @@ export function classManagementMarkup({T}){
 export async function bindClassManagement({main,T,escapeHtml}){
  const panel=main.querySelector("#classStudentPanel"),title=main.querySelector("#classStudentTitle"),status=main.querySelector("#classStudentStatus"),list=main.querySelector("#classStudentList"),rowsBox=main.querySelector("#studentEntryRows");
  if(!panel||!rowsBox)return;
- let activeClassId="",targetStrength=0,existingCount=0;
+ let activeClassId="",targetStrength=0,existingCount=0,activeStudents=[];
  const esc=v=>escapeHtml(String(v??""));
  const say=(message,bad=false)=>{status.textContent=message;status.className=bad?"class-admin-error":"class-admin-status";};
  const dobText=v=>/^\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"");
  const strengthSetup=main.querySelector("#classStrengthSetup"),workspace=main.querySelector("#classSheetWorkspace"),strengthInput=main.querySelector("#classStrengthInput"),summary=main.querySelector("#classSheetSummary");
  const renderStudents=students=>{
+  activeStudents=students;
   if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students registered yet.")+'</div>';return;}
   list.innerHTML='<h4>'+T("విద్యార్థుల జాబితా · Edit / Update","Student Register · Edit / Update")+'</h4>'+students.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>Student ID: '+esc(st.studentId)+' · Roll No. '+esc(st.rollNumber)+'</small></div><span>'+T("నమోదైంది","Registered")+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(T(st.gender==="Male"?"పురుషుడు":st.gender==="Female"?"స్త్రీ":"ఇతర",st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(dobText(st.dob))+'</b></div><div class="class-secret"><span>Permanent Secret Code · Head Master Only</span><b>'+esc(st.secretCode||"—")+'</b></div></div><button type="button" class="btn secondary" data-edit-student="'+esc(st.studentRecordId)+'">'+T("Edit Student","Edit Student")+'</button><form class="class-edit-form" data-edit-form="'+esc(st.studentRecordId)+'" hidden><input name="name" maxlength="100" required value="'+esc(st.name)+'"><select name="gender" required><option value="Male" '+(st.gender==="Male"?"selected":"")+'>'+T("పురుషుడు","Male")+'</option><option value="Female" '+(st.gender==="Female"?"selected":"")+'>'+T("స్త్రీ","Female")+'</option><option value="Other" '+(st.gender==="Other"?"selected":"")+'>'+T("ఇతర","Other")+'</option></select><input name="dob" required maxlength="10" placeholder="DD/MM/YYYY" value="'+esc(dobText(st.dob))+'"><button class="btn" type="submit">'+T("Update Student","Update Student")+'</button></form></article>').join("");
  };
@@ -67,12 +68,12 @@ export async function bindClassManagement({main,T,escapeHtml}){
    }));
    const totalRegistered=existingCount+createdStudents.length;
    existingCount=totalRegistered;
-   const currentStudents=[...createdStudents];
+   const currentStudents=[...activeStudents,...createdStudents];
    renderStudents(currentStudents);
    const saved=await saveClassDetails(activeClassId,targetStrength,totalRegistered);
    if(failed.length){
     rowsBox.innerHTML="";
-    for(let failedIndex=0;failedIndex<failed.length;failedIndex++){const item=failed[failedIndex],r=entries[item.index],roll=String(students.length+failedIndex+1).padStart(2,"0");rowsBox.insertAdjacentHTML("beforeend",'<tr><td><span class="class-sheet-roll">'+roll+'</span></td><td><input data-student-name value="'+esc(r.name)+'"></td><td><select data-student-gender><option value="Male" '+(r.gender==="Male"?"selected":"")+' >Male</option><option value="Female" '+(r.gender==="Female"?"selected":"")+' >Female</option><option value="Other" '+(r.gender==="Other"?"selected":"")+' >Other</option></select></td><td><input data-student-dob value="'+esc(r.dob)+'" maxlength="10"></td></tr>');}
+    for(let failedIndex=0;failedIndex<failed.length;failedIndex++){const item=failed[failedIndex],r=entries[item.index],roll=String(totalRegistered+failedIndex+1).padStart(2,"0");rowsBox.insertAdjacentHTML("beforeend",'<tr><td><span class="class-sheet-roll">'+roll+'</span></td><td><input data-student-name value="'+esc(r.name)+'"></td><td><select data-student-gender><option value="Male" '+(r.gender==="Male"?"selected":"")+' >Male</option><option value="Female" '+(r.gender==="Female"?"selected":"")+' >Female</option><option value="Other" '+(r.gender==="Other"?"selected":"")+' >Other</option></select></td><td><input data-student-dob value="'+esc(r.dob)+'" maxlength="10"></td></tr>');}
     say(T("కొన్ని Rows సేవ్ కాలేదు. ఇప్పటికే సృష్టించిన విద్యార్థుల Student ID, Roll Number, Secret Code క్రింద చూపించబడ్డాయి. మిగిలిన Rows మళ్లీ Submit చేయండి.","Some rows failed. Generated Student IDs, Roll Numbers and Secret Codes for successful rows are shown below. Submit the remaining rows again."),true);
    }else{
     workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value=String(targetStrength);
