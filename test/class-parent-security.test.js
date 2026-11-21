@@ -72,7 +72,7 @@ test("Student Secret Code generator creates a six-digit numeric code", async () 
 test("Parent verification accepts six-digit student Secret Codes", async () => {
   const parentService = await read("../js/sections/parent/parent-service.js");
   const parentSection = await read("../js/sections/parent/parent-section.js");
-  assert.match(parentService, /!\/^\\d\{6\}\$\//);
+  assert.ok(parentService.includes("!/\\d{6}$/.test(t(secretCode))"));
   assert.match(parentSection, /id="parentSecretCode" type="password" inputmode="numeric" maxlength="6"/);
   assert.doesNotMatch(parentService, /12-digit Permanent Secret Code/);
 });
