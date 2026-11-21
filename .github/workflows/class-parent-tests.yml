@@ -22,5 +22,6 @@ jobs:
             node --check "$file"
           done
       - name: Validate Firestore Rules in emulator
-        run: npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-digital-mana-badi "echo Firestore Rules compiled successfully"\n      - name: Run tests
+        run: npx --yes firebase-tools@latest emulators:exec --only firestore --project demo-digital-mana-badi "echo Firestore Rules compiled successfully"
+      - name: Run tests
         run: npm test
