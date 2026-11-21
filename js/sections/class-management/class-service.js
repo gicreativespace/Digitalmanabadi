@@ -16,8 +16,11 @@ function academicYearCode(){
   return parts;
 }
 function randomSecretCode(){
-  const bytes=crypto.getRandomValues(new Uint32Array(1));
-  return String(100000000000n + (BigInt(bytes[0]) * 900000000000n / 4294967296n)).padStart(12,"0");
+  // Uniform cryptographically-random six-digit student verification code.
+  const range=900000,limit=Math.floor(0x100000000/range)*range;
+  let value;
+  do { value=crypto.getRandomValues(new Uint32Array(1))[0]; } while(value>=limit);
+  return String(100000+(value%range));
 }
 async function sha256(value){
   const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(value)));
