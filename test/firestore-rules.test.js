@@ -5,7 +5,7 @@ import { initializeTestEnvironment, assertSucceeds, assertFails } from "@firebas
 import { doc, getDoc, setDoc, writeBatch, collection, getDocs, query, where } from "firebase/firestore";
 
 let env;
-const projectId="demo-digital-mana-badi-rules";
+const projectId="demo-digital-mana-badi";
 const parentToken={firebase:{sign_in_provider:"anonymous"}};
 
 before(async()=>{
