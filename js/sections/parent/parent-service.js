@@ -1,11 +1,12 @@
 import { auth, db } from "../../firebase-client.js";
 import { signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { collection, doc, getDoc, getDocs, query, where, setDoc, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const t=value=>String(value??"").trim();
 const te=()=>localStorage.getItem("gim_lang")!=="en";
 function msg(en,teText){return new Error(te()?teText:en);}
 async function ensureParentSession(){
+  if(typeof auth.authStateReady==="function") await auth.authStateReady();
   if(!auth.currentUser) await signInAnonymously(auth);
   return auth.currentUser;
 }
