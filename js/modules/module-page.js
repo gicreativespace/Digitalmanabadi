@@ -227,7 +227,7 @@ function modulePage(){
  const teacherManagement=title==="Teacher Management"&&state.role==="hm";
  const classManagement=title==="Class Management"&&state.role==="hm";
  const managementDetail=teacherManagement||classManagement;
- const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup():`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
+ const detailMarkup=teacherManagement?teacherManagementMarkup():classManagement?classManagementMarkup({T}):`<div class="detail-list">${cfg.map((s,i)=>`<div class="detail-row"><span class="detail-icon">${i+1}</span><div><strong>${s}</strong><small>${i===0?"విభాగాన్ని తెరిచి వివరాలు చూడండి.":"అనుమతులకు అనుగుణంగా అందుబాటులో ఉంటుంది."}</small></div><span>›</span></div>`).join("")}</div>`;
  const previewNote=managementLanding||managementDetail?"":'<div class="demo-note">ఇది Frontend Preview. నిజమైన School Data, Authentication, Approval Writes ఇంకా Firebaseతో అనుసంధానం కాలేదు.</div>';
  if(managementLanding){
   main.innerHTML='<section class="management-picker-screen">'+managementLandingMarkup()+'</section>';
@@ -267,7 +267,7 @@ function modulePage(){
  setupPosterStudio();
  alumniSponsorSection.bindCommunityModuleActions();
  if(teacherManagement)bindTeacherManagement();
- if(classManagement)bindClassManagement();
+ if(classManagement)bindClassManagement({main,T,escapeHtml});
 }
  return { modulePage };
 }
