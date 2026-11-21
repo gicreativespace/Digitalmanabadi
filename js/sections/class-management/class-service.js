@@ -73,7 +73,7 @@ export async function createClassStudent(classId,payload){
     if(lookup.exists()) throw new Error("Student ID already exists. Please retry.");
     tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,rollNumber,studentId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     tx.set(secretRef,{schoolId:hm.schoolId,studentRecordId:recordRef.id,secretCode,secretCodeHash,createdAt:serverTimestamp()});
-    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,classId,rollNumber,name,schoolId:hm.schoolId,status:"active"});
+    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,classId,rollNumber,schoolId:hm.schoolId,status:"active"});
     tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
     tx.set(doc(db,"classrooms",hm.schoolId+"_"+classId),{schoolId:hm.schoolId,classId,classNumber,updatedBy:hm.uid,updatedAt:serverTimestamp()},{merge:true});
     created={studentRecordId:recordRef.id,studentId,rollNumber,secretCode};
