@@ -1,5 +1,5 @@
 import { auth, db } from "../../firebase-client.js";
-import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const CLASSES = new Set(["class-1","class-2","class-3","class-4","class-5"]);
 const text = value => String(value ?? "").trim();
@@ -96,4 +96,31 @@ export async function createClassStudents(classId, entries){
     }
   }
   return {created,failed};
+}
+
+
+// Persist class strength and lifecycle only after the register submission attempt.
+// Existing student identity, roll allocation, Secret Code and parent-link records are untouched.
+export async function saveClassDetails(classId, strength, registeredCount){
+  if(!CLASSES.has(classId)) throw new Error("Choose a valid class.");
+  if(!Number.isInteger(strength)||strength<1||strength>99||!Number.isInteger(registeredCount)||registeredCount<0||registeredCount>strength) throw new Error("Enter a valid class strength.");
+  const hm=await requireHeadMaster(),classNumber=Number(classId.slice(-1));
+  const complete=registeredCount===strength;
+  await setDoc(doc(db,"classrooms",hm.schoolId+"_"+classId),{
+    schoolId:hm.schoolId,classId,classNumber,strength,registeredCount,
+    status:complete?"complete":"draft",updatedBy:hm.uid,updatedAt:serverTimestamp(),
+    ...(complete?{completedAt:serverTimestamp()}:{})
+  },{merge:true});
+  return {classId,strength,registeredCount,status:complete?"complete":"draft"};
+}
+
+export async function updateClassStudent(studentRecordId, payload){
+  const hm=await requireHeadMaster();
+  const name=text(payload.name).slice(0,100),gender=text(payload.gender),dob=normalizeDob(payload.dob);
+  if(name.length<2||!["Male","Female","Other"].includes(gender)) throw new Error("Enter all required student details.");
+  const studentRef=doc(db,"students",String(studentRecordId||""));
+  const snap=await getDoc(studentRef);
+  if(!snap.exists()||snap.data().schoolId!==hm.schoolId) throw new Error("Student record was not found in this school.");
+  await updateDoc(studentRef,{name,gender,dob,updatedAt:serverTimestamp()});
+  return {studentRecordId:String(studentRecordId),name,gender,dob};
 }

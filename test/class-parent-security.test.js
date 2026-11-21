@@ -41,3 +41,16 @@ test("Legacy API and Firebase Admin source are not present", async () => {
   await assert.rejects(access(new URL("../api", import.meta.url)));
   await assert.rejects(access(new URL("../lib/backend", import.meta.url)));
 });
+
+
+test("Class register supports explicit Submit Class, persisted strength and safe student edits", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  const register = await read("../js/sections/class-management/class-register.js");
+  const page = await read("../js/modules/module-page.js");
+  assert.match(register, /Submit Class/);
+  assert.match(register, /saveClassDetails/);
+  assert.match(register, /updateClassStudent/);
+  assert.match(service, /status:complete\?"complete":"draft"/);
+  assert.match(service, /updateDoc\(studentRef,\{name,gender,dob,updatedAt/);
+  assert.match(page, /classManagementMarkup, bindClassManagement/);
+});
