@@ -1,36 +1,43 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { classNumberFromId, validateDob } from "../lib/backend/ids.js";
-import { generateSecretCode, encryptSecretCode, decryptSecretCode, hmac } from "../lib/backend/admin.js";
+import { readFile } from "node:fs/promises";
 
-process.env.STUDENT_SECRET_ENCRYPTION_KEY = "a".repeat(64);
-process.env.PARENT_SECRET_PEPPER = "test-pepper-value-that-is-at-least-32-characters-long";
+const read = path => readFile(new URL(path, import.meta.url), "utf8");
 
-test("class IDs are restricted to the five approved classrooms", () => {
-  assert.equal(classNumberFromId("class-1"), 1);
-  assert.equal(classNumberFromId("class-5"), 5);
-  assert.throws(() => classNumberFromId("class-6"));
+test("Class Management uses Firestore client and generates annual IDs", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  assert.match(service, /firebase-firestore\.js/);
+  assert.match(service, /studentId=year\+String\(classNumber\)/);
+  assert.match(service, /crypto\.getRandomValues/);
+  assert.doesNotMatch(service, /fetch\(|backendApiBaseUrl|\/api\//);
 });
 
-test("DOB accepts valid DDMMYYYY and rejects impossible dates", () => {
-  assert.equal(validateDob("29/02/2000"), "29022000");
-  assert.throws(() => validateDob("29/02/2001"));
-  assert.throws(() => validateDob("31131999"));
+test("Parent verification uses anonymous Firebase identity and private verifier claims", async () => {
+  const service = await read("../js/sections/parent/parent-service.js");
+  const rules = await read("../firestore.rules");
+  assert.match(service, /signInAnonymously/);
+  assert.match(service, /SHA-256/);
+  assert.match(service, /parentClaims/);
+  assert.match(service, /gim_parent_device_pin_v1/);
+  assert.doesNotMatch(service, /signInWithCustomToken|fetch\(|backendApiBaseUrl/);
+  assert.match(rules, /match \/studentSecrets/);
+  assert.match(rules, /match \/parentClaims/);
+  assert.match(rules, /getAfter\(/);
+  assert.match(rules, /function linkedParent/);
 });
 
-test("Permanent Secret Codes are 12 digits and encrypt/decrypt without storing plaintext", () => {
-  const code = generateSecretCode();
-  assert.match(code, /^\d{12}$/);
-  const encrypted = encryptSecretCode(code);
-  assert.equal(encrypted.ciphertext.includes(code), false);
-  assert.equal(decryptSecretCode({
-    secretCodeCiphertext: encrypted.ciphertext,
-    secretCodeIv: encrypted.iv,
-    secretCodeTag: encrypted.tag
-  }), code);
+test("Parent PIN is a local device lock, not a server credential", async () => {
+  const service = await read("../js/sections/parent/parent-service.js");
+  const section = await read("../js/sections/parent/parent-section.js");
+  const login = await read("../js/sections/parent/login.js");
+  assert.match(service, /localStorage\.setItem\(PIN_KEY/);
+  assert.doesNotMatch(service, /setDoc\(.*PIN|parentProfiles.*pin/i);
+  assert.match(section, /saveParentPin/);
+  assert.match(login, /App Lock PIN/);
 });
 
-test("Secret Code verifiers are deterministic keyed hashes", () => {
-  assert.equal(hmac("secret:123456789012"), hmac("secret:123456789012"));
-  assert.notEqual(hmac("secret:123456789012"), hmac("mobile:+919876543210"));
+test("Legacy API and Firebase Admin source are not present", async () => {
+  const { access } = await import("node:fs/promises");
+  await assert.rejects(access(new URL("../api", import.meta.url)));
+  await assert.rejects(access(new URL("../lib/backend", import.meta.url)));
 });
