@@ -1,6 +1,6 @@
 import { renderCalendarMarkup } from "./calendar.js";
 import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
-import { listClassrooms, listClassStudents, createClassStudent } from "../sections/class-management/class-service.js";
+import { listClassrooms, listClassStudents, createClassStudents } from "../sections/class-management/class-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
@@ -85,15 +85,13 @@ async function bindClassManagement(){
   const entries=[...rowsBox.querySelectorAll("[data-entry-row]")].map(row=>({key:row.dataset.entryRow,name:row.querySelector("[data-student-name]").value.trim(),gender:row.querySelector("[data-student-gender]").value,dob:row.querySelector("[data-student-dob]").value.trim()}));
   const filled=entries.filter(row=>row.name||row.gender||row.dob);
   if(!filled.length){say(T("ముందుగా కనీసం ఒక విద్యార్థి వివరాలు నమోదు చేయండి.","Enter at least one student before saving."),true);return;}
-  const invalid=filled.filter(row=>row.name.length<2||!["Male","Female","Other"].includes(row.gender)||!/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(row.dob));
+  const invalid=filled.filter(row=>row.name.length<2||!["Male","Female","Other"].includes(row.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(row.dob));
   if(invalid.length){say(T("పేరు, లింగం మరియు DD/MM/YYYY పుట్టిన తేదీ అన్ని Rows‌లో సరిచూడండి.","Check name, gender and DD/MM/YYYY date of birth in every filled row."),true);return;}
   const button=main.querySelector("#saveAllStudents"),addButtons=[main.querySelector("#addStudentRows"),main.querySelector("#addOneStudentRow")];
   button.disabled=true;addButtons.forEach(b=>b.disabled=true);button.textContent=T("విద్యార్థులను సేవ్ చేస్తోంది…","Saving students…");
-  const failed=[],created=[];
-  for(const row of filled){
-   try{const result=await createClassStudent(activeClassId,{name:row.name,gender:row.gender,dob:row.dob});created.push(result.student);}
-   catch(error){failed.push({row,error});}
-  }
+  const response=await createClassStudents(activeClassId,filled.map(row=>({name:row.name,gender:row.gender,dob:row.dob})));
+  const created=response.created||[];
+  const failed=(response.failed||[]).map(item=>({row:filled[item.index],error:{message:item.message}}));
   try{
    const result=await listClassStudents(activeClassId);renderStudents(result.students||[]);
   }catch(error){say(T("కొన్ని రికార్డులు సేవ్ అయ్యాయి, కానీ జాబితాను రీలోడ్ చేయలేకపోయాం.","Some records were saved, but the list could not be reloaded."),true);}
