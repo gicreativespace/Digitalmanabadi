@@ -44,7 +44,6 @@ function classManagementMarkup(){
  '<div class="field"><label for="studentName">'+T("విద్యార్థి పేరు","Student Name")+'</label><input id="studentName" name="name" maxlength="100" required></div>'+
  '<div class="field"><label for="studentGender">'+T("లింగం","Gender")+'</label><select id="studentGender" name="gender" required><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Male">'+T("పురుషుడు","Male")+'</option><option value="Female">'+T("స్త్రీ","Female")+'</option><option value="Other">'+T("ఇతర","Other")+'</option></select></div>'+
  '<div class="field"><label for="studentDob">'+T("పుట్టిన తేదీ (DD/MM/YYYY)","Date of Birth (DD/MM/YYYY)")+'</label><input id="studentDob" name="dob" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" required></div>'+
-    '<div class="field"><label for="studentSection">'+T("సెక్షన్ (ఐచ్ఛికం)","Section (optional)")+'</label><input id="studentSection" name="section" maxlength="1" placeholder="A"></div>'+
  '</div><div class="class-student-actions"><button type="submit" class="btn" id="createStudentButton">+ '+T("విద్యార్థిని చేర్చండి","Add Student")+'</button></div></form>'+
  '<div id="classStudentList" class="class-student-list"><div class="class-admin-empty">'+T("తరగతిని ఎంచుకోండి.","Choose a class.")+'</div></div></section></div>';
 }
