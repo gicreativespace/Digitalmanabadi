@@ -1,9 +1,9 @@
-name: Class and Parent Security Tests
+name: Class and Parent Firestore Tests
 
 on:
   push:
     branches:
-      - feature/parent-verification-class-management
+      - feature/firestore-parent-classroom-no-backend
   pull_request:
     branches:
       - main
@@ -12,33 +12,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install dependencies
-        run: npm install
       - name: Check JavaScript syntax
         run: |
-          for file in \
-            api/classrooms/index.js \
-            'api/classrooms/[classId]/students.js' \
-            api/parent/students.js \
-            api/parent/verify.js \
-            api/parent/children.js \
-            'api/students/[studentRecordId].js' \
-            lib/backend/admin.js \
-            lib/backend/ids.js \
-            config/school-config.js \
-            js/modules/module-page.js \
-            js/sections/class-management/class-service.js \
-            js/sections/parent/parent-section.js \
-            js/sections/parent/parent-service.js \
-            js/sections/parent/dashboard.js \
-            js/shared/login-screen.js; do
+          for file in config/school-config.js js/core/app.js js/modules/module-page.js js/sections/class-management/class-service.js js/sections/parent/parent-section.js js/sections/parent/parent-service.js js/sections/parent/dashboard.js js/sections/parent/login.js js/shared/login-screen.js; do
             node --check "$file"
           done
-      - name: Run unit tests
+      - name: Run tests
         run: npm test
