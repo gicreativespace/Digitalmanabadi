@@ -7,7 +7,7 @@ service cloud.firestore {
   function isSuperAdmin(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="GI_SUPER_ADMIN" && get(adminPath()).data.status=="active";}
   function hmPath(){return /databases/$(database)/documents/headMasters/$(request.auth.uid);}
   function isActiveHeadMasterFor(schoolId){return signedIn() && exists(hmPath()) && get(hmPath()).data.role=="HEAD_MASTER" && get(hmPath()).data.status=="active" && get(hmPath()).data.schoolId==schoolId;}
-  function isActiveHeadMaster(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="HEAD_MASTER" && get(adminPath()).data.status=="active";}
+  function isActiveHeadMaster(){return signedIn() && exists(adminPath()) && get(adminPath()).data.role=="HEAD_MASTER" && get(adminPath()).data.status=="active";}\n  function isActiveHeadMasterForSchool(schoolId){return isActiveHeadMaster() && get(adminPath()).data.schoolId==schoolId;}
   function linkedParent(studentRecordId){return anonymousParent() && exists(/databases/$(database)/documents/parentLinks/$(studentRecordId)) && get(/databases/$(database)/documents/parentLinks/$(studentRecordId)).data.parentUid==request.auth.uid;}
   match /platformAdmins/{adminUid}{allow get: if signedIn() && request.auth.uid==adminUid;allow list,create,update,delete: if false;}
   match /schools/{schoolId}{allow read,write: if isSuperAdmin();allow get: if isActiveHeadMasterFor(schoolId);allow list: if false;}
@@ -33,8 +33,8 @@ service cloud.firestore {
    allow update: if isActiveHeadMaster() && request.resource.data.schoolId==resource.data.schoolId && request.resource.data.studentRecordId==resource.data.studentRecordId;
    allow delete: if false;
   }
-  match /studentSecrets/{studentRecordId}{allow get,list: if isActiveHeadMaster();allow create,update,delete: if isActiveHeadMaster();}
-  match /studentLookup/{studentId}{allow get: if anonymousParent() || isActiveHeadMaster();allow list: if false;allow write: if isActiveHeadMaster();}
+  match /studentSecrets/{studentRecordId}{allow get,list: if isActiveHeadMasterForSchool(resource.data.schoolId);allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId);allow update: if isActiveHeadMasterForSchool(resource.data.schoolId) && request.resource.data.schoolId==resource.data.schoolId;allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);}
+  match /studentLookup/{studentId}{allow get: if anonymousParent() || isActiveHeadMasterForSchool(resource.data.schoolId);allow list: if false;allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId);allow update: if isActiveHeadMasterForSchool(resource.data.schoolId) && request.resource.data.schoolId==resource.data.schoolId;allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);}
   match /parentProfiles/{uid}{
    allow get: if anonymousParent() && request.auth.uid==uid;
    allow list: if false;
@@ -52,13 +52,13 @@ service cloud.firestore {
    allow read,update,delete: if false;
   }
   match /parentLinks/{studentRecordId}{
-   allow get,list: if isActiveHeadMaster() || (anonymousParent() && resource.data.parentUid==request.auth.uid);
+   allow get,list: if isActiveHeadMasterForSchool(resource.data.schoolId) || (anonymousParent() && resource.data.parentUid==request.auth.uid);
    allow create,update: if anonymousParent()
     && request.resource.data.parentUid==request.auth.uid
     && request.resource.data.studentRecordId==studentRecordId
     && existsAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid+"_"+studentRecordId))
     && getAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid+"_"+studentRecordId)).data.parentUid==request.auth.uid;
-   allow delete: if isActiveHeadMaster();
+   allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);
   }
   match /{document=**}{allow read,write: if false;}
  }
