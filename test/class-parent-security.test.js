@@ -58,3 +58,12 @@ test("Class register supports explicit Submit Class, persisted strength and safe
   assert.match(service, /updateDoc\(studentRef,\{name,gender,dob,updatedAt/);
   assert.match(page, /classManagementMarkup, bindClassManagement/);
 });
+
+
+test("Student Secret Code generator creates a six-digit numeric code", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  assert.match(service, /function randomSecretCode\(\)/);
+  assert.match(service, /const range=900000/);
+  assert.match(service, /return String\(100000\+\(value%range\)\)/);
+  assert.doesNotMatch(service, /padStart\(12/);
+});
