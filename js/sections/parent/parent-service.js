@@ -14,8 +14,8 @@ async function ensureParentSession(){
   return user;
 }
 export async function signInParentAccount(mobile,password){
-  const phone=t(mobile).replace(/\\D/g,"");
-  if(!/^\\d{10}$/.test(phone)||!t(password)) throw msg("Enter your 10-digit mobile number and password.","10 అంకెల మొబైల్ నంబర్ మరియు Password నమోదు చేయండి.");
+  const phone=t(mobile).replace(/\D/g,"");
+  if(!/^\d{10}$/.test(phone)||!t(password)) throw msg("Enter your 10-digit mobile number and password.","10 అంకెల మొబైల్ నంబర్ మరియు Password నమోదు చేయండి.");
   await setPersistence(auth,browserLocalPersistence);
   const email=phone+"@parents.dagguluruschool.in";
   try{
@@ -51,41 +51,36 @@ export async function findParentStudent(studentId){
   return snap.data();
 }
 export async function registerParent({studentRecordId,studentId,classId,rollNumber,schoolId,dob,secretCode,parentName,relationship}){
-  const user=await ensureParentSession();
-  const name=t(parentName).slice(0,80),relation=t(relationship);
-  if(name.length<2||!["Father","Mother","Guardian","Other"].includes(relation)) throw msg("Enter your name and relationship.","మీ పేరు మరియు విద్యార్థితో సంబంధం నమోదు చేయండి.");
-  const normalizedDob=t(dob).replaceAll("/","");
-  if(!/^\d{8}$/.test(normalizedDob)||!/^\d{12}$/.test(t(secretCode))) throw msg("Enter DOB and the 12-digit Permanent Secret Code.","పుట్టిన తేదీ మరియు 12 అంకెల Permanent Secret Code నమోదు చేయండి.");
+  const user=await ensureParentSession(),profile=await getParentProfile();
+  const relation=t(relationship),normalizedDob=t(dob).replaceAll("/","");
+  if(!["Father","Mother","Guardian","Other"].includes(relation)) throw msg("Choose your relationship to the student.","విద్యార్థితో మీ సంబంధాన్ని ఎంచుకోండి.");
+  if(!/^\d{8}$/.test(normalizedDob)||!/^\d{12}$/.test(t(secretCode))) throw msg("Enter DOB and the 12-digit Student Secret Code.","పుట్టిన తేదీ మరియు 12 అంకెల Student Secret Code నమోదు చేయండి.");
   const secretCodeHash=await sha256(t(secretCode));
-  const profileRef=doc(db,"parentProfiles",user.uid);
   const claimRef=doc(db,"parentClaims",user.uid+"_"+studentRecordId);
-  const linkRef=doc(db,"parentLinks",studentRecordId);
+  const linkRef=doc(db,"parentLinks",studentRecordId+"_"+user.uid);
   await runTransaction(db,async tx=>{
-    tx.set(profileRef,{uid:user.uid,parentName:name,createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true});
     tx.set(claimRef,{parentUid:user.uid,studentRecordId,studentId,dob:normalizedDob,secretCodeHash,createdAt:serverTimestamp()});
-    tx.set(linkRef,{parentUid:user.uid,studentRecordId,studentId,classId,rollNumber,schoolId,relationship:relation,linkedAt:serverTimestamp()});
+    tx.set(linkRef,{parentUid:user.uid,studentRecordId,studentId,classId,rollNumber,schoolId,relationship:relation,parentName:profile.parentName||t(parentName),linkedAt:serverTimestamp()});
   });
-  localStorage.setItem("gim_parent_name",name);
+  localStorage.setItem("gim_parent_name",String(profile.parentName||""));
   return await getParentChildren();
 }
 export async function addParentChild({studentId,dob,secretCode,relationship}){
   const user=await ensureParentSession();
   const lookup=await findParentStudent(studentId);
-  const profile=await getDoc(doc(db,"parentProfiles",user.uid));
-  if(!profile.exists()) throw msg("Parent registration is required.","ముందుగా Parent Registration పూర్తి చేయండి.");
-  return registerParent({studentRecordId:lookup.studentRecordId,studentId:lookup.studentId,classId:lookup.classId,rollNumber:lookup.rollNumber,schoolId:lookup.schoolId,dob,secretCode,parentName:profile.data().parentName,relationship});
+  const profile=await getParentProfile();
+  return registerParent({studentRecordId:lookup.studentRecordId,studentId:lookup.studentId,classId:lookup.classId,rollNumber:lookup.rollNumber,schoolId:lookup.schoolId,dob,secretCode,parentName:profile.parentName,relationship});
 }
 export async function getParentChildren(){
   const user=await ensureParentSession();
-  const q=query(collection(db,"parentLinks"),where("parentUid","==",user.uid));
-  const links=await getDocs(q),children=[];
+  const links=await getDocs(query(collection(db,"parentLinks"),where("parentUid","==",user.uid))),children=[];
   for(const link of links.docs){
     const data=link.data(),student=await getDoc(doc(db,"students",data.studentRecordId));
-    if(student.exists()) children.push({...student.data(),studentRecordId:student.id,relationship:data.relationship});
+    if(student.exists()&&student.data().status==="active") children.push({...student.data(),studentRecordId:student.id,relationship:data.relationship});
   }
   return children;
 }
-const PIN_KEY="gim_parent_device_pin_v1";
+const PIN_KEY="gim_parent_device_pin_v2";
 function b64(bytes){return btoa(String.fromCharCode(...new Uint8Array(bytes)));}
 function unb64(value){return Uint8Array.from(atob(value),c=>c.charCodeAt(0));}
 export async function saveParentPin(pin){
