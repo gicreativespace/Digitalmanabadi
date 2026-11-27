@@ -20,7 +20,7 @@ jobs:
         run: npm install
       - name: Check JavaScript syntax
         run: |
-          for file in config/school-config.js js/core/app.js js/modules/module-page.js js/sections/class-management/class-service.js js/sections/parent/parent-section.js js/sections/parent/parent-service.js js/sections/parent/dashboard.js js/sections/parent/login.js js/shared/login-screen.js test/class-parent-security.test.js test/firestore-rules.test.js; do
+          for file in config/school-config.js js/core/app.js js/modules/module-page.js js/sections/class-management/class-service.js js/sections/student/pin-auth.js js/sections/student/student-portal.js js/sections/parent/parent-section.js js/sections/parent/parent-service.js js/sections/parent/dashboard.js js/sections/parent/login.js js/shared/login-screen.js js/shared/navigation.js test/class-parent-security.test.js test/firestore-rules.test.js; do
             node --check "$file"
           done
       - name: Validate Firestore Rules in emulator
