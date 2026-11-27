@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { webcrypto } from "node:crypto";
 
 const values=new Map();
-globalThis.crypto=globalThis.crypto||webcrypto;
+if(!globalThis.crypto?.subtle)Object.defineProperty(globalThis,"crypto",{value:webcrypto,configurable:true});
 globalThis.localStorage={
   getItem:key=>values.has(key)?values.get(key):null,
   setItem:(key,value)=>values.set(key,String(value)),
