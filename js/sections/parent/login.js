@@ -1,4 +1,8 @@
 export function getParentLoginView({T}) {
  const t=T||((a,b)=>a);
- return {kind:"parent",description:t("ఈ పరికరంలో మీ Parent App Lock PINతో కొనసాగండి. కొత్త పరికరమా? విద్యార్థిని Verify చేసి నమోదు చేయండి.","Continue with your Parent App Lock PIN on this device. New device? Verify and register your child."),formMarkup:'<input id="loginId" type="hidden" value="parent"><div class="field"><label>'+t("4 అంకెల App Lock PIN","4-digit App Lock PIN")+'</label><input id="loginPin" type="password" inputmode="numeric" maxlength="4" autocomplete="current-password"></div><button class="btn full" id="loginGo">'+t("యాప్‌ను అన్‌లాక్ చేయండి","Unlock App")+'</button><div class="link-row"><button class="text-link" id="startLink">'+t("కొత్త పరికరం / మొదటిసారి? నమోదు చేయండి","New device / First time? Register")+'</button></div>'};
+ return {
+  kind:"parent",
+  description:t("పాఠశాల అందించిన Parent Login ID మరియు Passwordతో కొనసాగండి.","Sign in with the Parent Login ID and temporary password provided by the school."),
+  formMarkup:'<div class="field"><label for="loginId">'+t("Parent Login ID","Parent Login ID")+'</label><input id="loginId" type="text" inputmode="numeric" autocomplete="username" placeholder="9876543210" maxlength="10"></div><div class="field"><label for="loginPassword">'+t("Password","Password")+'</label><input id="loginPassword" type="password" autocomplete="current-password"></div><button class="btn full" id="loginGo">'+t("సురక్షితంగా ప్రవేశించండి","Sign In Securely")+'</button><p class="role-login-hint">'+t("మొదటి Login తర్వాత మీ 4 అంకెల PIN సెట్ చేసుకోవచ్చు.","Set your 4-digit PIN after your first sign-in.")+'</p>'
+ };
 }
