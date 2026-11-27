@@ -15,7 +15,7 @@ test("Class Management uses Firestore client and generates annual IDs", async ()
 test("Sections share one class-wide transactional roll sequence", async () => {
   const service = await read("../js/sections/class-management/class-service.js");
   assert.match(service, /counterId=hm\.schoolId\+"_"\+year\+"_"\+classId/);
-  assert.match(service, /section,classNumber,rollNumber,studentId/);
+  assert.match(service, /classNumber,section,rollNumber,studentId/);
   assert.match(service, /latestSections/);
   assert.doesNotMatch(service, /counterId=.*section/);
 });
