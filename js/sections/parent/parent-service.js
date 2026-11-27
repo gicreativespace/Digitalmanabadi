@@ -1,5 +1,5 @@
 import { auth, db } from "../../firebase-client.js";
-import { signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const t=value=>String(value??"").trim();
@@ -7,8 +7,36 @@ const te=()=>localStorage.getItem("gim_lang")!=="en";
 function msg(en,teText){return new Error(te()?teText:en);}
 async function ensureParentSession(){
   if(typeof auth.authStateReady==="function") await auth.authStateReady();
-  if(!auth.currentUser) await signInAnonymously(auth);
-  return auth.currentUser;
+  const user=auth.currentUser;
+  if(!user||user.isAnonymous) throw msg("Sign in with your Parent Login ID and password.","Parent Login ID మరియు Passwordతో Sign In చేయండి.");
+  const profile=await getDoc(doc(db,"parentProfiles",user.uid));
+  if(!profile.exists()||profile.data().role!=="PARENT"||profile.data().status!=="active") throw msg("This Parent account is not active. Contact the Head Master.","ఈ Parent ఖాతా క్రియాశీలంగా లేదు. Head Masterను సంప్రదించండి.");
+  return user;
+}
+export async function signInParentAccount(mobile,password){
+  const phone=t(mobile).replace(/\\D/g,"");
+  if(!/^\\d{10}$/.test(phone)||!t(password)) throw msg("Enter your 10-digit mobile number and password.","10 అంకెల మొబైల్ నంబర్ మరియు Password నమోదు చేయండి.");
+  await setPersistence(auth,browserLocalPersistence);
+  const email=phone+"@parents.dagguluruschool.in";
+  try{
+    const credential=await signInWithEmailAndPassword(auth,email,t(password));
+    const profile=await getDoc(doc(db,"parentProfiles",credential.user.uid));
+    if(!profile.exists()||profile.data().role!=="PARENT"||profile.data().status!=="active"){
+      await signOut(auth);
+      throw msg("Parent account is not registered with this school.","ఈ పాఠశాలలో Parent ఖాతా నమోదు కాలేదు.");
+    }
+    localStorage.setItem("gim_parent_name",String(profile.data().parentName||""));
+    return profile.data();
+  }catch(error){
+    if(error?.message?.includes("Parent account is not registered"))throw error;
+    if(["auth/invalid-credential","auth/user-not-found","auth/wrong-password"].includes(error?.code)) throw msg("Mobile number or password is incorrect.","మొబైల్ నంబర్ లేదా Password సరిపోలలేదు.");
+    throw error;
+  }
+}
+export async function getParentProfile(){
+  const user=await ensureParentSession();
+  const snap=await getDoc(doc(db,"parentProfiles",user.uid));
+  return {uid:user.uid,...snap.data()};
 }
 async function sha256(value){
   const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(String(value)));
