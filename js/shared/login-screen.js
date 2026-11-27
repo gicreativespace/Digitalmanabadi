@@ -3,9 +3,30 @@ import { auth } from "../firebase-client.js";
 import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { getLocalTeacherPinRecord, saveLocalTeacherPin, verifyLocalTeacherPin } from "../sections/teacher/pin-auth.js";
-import { verifyParentPin, getParentChildren } from "../sections/parent/parent-service.js";
+import { verifyParentPin, saveParentPin, hasParentPin, getParentChildren, signInParentAccount } from "../sections/parent/parent-service.js";
 
 export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,roleLoginViews}) {
+ async function renderParentPinGate(setup){
+  const title=setup?T("మీ 4 అంకెల Parent PIN సెట్ చేయండి","Set your 4-digit Parent PIN"):T("Parent App Lock","Parent App Lock");
+  main.innerHTML='<div class="backline role-login-backline"><button class="btn secondary" id="parentPinBack">← '+T("వెనక్కి","Back")+'</button><span class="pill">PARENT</span></div><section class="role-login-layout login-unified" data-role="parent"><section class="role-login-panel"><div class="role-login-panel-heading"><span class="role-login-panel-kicker">FAMILY & SCHOOL · SECURE ACCESS</span><h2>'+title+'</h2><p>'+T("మీ పిల్లల పాఠశాల వివరాలను సురక్షితంగా చూడండి.","Securely access your child school information.")+'</p></div><div class="role-login-alert" id="parentPinAlert" role="alert" aria-live="polite" hidden></div><div class="field"><label>'+T("4 అంకెల PIN","4-digit PIN")+'</label><input id="parentPinValue" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>'+(setup?'<div class="field"><label>'+T("PIN నిర్ధారించండి","Confirm PIN")+'</label><input id="parentPinConfirm" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••"></div>':'')+'<button type="button" class="btn full role-login-submit" id="parentPinContinue">'+(setup?T("PIN సేవ్ చేయండి","Save PIN"):T("అన్‌లాక్ చేయండి","Unlock"))+'</button></section></section>';
+  const alert=main.querySelector("#parentPinAlert"),button=main.querySelector("#parentPinContinue");
+  const show=message=>{alert.hidden=false;alert.textContent=message;};
+  main.querySelector("#parentPinBack").onclick=async()=>{try{await signOut(auth)}catch{}state.role=null;state.authenticated=false;localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");state.view="welcome";render();};
+  button.onclick=async()=>{
+   const pin=main.querySelector("#parentPinValue").value;
+   if(!/^\d{4}$/.test(pin)){show(T("4 అంకెల PIN నమోదు చేయండి.","Enter a valid 4-digit PIN."));return;}
+   button.disabled=true;
+   try{
+    if(setup){if(pin!==main.querySelector("#parentPinConfirm").value){show(T("రెండు PINలు సరిపోలలేదు.","The PINs do not match."));button.disabled=false;return;}await saveParentPin(pin);}
+    else if(!await verifyParentPin(pin)){show(T("PIN సరిపోలలేదు.","Incorrect PIN."));button.disabled=false;return;}
+    const children=await getParentChildren();
+    state.parentChildren=children;state.linkedStudent=children[0]||null;state.parentName=localStorage.getItem("gim_parent_name")||"";state.parentLinked=children.length>0;state.authenticated=children.length>0;
+    localStorage.setItem("gim_role","parent");
+    if(children.length){localStorage.setItem("gim_authenticated","true");state.view="dashboard";}else{localStorage.removeItem("gim_authenticated");state.view="link";}
+    render();
+   }catch(error){show(error?.message||T("Parent వివరాలు లోడ్ కాలేదు.","Could not load Parent details."));button.disabled=false;}
+  };
+ }
  async function renderHmPinGate(){
   const setup=state.hmPinMode==="setup";
   const title=setup?T("కొత్త 4 అంకెల PIN సెట్ చేయండి","Set your 4-digit PIN"):T("Head Master PIN","Head Master PIN");
