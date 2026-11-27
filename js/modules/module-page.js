@@ -61,7 +61,7 @@ async function bindClassManagement(){
  const importStatus=main.querySelector("#rosterImportStatus"),importPreview=main.querySelector("#rosterImportPreview"),rosterFile=main.querySelector("#rosterFile");
  const csvCell=value=>'"'+String(value??"").replaceAll('"','""')+'"';
  const downloadCsv=(filename,rows)=>{const csv=rows.map(row=>row.map(csvCell).join(",")).join("\\r\\n");const url=URL.createObjectURL(new Blob(["\\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);};
- main.querySelector("#downloadRosterTemplate").onclick=()=>downloadCsv("digital-mana-badi-student-template.csv",[["Class","Section","Student Name","DOB","Gender","Parent Name","Parent Mobile","Relationship"],["Class 1","A","Student Name","DD/MM/YYYY","Male","Parent Name","9876543210","Father"]]);
+ main.querySelector("#downloadRosterTemplate").onclick=()=>downloadCsv("digital-mana-badi-student-template.csv",[["Class","Section","Student Name","DOB","Gender","Parent Name","Parent Mobile","Relationship"],["Class 1","","Student Name","DD/MM/YYYY","Male","Parent Name","9876543210","Father"]]);
  const parseCsv=textValue=>{const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<textValue.length;i++){const ch=textValue[i];if(ch==='"'&&quoted&&textValue[i+1]==='"'){cell+='"';i++;}else if(ch==='"'){quoted=!quoted;}else if(ch===","&&!quoted){row.push(cell);cell="";}else if((ch==="\\n"||ch==="\\r")&&!quoted){if(ch==="\\r"&&textValue[i+1]==="\\n")i++;row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);row=[];cell="";}else cell+=ch;}row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);return rows;};
  const readRoster=async file=>{
   const ext=file.name.split(".").pop().toLowerCase();let raw=[];
@@ -189,7 +189,7 @@ async function bindClassManagement(){
   }catch{if(linkStatus)linkStatus.textContent=portalUrl;}
  };
  const loadClass=async classId=>{
-  activeClassId=classId;targetStrength=0;existingCount=0;panel.hidden=false;workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value="";title.textContent=T(classId.slice(-1)+"వ తరగతి","Class "+classId.slice(-1));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';rowsBox.innerHTML="";
+  activeClassId=classId;targetStrength=0;existingCount=0;panel.hidden=false;workspace.hidden=true;strengthSetup.hidden=true;strengthInput.value="";title.textContent=T(classId.slice(-1)+"వ తరగతి","Class "+classId.slice(-1));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';rowsBox.innerHTML="";
   main.querySelectorAll("[data-class-open]").forEach(btn=>btn.setAttribute("aria-expanded",String(btn.dataset.classOpen===classId)));
   try{
    const [classroomsResult,studentResult]=await Promise.all([listClassrooms(),listClassStudents(classId)]);
