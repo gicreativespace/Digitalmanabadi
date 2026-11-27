@@ -19,7 +19,7 @@ function academicYearCode(){
 }
 function createStudentSecretCode(dob){
   const value=String(dob??"");
-  if(!/^\\d{8}$/.test(value)) throw new Error("A valid student date of birth is required to generate the login code.");
+  if(!/^\d{8}$/.test(value)) throw new Error("A valid student date of birth is required to generate the login code.");
   const dobDDMMYY=value.slice(0,4)+value.slice(6,8);
   const code=919720-Number(dobDDMMYY);
   if(!Number.isInteger(code)||code<100000||code>999999) throw new Error("Could not generate a valid six-digit student code.");
@@ -118,7 +118,7 @@ export async function createStudentLogin(studentRecordId){
   const secretSnapshot=await getDoc(doc(db,"studentSecrets",String(studentRecordId)));
   if(!secretSnapshot.exists()) throw new Error("Student Secret Code was not found.");
   const secretCode=String(secretSnapshot.data().secretCode||"");
-  if(!/^\\d{6}$/.test(secretCode)) throw new Error("The student's Secret Code is invalid. Please contact GI Support.");
+  if(!/^\d{6}$/.test(secretCode)) throw new Error("The student's Secret Code is invalid. Please contact GI Support.");
   const loginId=getStudentLoginId(student.studentId);
   const secondaryApp=initializeApp(auth.app.options,"student-provision-"+String(studentRecordId)+"-"+crypto.randomUUID());
   const secondaryAuth=getAuth(secondaryApp);
