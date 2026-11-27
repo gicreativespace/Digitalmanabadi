@@ -1,6 +1,6 @@
 import { auth, db } from "../../firebase-client.js";
 import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser, getAuth, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, deleteUser, getAuth, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
 const CLASSES = new Set(["class-1","class-2","class-3","class-4","class-5"]);
@@ -207,20 +207,7 @@ export async function createStudentLogin(studentRecordId){
       return {studentId:student.studentId,loginId,secretCode};
     }catch(error){
       if(error?.code==="auth/email-already-in-use"&&!createdUser){
-        try{
-          const existingCredential=await signInWithEmailAndPassword(secondaryAuth,loginId,secretCode);
-          const existingUser=existingCredential.user;
-          const linked=await getDocs(query(collection(db,"students"),where("authUid","==",existingUser.uid)));
-          if(linked.docs.some(item=>item.id!==String(studentRecordId))) throw new Error("This Firebase Login ID is already linked to another student. Please contact GI Support; no records were changed.");
-          await updateProfile(existingUser,{displayName:student.name});
-          await updateDoc(studentRef,{authUid:existingUser.uid,loginId,loginCreatedAt:student.loginCreatedAt||serverTimestamp(),loginCreatedBy:hm.uid,updatedAt:serverTimestamp()});
-          profileLinked=true;
-          return {studentId:student.studentId,loginId,secretCode};
-        }catch(reuseError){
-          if(reuseError?.message?.includes("already linked to another student")) throw reuseError;
-          if(["auth/invalid-credential","auth/wrong-password","auth/user-not-found"].includes(reuseError?.code)) throw new Error("This Login ID already exists in Firebase, but its Secret Code does not match. No account was changed. Please contact GI Support.");
-          throw new Error("The existing Firebase account could not be safely linked. No records were changed. Please contact GI Support. Details: "+(reuseError?.message||reuseError?.code||"Unknown error"));
-        }
+        throw new Error("This Student Login ID already exists in Firebase Authentication. No account or student record was changed. Contact GI Support for safe verification; existing student accounts are never linked automatically across schools.");
       }
       if(createdUser&&!profileLinked){try{await deleteUser(createdUser);}catch{}}
       const messages={
