@@ -82,15 +82,16 @@ export async function createClassStudent(classId,payload){
     const counter=await tx.get(counterRef),roll=Number(counter.exists()?counter.data().lastRoll||0:0)+1;
     if(roll>99) throw new Error("This class sequence is full for the current academic year.");
     const rollNumber=String(roll).padStart(2,"0"),studentId=year+String(classNumber).padStart(2,"0")+rollNumber;
+    const loginId=getStudentLoginId(studentId);
     const studentRef=recordRef,secretRef=doc(db,"studentSecrets",recordRef.id),lookupRef=doc(db,"studentLookup",studentId);
     const lookup=await tx.get(lookupRef);
     if(lookup.exists()) throw new Error("Student ID already exists. Please retry.");
-    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,section,rollNumber,studentId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,section,rollNumber,studentId,loginId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     tx.set(secretRef,{schoolId:hm.schoolId,studentRecordId:recordRef.id,secretCode,secretCodeHash,createdAt:serverTimestamp()});
-    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,classId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
+    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,loginId,classId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
     tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
     tx.set(doc(db,"classrooms",hm.schoolId+"_"+classId),{schoolId:hm.schoolId,classId,classNumber,updatedBy:hm.uid,updatedAt:serverTimestamp()},{merge:true});
-    created={studentRecordId:recordRef.id,studentId,rollNumber,secretCode};
+    created={studentRecordId:recordRef.id,studentId,loginId,rollNumber,secretCode};
   });
   return {student:created};
 }

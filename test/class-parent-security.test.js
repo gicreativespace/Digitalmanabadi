@@ -12,6 +12,21 @@ test("Class Management uses Firestore client and generates annual IDs", async ()
   assert.doesNotMatch(service, /fetch\(|backendApiBaseUrl|\/api\//);
 });
 
+test("Student enrollment persists generated roll, ID and school email", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  assert.match(service, /const rollNumber=String\(roll\)\.padStart\(2,"0"\),studentId=year\+String\(classNumber\)\.padStart\(2,"0"\)\+rollNumber/);
+  assert.match(service, /const loginId=getStudentLoginId\(studentId\)/);
+  assert.match(service, /section,rollNumber,studentId,loginId,academicYear/);
+  assert.match(service, /studentId,loginId,classId,section,rollNumber/);
+});
+
+test("Class register passes each selected section to transactional enrollment", async () => {
+  const modulePage = await read("../js/modules/module-page.js");
+  assert.match(modulePage, /createClassStudents\(activeClassId,filled\.map\(row=>\(\{name:row\.name,gender:row\.gender,dob:row\.dob,section:row\.section\}\)\)\)/);
+  assert.match(modulePage, /Teacher list could not be loaded/);
+  assert.match(modulePage, /eligibleTeachers=teacherRecords\.filter\(t=>t\.status==="active"&&Array\.isArray\(t\.assignedClasses\)&&t\.assignedClasses\.includes\(classLabel\)\)/);
+});
+
 test("Sections share one class-wide transactional roll sequence", async () => {
   const service = await read("../js/sections/class-management/class-service.js");
   assert.match(service, /counterId=hm\.schoolId\+"_"\+year\+"_"\+classId/);
