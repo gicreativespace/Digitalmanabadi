@@ -320,6 +320,7 @@ export async function updateStudentDetails(studentRecordId,payload={}){
   const section=text(payload.section).toUpperCase();
   const classroom=await getDoc(doc(db,"classrooms",hm.schoolId+"_"+current.classId));
   const sections=classroom.exists()&&Array.isArray(classroom.data().sections)?classroom.data().sections:[];
+  if(sections.length&&!section) throw new Error("Choose a section for this class.");
   if(section&&!sections.includes(section)) throw new Error("Choose a configured section.");
   await updateDoc(ref,{name,gender,dob,section,updatedBy:hm.uid,updatedAt:serverTimestamp()});
   const lookup=await getDoc(doc(db,"studentLookup",String(current.studentId)));
