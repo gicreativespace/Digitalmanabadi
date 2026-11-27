@@ -1,7 +1,7 @@
 import { auth } from "../../firebase-client.js";
 import { setPersistence, browserLocalPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getStudentProfileForAuth, getStudentLoginId } from "../class-management/class-service.js";
-import { getLocalStudentPinRecord, saveLocalStudentPin, verifyLocalStudentPin } from "./pin-auth.js";
+import { getLocalStudentPinRecord, saveLocalStudentPin, verifyLocalStudentPin, clearLocalStudentPinRecord } from "./pin-auth.js";
 
 export function createStudentPortal({main,state,T,render}){
  const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
@@ -86,7 +86,7 @@ export function createStudentPortal({main,state,T,render}){
    }
   };
   const useSecret=main.querySelector("#studentUseSecretCode");
-  if(useSecret)useSecret.onclick=async()=>{try{await signOut(auth);}catch{}state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;localStorage.removeItem("gim_authenticated");renderLogin();};
+  if(useSecret)useSecret.onclick=async()=>{clearLocalStudentPinRecord(auth.currentUser?.uid);try{await signOut(auth);}catch{}state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;localStorage.removeItem("gim_authenticated");renderLogin();};
  }
  function renderDashboard(){
   const student=state.studentProfile;
