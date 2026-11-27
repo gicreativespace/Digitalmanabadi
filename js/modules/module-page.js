@@ -65,7 +65,7 @@ async function bindClassManagement(){
  const parseCsv=textValue=>{const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<textValue.length;i++){const ch=textValue[i];if(ch==='"'&&quoted&&textValue[i+1]==='"'){cell+='"';i++;}else if(ch==='"'){quoted=!quoted;}else if(ch===","&&!quoted){row.push(cell);cell="";}else if((ch==="\n"||ch==="\r")&&!quoted){if(ch==="\r"&&textValue[i+1]==="\n")i++;row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);row=[];cell="";}else cell+=ch;}row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);return rows;};
  const readRoster=async file=>{
   const ext=file.name.split(".").pop().toLowerCase();let raw=[];
-  if(ext==="csv"){const csvText=(await file.text()).replace(/^\\uFEFF/,"");const rows=parseCsv(csvText);if(!rows.length)throw new Error("The CSV file is empty.");const headers=rows[0].map(v=>String(v).trim());raw=rows.slice(1).map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]??""])));}
+  if(ext==="csv"){const csvText=(await file.text()).replace(String.fromCharCode(65279),"");const rows=parseCsv(csvText);if(!rows.length)throw new Error("The CSV file is empty.");const headers=rows[0].map(v=>String(v).trim());raw=rows.slice(1).map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]??""])));}
   else if(["xlsx","xls"].includes(ext)){const XLSX=await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");const wb=XLSX.read(await file.arrayBuffer(),{cellDates:true});const sheet=wb.Sheets[wb.SheetNames[0]];raw=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:false,dateNF:"dd/mm/yyyy"});}
   else throw new Error("Choose a .csv, .xlsx or .xls file.");
   const key=v=>String(v??"").toLowerCase().replace(/[^a-z0-9]/g,"");
