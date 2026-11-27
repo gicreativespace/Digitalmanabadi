@@ -86,7 +86,7 @@ export async function createClassStudent(classId,payload){
     const studentRef=recordRef,secretRef=doc(db,"studentSecrets",recordRef.id),lookupRef=doc(db,"studentLookup",studentId);
     const lookup=await tx.get(lookupRef);
     if(lookup.exists()) throw new Error("Student ID already exists. Please retry.");
-    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,section,rollNumber,studentId,loginId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,section,rollNumber,studentId,loginId,academicYear:year,name,gender,dob,parentMobile:text(payload.parentMobile),parentName:text(payload.parentName),parentRelationship:text(payload.parentRelationship),status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     tx.set(secretRef,{schoolId:hm.schoolId,studentRecordId:recordRef.id,secretCode,secretCodeHash,createdAt:serverTimestamp()});
     tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,loginId,classId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
     tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
@@ -226,4 +226,139 @@ export async function createStudentLogin(studentRecordId){
     try{await signOut(secondaryAuth);}catch{}
     try{await deleteApp(secondaryApp);}catch{}
   }
+}
+
+
+// Import a validated roster and provision one Firebase Parent account per mobile number.
+// Authentication accounts are created in isolated secondary Firebase app instances so the
+// Head Master's active session is never replaced.
+export async function importStudentRoster(entries){
+  if(!Array.isArray(entries)||!entries.length||entries.length>150) throw new Error("Upload between 1 and 150 student rows.");
+  const hm=await requireHeadMaster();
+  const normalized=entries.map((row,index)=>{
+    const classId=text(row.classId).toLowerCase().replace(" ","-");
+    const name=text(row.name).slice(0,100),gender=text(row.gender),dob=normalizeDob(row.dob);
+    const parentName=text(row.parentName).slice(0,80),parentMobile=text(row.parentMobile).replace(/\D/g,"");
+    const parentRelationship=text(row.relationship||"Guardian"),section=text(row.section).toUpperCase();
+    if(!CLASSES.has(classId)||name.length<2||!["Male","Female","Other"].includes(gender)||parentName.length<2||!/^\d{10}$/.test(parentMobile)||!["Father","Mother","Guardian","Other"].includes(parentRelationship)) throw new Error("Row "+(index+2)+": check Class, Name, DOB, Gender, Parent Name, 10-digit Parent Mobile and Relationship.");
+    if(section&&!/^[A-Z0-9]{1,4}$/.test(section)) throw new Error("Row "+(index+2)+": invalid Section.");
+    return {classId,name,gender,dob,parentName,parentMobile,parentRelationship,section};
+  });
+  const seen=new Set(),parents=new Map();
+  for(const row of normalized){
+    const key=row.classId+"|"+row.name.toLowerCase()+"|"+row.dob;
+    if(seen.has(key)) throw new Error("Duplicate student in upload: "+row.name);
+    seen.add(key);
+    if(parents.has(row.parentMobile)&&parents.get(row.parentMobile).parentName.toLowerCase()!==row.parentName.toLowerCase()) throw new Error("One Parent Mobile Number has different names. Use the same Parent Name for that number.");
+    if(!parents.has(row.parentMobile)) parents.set(row.parentMobile,{parentName:row.parentName,parentMobile:row.parentMobile});
+  }
+  const classroomData=await listClassrooms();
+  const configs=new Map((classroomData.classrooms||[]).map(item=>[item.classId,item]));
+  for(const classId of new Set(normalized.map(row=>row.classId))){
+    const existing=await listClassStudents(classId);
+    const known=new Set((existing.students||[]).map(row=>String(row.name||"").trim().toLowerCase()+"|"+String(row.dob||"")));
+    const duplicate=normalized.find(row=>row.classId===classId&&known.has(row.name.toLowerCase()+"|"+row.dob));
+    if(duplicate) throw new Error("Student already exists in "+classId+": "+duplicate.name+". Edit the existing record instead of importing it again.");
+  }
+  for(let i=0;i<normalized.length;i++){
+    const row=normalized[i],sections=configs.get(row.classId)?.sections||[];
+    if(sections.length&&!row.section) throw new Error("Row "+(i+2)+": choose a configured section for "+row.name+".");
+    if(row.section&&!sections.includes(row.section)) throw new Error("Row "+(i+2)+": Section "+row.section+" is not configured for "+row.classId+".");
+  }
+  const parentCredentials=[],createdParents=[];
+  const secondaryApp=initializeApp(auth.app.options,"parent-import-"+crypto.randomUUID());
+  const secondaryAuth=getAuth(secondaryApp);
+  try{
+    for(const parent of parents.values()){
+      const email=parent.parentMobile+"@parents.dagguluruschool.in";
+      const existing=await getDocs(query(collection(db,"parentProfiles"),where("schoolId","==",hm.schoolId)));
+      const matched=existing.docs.find(item=>String(item.data().mobile||"")===parent.parentMobile);
+      if(matched){
+        const profile=matched.data();
+        if(String(profile.parentName||"").trim().toLowerCase()!==parent.parentName.toLowerCase()) throw new Error("Parent name does not match the existing account for mobile "+parent.parentMobile+". Verify the uploaded file.");
+        parent.uid=profile.uid;
+        parentCredentials.push({parentName:parent.parentName,mobile:parent.parentMobile,loginId:email,temporaryPassword:"",existing:true});
+        continue;
+      }
+      const password=crypto.randomUUID().replaceAll("-","")+"A7!";
+      try{
+        const credential=await createUserWithEmailAndPassword(secondaryAuth,email,password);
+        await updateProfile(credential.user,{displayName:parent.parentName});
+        parent.uid=credential.user.uid;
+        parent.password=password;
+        createdParents.push(parent);
+      }catch(error){
+        if(error?.code==="auth/email-already-in-use") throw new Error("Parent Login ID "+email+" already exists but is not linked to this school. Contact GI Support; it was not attached automatically.");
+        throw error;
+      }finally{try{await signOut(secondaryAuth)}catch{}}
+      await setDoc(doc(db,"parentProfiles",parent.uid),{uid:parent.uid,schoolId:hm.schoolId,parentName:parent.parentName,mobile:parent.parentMobile,email,status:"active",role:"PARENT",createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+      parentCredentials.push({parentName:parent.parentName,mobile:parent.parentMobile,loginId:email,temporaryPassword:password,existing:false});
+    }
+    const parentByMobile=new Map([...parents.values()].map(p=>[p.parentMobile,p]));
+    const created=[],failed=[];
+    for(let index=0;index<normalized.length;index++){
+      const row=normalized[index],parent=parentByMobile.get(row.parentMobile);
+      try{
+        const result=await createClassStudent(row.classId,{name:row.name,gender:row.gender,dob:row.dob,section:row.section,parentMobile:row.parentMobile,parentName:row.parentName,parentRelationship:row.parentRelationship});
+        created.push({...result.student,index,parentLoginId:row.parentMobile+"@parents.dagguluruschool.in"});
+      }catch(error){failed.push({index,name:row.name,message:error?.message||"Student could not be imported."});}
+    }
+    return {created,failed,parents:parentCredentials};
+  }finally{
+    try{await signOut(secondaryAuth)}catch{}
+    try{await deleteApp(secondaryApp)}catch{}
+  }
+}
+
+export async function updateStudentDetails(studentRecordId,payload={}){
+  const hm=await requireHeadMaster();
+  const ref=doc(db,"students",String(studentRecordId)),snap=await getDoc(ref);
+  if(!snap.exists()) throw new Error("Student record was not found.");
+  const current=snap.data();
+  if(current.schoolId!==hm.schoolId) throw new Error("This student belongs to another school.");
+  const name=text(payload.name).slice(0,100),gender=text(payload.gender),dob=normalizeDob(payload.dob);
+  if(name.length<2||!["Male","Female","Other"].includes(gender)) throw new Error("Enter a valid student name and gender.");
+  const section=text(payload.section).toUpperCase();
+  const classroom=await getDoc(doc(db,"classrooms",hm.schoolId+"_"+current.classId));
+  const sections=classroom.exists()&&Array.isArray(classroom.data().sections)?classroom.data().sections:[];
+  if(sections.length&&!section) throw new Error("Choose a section for this class.");
+  if(section&&!sections.includes(section)) throw new Error("Choose a configured section.");
+  await updateDoc(ref,{name,gender,dob,section,updatedBy:hm.uid,updatedAt:serverTimestamp()});
+  const lookup=await getDoc(doc(db,"studentLookup",String(current.studentId)));
+  if(lookup.exists()) await updateDoc(doc(db,"studentLookup",String(current.studentId)),{section});
+  return {studentRecordId:String(studentRecordId),name,gender,dob,section};
+}
+
+export async function moveStudentClass(studentRecordId,targetClassId,sectionValue=""){
+  if(!CLASSES.has(targetClassId)) throw new Error("Choose a valid target class.");
+  const hm=await requireHeadMaster(),studentRef=doc(db,"students",String(studentRecordId)),snapshot=await getDoc(studentRef);
+  if(!snapshot.exists()) throw new Error("Student record was not found.");
+  const student=snapshot.data();
+  if(student.schoolId!==hm.schoolId) throw new Error("This student belongs to another school.");
+  if(student.classId===targetClassId) return updateStudentSection(studentRecordId,sectionValue);
+  if(student.authUid||student.loginCreatedAt) throw new Error("This student already has a Firebase Student Login. Contact GI Support before changing the class so the login ID can be migrated safely.");
+  const year=String(student.academicYear||academicYearCode()),classNumber=Number(targetClassId.slice(-1));
+  const classroomRef=doc(db,"classrooms",hm.schoolId+"_"+targetClassId);
+  const counterRef=doc(db,"studentCounters",hm.schoolId+"_"+year+"_"+targetClassId);
+  const oldLookupRef=doc(db,"studentLookup",String(student.studentId));
+  const section=text(sectionValue).toUpperCase();
+  let updated;
+  await runTransaction(db,async tx=>{
+    const [latestStudent,classroom,counter]=await Promise.all([tx.get(studentRef),tx.get(classroomRef),tx.get(counterRef)]);
+    if(!latestStudent.exists()||latestStudent.data().schoolId!==hm.schoolId) throw new Error("Student record changed. Refresh and try again.");
+    const sections=classroom.exists()&&Array.isArray(classroom.data().sections)?classroom.data().sections:[];
+    if(sections.length&&!section) throw new Error("Choose a Section for the target class.");
+    if(section&&!sections.includes(section)) throw new Error("Choose a Section configured for the target class.");
+    const roll=Number(counter.exists()?counter.data().lastRoll||0:0)+1;
+    if(roll>99) throw new Error("The target class has reached its 99-student roll limit for this academic year.");
+    const rollNumber=String(roll).padStart(2,"0"),studentId=year+String(classNumber).padStart(2,"0")+rollNumber;
+    const newLookupRef=doc(db,"studentLookup",studentId),collision=await tx.get(newLookupRef);
+    if(collision.exists()) throw new Error("The generated Student ID already exists. Retry the class move.");
+    tx.update(studentRef,{classId:targetClassId,classNumber,section,rollNumber,studentId,loginId:getStudentLoginId(studentId),updatedBy:hm.uid,updatedAt:serverTimestamp()});
+    tx.delete(oldLookupRef);
+    tx.set(newLookupRef,{studentRecordId:String(studentRecordId),studentId,loginId:getStudentLoginId(studentId),classId:targetClassId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
+    tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId:targetClassId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
+    updated={studentId,rollNumber,classId:targetClassId,section};
+  });
+  return updated;
 }

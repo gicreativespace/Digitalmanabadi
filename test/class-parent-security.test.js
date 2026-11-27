@@ -35,18 +35,38 @@ test("Sections share one class-wide transactional roll sequence", async () => {
   assert.doesNotMatch(service, /counterId=.*section/);
 });
 
-test("Parent verification uses anonymous Firebase identity and private verifier claims", async () => {
+test("Parent verification uses school-provisioned Firebase accounts and private claims", async () => {
   const service = await read("../js/sections/parent/parent-service.js");
   const rules = await read("../firestore.rules");
-  assert.match(service, /signInAnonymously/);
+  assert.match(service, /signInWithEmailAndPassword/);
+  assert.match(service, /parents\.dagguluruschool\.in/);
+  assert.match(service, /user\.isAnonymous/);
   assert.match(service, /SHA-256/);
   assert.match(service, /parentClaims/);
-  assert.match(service, /gim_parent_device_pin_v1/);
-  assert.doesNotMatch(service, /signInWithCustomToken|fetch\(|backendApiBaseUrl/);
+  assert.match(service, /parentLinks/);
+  assert.match(service, /gim_parent_device_pin_v2/);
+  assert.doesNotMatch(service, /signInAnonymously|signInWithCustomToken|fetch\(|backendApiBaseUrl/);
+  assert.match(rules, /function isParent/);
   assert.match(rules, /match \/studentSecrets/);
   assert.match(rules, /match \/parentClaims/);
   assert.match(rules, /getAfter\(/);
   assert.match(rules, /function linkedParent/);
+});
+
+test("Class Management imports CSV and Excel rosters and provisions Parent accounts", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  const modulePage = await read("../js/modules/module-page.js");
+  assert.match(service, /export async function importStudentRoster/);
+  assert.match(service, /createUserWithEmailAndPassword/);
+  assert.match(service, /parents\.dagguluruschool\.in/);
+  assert.match(service, /parentMobile/);
+  assert.match(modulePage, /accept="\.csv,\.xlsx,\.xls"/);
+  assert.match(modulePage, /xlsx\.mjs/);
+  assert.match(modulePage, /importStudentRoster\(pendingRoster\)/);
+  assert.match(modulePage, /downloadRosterCredentials/);
+  assert.match(modulePage, /updateStudentDetails/);
+  assert.match(service, /export async function moveStudentClass/);
+  assert.match(modulePage, /data-edit-student-form/);
 });
 
 test("Parent PIN is a local device lock, not a server credential", async () => {
@@ -56,7 +76,8 @@ test("Parent PIN is a local device lock, not a server credential", async () => {
   assert.match(service, /localStorage\.setItem\(PIN_KEY/);
   assert.doesNotMatch(service, /setDoc\(.*PIN|parentProfiles.*pin/i);
   assert.match(section, /saveParentPin/);
-  assert.match(login, /App Lock PIN/);
+  assert.match(login, /Parent Login ID/);
+  assert.match(login, /loginPassword/);
 });
 
 test("Legacy API and Firebase Admin source are not present", async () => {
