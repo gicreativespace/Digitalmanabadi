@@ -275,6 +275,7 @@ export async function importStudentRoster(entries){
       const matched=existing.docs.find(item=>String(item.data().mobile||"")===parent.parentMobile);
       if(matched){
         const profile=matched.data();
+        if(String(profile.parentName||"").trim().toLowerCase()!==parent.parentName.toLowerCase()) throw new Error("Parent name does not match the existing account for mobile "+parent.parentMobile+". Verify the uploaded file.");
         parent.uid=profile.uid;
         parentCredentials.push({parentName:parent.parentName,mobile:parent.parentMobile,loginId:email,temporaryPassword:"",existing:true});
         continue;
