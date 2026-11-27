@@ -265,9 +265,10 @@ export async function importStudentRoster(entries){
   try{
     for(const parent of parents.values()){
       const email=parent.parentMobile+"@parents.dagguluruschool.in";
-      const existing=await getDocs(query(collection(db,"parentProfiles"),where("schoolId","==",hm.schoolId),where("mobile","==",parent.parentMobile)));
-      if(!existing.empty){
-        const profile=existing.docs[0].data();
+      const existing=await getDocs(query(collection(db,"parentProfiles"),where("schoolId","==",hm.schoolId)));
+      const matched=existing.docs.find(item=>String(item.data().mobile||"")===parent.parentMobile);
+      if(matched){
+        const profile=matched.data();
         parent.uid=profile.uid;
         parentCredentials.push({parentName:parent.parentName,mobile:parent.parentMobile,loginId:email,temporaryPassword:"",existing:true});
         continue;
