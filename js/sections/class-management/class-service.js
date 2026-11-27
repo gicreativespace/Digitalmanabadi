@@ -48,7 +48,7 @@ export async function listClassrooms(){
 export async function listClassStudents(classId, sectionFilter=""){
   if(!CLASSES.has(classId)) throw new Error("Choose a valid class.");
   const hm=await requireHeadMaster();
-  const q=query(collection(db,"students"),where("schoolId","==",hm.schoolId),where("classId","==",classId));
+  const q=query(collection(db,"students"),where("schoolId","==",hm.schoolId),where("classId","==",classId),where("academicYear","==",academicYearCode()));
   const snap=await getDocs(q),students=[];
   for(const item of snap.docs){
     const data=item.data();
