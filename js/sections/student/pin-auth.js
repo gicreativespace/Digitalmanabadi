@@ -24,6 +24,13 @@ export function getLocalStudentPinRecord(uid) {
   if (!record || record.version !== 1 || !record.salt || !record.hash || record.iterations !== PBKDF2_ITERATIONS) return null;
   return record;
 }
+export function clearLocalStudentPinRecord(uid) {
+  if (!uid) return;
+  const records = readRecords();
+  delete records[uid];
+  if (Object.keys(records).length) localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  else localStorage.removeItem(STORAGE_KEY);
+}
 async function derivePinHash(pin, salt) {
   const material = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(pin)), "PBKDF2", false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt,iterations:PBKDF2_ITERATIONS}, material, 256);
