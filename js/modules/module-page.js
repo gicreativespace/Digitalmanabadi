@@ -60,9 +60,9 @@ async function bindClassManagement(){
  const esc=v=>escapeHtml(String(v??""));
  const importStatus=main.querySelector("#rosterImportStatus"),importPreview=main.querySelector("#rosterImportPreview"),rosterFile=main.querySelector("#rosterFile");
  const csvCell=value=>'"'+String(value??"").replaceAll('"','""')+'"';
- const downloadCsv=(filename,rows)=>{const csv=rows.map(row=>row.map(csvCell).join(",")).join("\\r\\n");const url=URL.createObjectURL(new Blob(["\\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);};
+ const downloadCsv=(filename,rows)=>{const csv=rows.map(row=>row.map(csvCell).join(",")).join("\r\n");const url=URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url);};
  main.querySelector("#downloadRosterTemplate").onclick=()=>downloadCsv("digital-mana-badi-student-template.csv",[["Class","Section","Student Name","DOB","Gender","Parent Name","Parent Mobile","Relationship"],["Class 1","","Student Name","DD/MM/YYYY","Male","Parent Name","9876543210","Father"]]);
- const parseCsv=textValue=>{const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<textValue.length;i++){const ch=textValue[i];if(ch==='"'&&quoted&&textValue[i+1]==='"'){cell+='"';i++;}else if(ch==='"'){quoted=!quoted;}else if(ch===","&&!quoted){row.push(cell);cell="";}else if((ch==="\\n"||ch==="\\r")&&!quoted){if(ch==="\\r"&&textValue[i+1]==="\\n")i++;row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);row=[];cell="";}else cell+=ch;}row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);return rows;};
+ const parseCsv=textValue=>{const rows=[];let row=[],cell="",quoted=false;for(let i=0;i<textValue.length;i++){const ch=textValue[i];if(ch==='"'&&quoted&&textValue[i+1]==='"'){cell+='"';i++;}else if(ch==='"'){quoted=!quoted;}else if(ch===","&&!quoted){row.push(cell);cell="";}else if((ch==="\n"||ch==="\r")&&!quoted){if(ch==="\r"&&textValue[i+1]==="\n")i++;row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);row=[];cell="";}else cell+=ch;}row.push(cell);if(row.some(v=>String(v).trim()))rows.push(row);return rows;};
  const readRoster=async file=>{
   const ext=file.name.split(".").pop().toLowerCase();let raw=[];
   if(ext==="csv"){const rows=parseCsv(await file.text());if(!rows.length)throw new Error("The CSV file is empty.");const headers=rows[0].map(v=>String(v).trim());raw=rows.slice(1).map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]??""])));}
@@ -71,12 +71,12 @@ async function bindClassManagement(){
   const key=v=>String(v??"").toLowerCase().replace(/[^a-z0-9]/g,"");
   const pick=(row,names)=>{const map=new Map(Object.entries(row).map(([k,v])=>[key(k),v]));for(const name of names){if(map.has(key(name)))return map.get(key(name));}return "";};
   return raw.filter(row=>Object.values(row).some(v=>String(v??"").trim())).map(row=>{
-   let cls=String(pick(row,["Class","Class Name","Class ID"])).trim().toLowerCase().replace(/class\\s*/,"").replace(/^([1-5])$/,"class-$1").replace(/^([1-5])$/,"class-$1");
+   let cls=String(pick(row,["Class","Class Name","Class ID"])).trim().toLowerCase().replace(/class\s*/,"").replace(/^([1-5])$/,"class-$1").replace(/^([1-5])$/,"class-$1");
    if(/^[1-5]$/.test(cls))cls="class-"+cls;if(/^class[1-5]$/.test(cls))cls="class-"+cls.slice(-1);
    let dob=pick(row,["DOB","Date of Birth","Birth Date"]);if(dob instanceof Date)dob=dob.getDate().toString().padStart(2,"0")+"/"+(dob.getMonth()+1).toString().padStart(2,"0")+"/"+dob.getFullYear();
    let gender=String(pick(row,["Gender","Sex"])).trim().toLowerCase();gender=gender==="m"?"Male":gender==="f"?"Female":gender?gender[0].toUpperCase()+gender.slice(1):"";
    let relation=String(pick(row,["Relationship","Relation"])).trim();relation=relation?relation[0].toUpperCase()+relation.slice(1):"Guardian";
-   return {classId:cls,section:String(pick(row,["Section"])).trim().toUpperCase(),name:String(pick(row,["Student Name","Name"])).trim(),dob:String(dob??"").trim(),gender,parentName:String(pick(row,["Parent Name","Guardian Name"])).trim(),parentMobile:String(pick(row,["Parent Mobile","Mobile","Phone","Parent Phone"])).replace(/\\D/g,""),relationship:relation};
+   return {classId:cls,section:String(pick(row,["Section"])).trim().toUpperCase(),name:String(pick(row,["Student Name","Name"])).trim(),dob:String(dob??"").trim(),gender,parentName:String(pick(row,["Parent Name","Guardian Name"])).trim(),parentMobile:String(pick(row,["Parent Mobile","Mobile","Phone","Parent Phone"])).replace(/\D/g,""),relationship:relation};
   });
  };
  let pendingRoster=[];
@@ -87,7 +87,7 @@ async function bindClassManagement(){
   try{
    pendingRoster=await readRoster(file);
    if(!pendingRoster.length||pendingRoster.length>150)throw new Error("Upload between 1 and 150 student rows.");
-   const issues=[];pendingRoster.forEach((r,i)=>{if(!/^class-[1-5]$/.test(r.classId)||r.name.length<2||!/^\\d{2}\\/\\d{2}\\/\\d{4}$/.test(r.dob)||!["Male","Female","Other"].includes(r.gender)||r.parentName.length<2||!/^\\d{10}$/.test(r.parentMobile)||!["Father","Mother","Guardian","Other"].includes(r.relationship))issues.push("Row "+(i+2)+": "+(r.name||"Student")+" — "+T("అవసరమైన వివరాలు సరిచూడండి","check required fields"));});
+   const issues=[];pendingRoster.forEach((r,i)=>{if(!/^class-[1-5]$/.test(r.classId)||r.name.length<2||!/^\d{2}\/\d{2}\/\d{4}$/.test(r.dob)||!["Male","Female","Other"].includes(r.gender)||r.parentName.length<2||!/^\d{10}$/.test(r.parentMobile)||!["Father","Mother","Guardian","Other"].includes(r.relationship))issues.push("Row "+(i+2)+": "+(r.name||"Student")+" — "+T("అవసరమైన వివరాలు సరిచూడండి","check required fields"));});
    if(issues.length)throw new Error(issues.slice(0,5).join(" · "));
    importPreview.innerHTML='<div class="class-admin-status">'+T("పరిశీలన పూర్తయింది: ","Validation passed: ")+pendingRoster.length+T(" విద్యార్థులు · "," students · ")+new Set(pendingRoster.map(r=>r.parentMobile)).size+T(" Parent Accounts"," Parent accounts")+'</div><div class="class-sheet-wrap"><table class="class-student-sheet"><thead><tr><th>Class</th><th>Student</th><th>DOB</th><th>Parent Mobile</th></tr></thead><tbody>'+pendingRoster.slice(0,12).map(r=>'<tr><td data-label="Class">'+esc(r.classId)+'</td><td data-label="Student">'+esc(r.name)+'</td><td data-label="DOB">'+esc(r.dob)+'</td><td data-label="Parent Mobile">'+esc(r.parentMobile)+'</td></tr>').join("")+'</tbody></table></div><div class="class-sheet-actions" style="margin-top:12px"><button type="button" class="btn" id="confirmRosterImport">'+T("విద్యార్థులు & Parent Accounts సృష్టించండి","Create Students & Parent Accounts")+'</button><button type="button" class="btn secondary" id="cancelRosterImport">'+T("రద్దు","Cancel")+'</button></div><small>'+T("Import చేసిన తర్వాత credentials report ఒకసారి మాత్రమే డౌన్‌లోడ్ చేయాలి. దాన్ని సురక్షితంగా ఉంచండి.","Download the credentials report once after import and keep it secure.")+'</small>';
    importStatus.textContent="";
