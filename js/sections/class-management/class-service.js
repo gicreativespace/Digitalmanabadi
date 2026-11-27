@@ -75,6 +75,10 @@ export async function createClassStudent(classId,payload){
   const counterId=hm.schoolId+"_"+year+"_"+classId,counterRef=doc(db,"studentCounters",counterId);
   let created;
   await runTransaction(db,async tx=>{
+    const latestClassroom=await tx.get(classroomRef);
+    const latestSections=latestClassroom.exists()&&Array.isArray(latestClassroom.data().sections)?latestClassroom.data().sections:[];
+    if(section&&!latestSections.includes(section)) throw new Error("This section is no longer configured. Refresh the class and try again.");
+    if(latestSections.length&&!section) throw new Error("Choose a section for every student.");
     const counter=await tx.get(counterRef),roll=Number(counter.exists()?counter.data().lastRoll||0:0)+1;
     if(roll>99) throw new Error("This class sequence is full for the current academic year.");
     const rollNumber=String(roll).padStart(2,"0"),studentId=year+String(classNumber).padStart(2,"0")+rollNumber;
