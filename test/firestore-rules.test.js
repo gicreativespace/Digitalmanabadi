@@ -15,7 +15,7 @@ before(async()=>{
     const db=context.firestore();
     await setDoc(doc(db,"platformAdmins/hm-a"),{role:"HEAD_MASTER",status:"active",schoolId:"school-a"});
     await setDoc(doc(db,"platformAdmins/hm-b"),{role:"HEAD_MASTER",status:"active",schoolId:"school-b"});
-    await setDoc(doc(db,"students/student-a"),{studentRecordId:"student-a",schoolId:"school-a",classId:"class-1",studentId:"260101",name:"Student A",dob:"01012015",status:"active",createdBy:"hm-a"});
+    await setDoc(doc(db,"students/student-a"),{studentRecordId:"student-a",schoolId:"school-a",classId:"class-1",studentId:"260101",name:"Student A",dob:"01012015",status:"active",authUid:"student-a",createdBy:"hm-a"});
     await setDoc(doc(db,"studentSecrets/student-a"),{schoolId:"school-a",studentRecordId:"student-a",secretCode:"123456789012",secretCodeHash:"hash-a"});
     await setDoc(doc(db,"studentLookup/260101"),{studentRecordId:"student-a",studentId:"260101",classId:"class-1",rollNumber:"01",schoolId:"school-a",status:"active"});
     await setDoc(doc(db,"students/student-b"),{studentRecordId:"student-b",schoolId:"school-b",classId:"class-1",studentId:"260101",name:"Student B",dob:"02022015",status:"active",createdBy:"hm-b"});
@@ -33,6 +33,15 @@ test("Head Master access is school-scoped and private Secret Codes stay private"
   await assertFails(getDoc(doc(hmA,"studentSecrets/student-b")));
   const rows=await assertSucceeds(getDocs(query(collection(hmA,"students"),where("schoolId","==","school-a"),where("classId","==","class-1"))));
   assert.equal(rows.size,1);
+});
+
+test("A Student can read only their own active profile and lookup, never Secret Codes or other students",async()=>{
+  const student=env.authenticatedContext("student-a",{email:"260101@dagguluruschool.in"}).firestore();
+  await assertSucceeds(getDoc(doc(student,"studentLookup/260101")));
+  await assertSucceeds(getDoc(doc(student,"students/student-a")));
+  await assertFails(getDoc(doc(student,"students/student-b")));
+  await assertFails(getDoc(doc(student,"studentSecrets/student-a")));
+  await assertFails(getDocs(collection(student,"students")));
 });
 
 test("A Parent must prove DOB and Secret Code before linking; links are isolated per device",async()=>{
