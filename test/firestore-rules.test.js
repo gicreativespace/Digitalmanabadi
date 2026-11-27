@@ -17,7 +17,8 @@ before(async()=>{
     await setDoc(doc(db,"platformAdmins/hm-b"),{role:"HEAD_MASTER",status:"active",schoolId:"school-b"});
     await setDoc(doc(db,"students/student-a"),{studentRecordId:"student-a",schoolId:"school-a",classId:"class-1",studentId:"260101",name:"Student A",dob:"01012015",parentMobile:"9999999999",status:"active",authUid:"student-a",createdBy:"hm-a"});
     await setDoc(doc(db,"studentSecrets/student-a"),{schoolId:"school-a",studentRecordId:"student-a",secretCode:"123456789012",secretCodeHash:"hash-a"});
-    await setDoc(doc(db,"studentLookup/260101"),{studentRecordId:"student-a",studentId:"260101",classId:"class-1",rollNumber:"01",schoolId:"school-a",status:"active"});\n    await setDoc(doc(db,"parentProfiles/parent-a"),{uid:"parent-a",role:"PARENT",status:"active",schoolId:"school-a",mobile:"9999999999",parentName:"Parent A"});
+    await setDoc(doc(db,"studentLookup/260101"),{studentRecordId:"student-a",studentId:"260101",classId:"class-1",rollNumber:"01",schoolId:"school-a",status:"active"});
+    await setDoc(doc(db,"parentProfiles/parent-a"),{uid:"parent-a",role:"PARENT",status:"active",schoolId:"school-a",mobile:"9999999999",parentName:"Parent A"});
     await setDoc(doc(db,"students/student-b"),{studentRecordId:"student-b",schoolId:"school-b",classId:"class-1",studentId:"260101",name:"Student B",dob:"02022015",status:"active",createdBy:"hm-b"});
     await setDoc(doc(db,"studentSecrets/student-b"),{schoolId:"school-b",studentRecordId:"student-b",secretCode:"210987654321",secretCodeHash:"hash-b"});
   });
