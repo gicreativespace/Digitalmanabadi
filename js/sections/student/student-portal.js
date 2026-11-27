@@ -13,7 +13,7 @@ export function createStudentPortal({main,state,T,render}){
  };
  const backHome=async()=>{
   try{if(auth.currentUser)await signOut(auth);}catch{}
-  state.role=null;state.authenticated=false;state.studentProfile=null;state.studentPinMode=null;
+  state.role=null;state.authenticated=false;state.studentProfile=null;state.studentPinMode=null;state.studentPortalError=null;
   localStorage.removeItem("gim_role");localStorage.removeItem("gim_authenticated");
   window.history.replaceState(null,"",window.location.pathname);
   state.view="welcome";render();
@@ -25,12 +25,12 @@ export function createStudentPortal({main,state,T,render}){
   }
   main.innerHTML='<div class="backline role-login-backline"><button class="btn secondary" id="studentBackHome">← '+T("ముఖ్య పేజీ","Home")+'</button><span class="pill">STUDENT PORTAL</span></div>'+
    '<section class="role-login-layout login-unified" data-role="student"><section class="role-login-panel"><div class="role-login-panel-heading"><img class="login-hero-image" src="assets/branding/school/school-building.jpg" alt="'+T("పాఠశాల భవనం","School building")+'"><span class="role-login-panel-kicker">DIGITAL MANA BADI · STUDENT ACCESS</span><h2>'+T("విద్యార్థి ప్రవేశం","Student Login")+'</h2><p>'+T("మీ Student ID మరియు Head Master అందించిన Secret Code నమోదు చేయండి.","Enter your Student ID and the Secret Code provided by the Head Master.")+'</p></div><div class="role-login-alert" id="studentPortalNotice" role="alert" aria-live="assertive" hidden></div>'+
-   (current?'<p class="teacher-flow-hint">'+T("ఈ Browserలో మరో ఖాతా సక్రియంగా ఉంది. Student Loginకు ముందు దాన్ని Sign out చేయండి.","Another account is active in this browser. Sign out before using Student Login.")+'</p><button type="button" class="btn full role-login-submit" id="studentOtherAccountSignout">'+T("ప్రస్తుత ఖాతా నుంచి Sign out","Sign out current account")+'</button>':
+   (current?'<div class="role-login-alert" role="alert">'+esc(state.studentPortalError||T("ఈ Browserలో మరో ఖాతా సక్రియంగా ఉంది. Student Loginకు ముందు దాన్ని Sign out చేయండి.","Another account is active in this browser. Sign out before using Student Login."))+'</div><button type="button" class="btn full role-login-submit" id="studentOtherAccountSignout">'+T("ప్రస్తుత ఖాతా నుంచి Sign out","Sign out current account")+'</button>':
    '<form id="studentLoginForm"><div class="field"><label for="studentIdInput">Student ID</label><input id="studentIdInput" name="studentId" inputmode="numeric" autocomplete="username" maxlength="6" pattern="[0-9]{6}" placeholder="260101" required></div><div class="field"><label for="studentSecretInput">'+T("Permanent Secret Code","Permanent Secret Code")+'</label><input id="studentSecretInput" name="secretCode" type="password" inputmode="numeric" autocomplete="current-password" maxlength="12" pattern="[0-9]{12}" placeholder="••••••••••••" required></div><button type="submit" class="btn full role-login-submit" id="studentLoginSubmit">'+T("ధృవీకరించి కొనసాగండి","Verify & Continue")+'</button></form>')+
    '<p class="teacher-flow-hint">'+T("మొదటి ప్రవేశం తర్వాత ఈ పరికరంలో 4 అంకెల PIN సెట్ చేసుకోవచ్చు. కొత్త పరికరంలో Secret Codeతో మళ్లీ ధృవీకరించాలి.","After verification, set a 4-digit PIN on this device. A new device requires the Secret Code again.")+'</p></section></section>';
   main.querySelector("#studentBackHome").onclick=backHome;
   const otherSignout=main.querySelector("#studentOtherAccountSignout");
-  if(otherSignout)otherSignout.onclick=async()=>{otherSignout.disabled=true;try{await signOut(auth);state.studentProfile=null;state.studentPinMode=null;renderLogin();}catch{setNotice(T("ప్రస్తుత ఖాతా నుంచి Sign out చేయలేకపోయాం.","Could not sign out the current account."));otherSignout.disabled=false;}};
+  if(otherSignout)otherSignout.onclick=async()=>{otherSignout.disabled=true;try{await signOut(auth);state.studentProfile=null;state.studentPinMode=null;state.studentPortalError=null;renderLogin();}catch{setNotice(T("ప్రస్తుత ఖాతా నుంచి Sign out చేయలేకపోయాం.","Could not sign out the current account."));otherSignout.disabled=false;}};
   const form=main.querySelector("#studentLoginForm");
   if(form)form.onsubmit=async event=>{
    event.preventDefault();
@@ -41,11 +41,12 @@ export function createStudentPortal({main,state,T,render}){
     await setPersistence(auth,browserLocalPersistence);
     await signInWithEmailAndPassword(auth,getStudentLoginId(studentId),secretCode);
     const profile=await getStudentProfileForAuth(auth.currentUser);
-    state.studentProfile=profile;
+    state.studentProfile=profile;state.studentPortalError=null;
     state.studentPinMode=getLocalStudentPinRecord(auth.currentUser.uid)?"unlock":"setup";
     state.authenticated=false;localStorage.setItem("gim_role","student");localStorage.removeItem("gim_authenticated");
     renderLogin();
    }catch(error){
+    state.studentPortalError=error?.message||"Student sign-in failed.";
     if(auth.currentUser?.email===getStudentLoginId(studentId)){
      try{await signOut(auth);}catch{}
     }
