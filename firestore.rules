@@ -167,7 +167,7 @@ service cloud.firestore {
     && request.resource.data.schoolId == get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.schoolId
     && existsAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + request.resource.data.studentRecordId))
     && getAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + request.resource.data.studentRecordId)).data.parentUid == request.auth.uid;
-   allow update: if isParent() && resource.data.parentUid == request.auth.uid && request.resource.data.parentUid == request.auth.uid;
+   allow update: if false;
    allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);
   }
 
