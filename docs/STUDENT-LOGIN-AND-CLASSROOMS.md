@@ -25,6 +25,7 @@ The Secret Code is private and visible only to the Head Master. Share it with th
 - On first use of each device, the student sets and confirms a four-digit local PIN.
 - The PIN is stored on that device as a PBKDF2-SHA-256 salted verifier. It is a convenience lock, not a replacement for Firebase identity.
 - On later visits to the same device, the Firebase session is revalidated and the student unlocks with the local PIN. A new device requires the Secret Code again.
+- If the local PIN is forgotten, choose the Secret Code re-verification option. The old device PIN verifier is cleared, and the student must verify the 12-digit Secret Code before setting a new PIN.
 - The Student Dashboard shows the verified profile, Student ID, class/section, roll number and academic year. Attendance, Diary and Homework are shown as future integrations until those school data modules are connected.
 
 ## Security boundaries
