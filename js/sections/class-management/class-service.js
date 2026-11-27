@@ -142,6 +142,24 @@ export async function updateClassroomSettings(classId, payload={}){
   return {classId,sections,classTeacherId,classTeacherName};
 }
 
+export async function updateStudentSection(studentRecordId, sectionValue){
+  const hm=await requireHeadMaster();
+  const studentRef=doc(db,"students",String(studentRecordId));
+  const snapshot=await getDoc(studentRef);
+  if(!snapshot.exists()) throw new Error("Student record was not found.");
+  const student=snapshot.data();
+  if(student.schoolId!==hm.schoolId) throw new Error("This student belongs to another school.");
+  const section=text(sectionValue).toUpperCase();
+  const classroom=await getDoc(doc(db,"classrooms",hm.schoolId+"_"+student.classId));
+  const sections=classroom.exists()&&Array.isArray(classroom.data().sections)?classroom.data().sections:[];
+  if(section&&!sections.includes(section)) throw new Error("Choose a section configured for this class.");
+  await updateDoc(studentRef,{section,updatedBy:hm.uid,updatedAt:serverTimestamp()});
+  const lookupRef=doc(db,"studentLookup",String(student.studentId));
+  const lookup=await getDoc(lookupRef);
+  if(lookup.exists()) await updateDoc(lookupRef,{section});
+  return {studentRecordId:String(studentRecordId),section};
+}
+
 export async function getStudentProfileForAuth(user=auth.currentUser){
   if(!user||!user.email) throw new Error("Student sign-in is required.");
   const match=/^(\d{6})@dagguluruschool\.in$/i.exec(String(user.email));
