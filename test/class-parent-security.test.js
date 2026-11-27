@@ -12,6 +12,14 @@ test("Class Management uses Firestore client and generates annual IDs", async ()
   assert.doesNotMatch(service, /fetch\(|backendApiBaseUrl|\/api\//);
 });
 
+test("Sections share one class-wide transactional roll sequence", async () => {
+  const service = await read("../js/sections/class-management/class-service.js");
+  assert.match(service, /counterId=hm\.schoolId\+"_"\+year\+"_"\+classId/);
+  assert.match(service, /classNumber,section,rollNumber,studentId/);
+  assert.match(service, /latestSections/);
+  assert.doesNotMatch(service, /counterId=.*section/);
+});
+
 test("Parent verification uses anonymous Firebase identity and private verifier claims", async () => {
   const service = await read("../js/sections/parent/parent-service.js");
   const rules = await read("../firestore.rules");

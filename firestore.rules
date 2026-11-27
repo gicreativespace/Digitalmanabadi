@@ -37,6 +37,12 @@ service cloud.firestore {
     && exists(/databases/$(database)/documents/parentLinks/$(studentRecordId))
     && get(/databases/$(database)/documents/parentLinks/$(studentRecordId)).data.parentUid == request.auth.uid;
   }
+  function linkedStudent(studentRecordId) {
+   return signedIn()
+    && exists(/databases/$(database)/documents/students/$(studentRecordId))
+    && get(/databases/$(database)/documents/students/$(studentRecordId)).data.authUid == request.auth.uid
+    && get(/databases/$(database)/documents/students/$(studentRecordId)).data.status == "active";
+  }
 
   match /platformAdmins/{adminUid} {
    allow get: if signedIn() && request.auth.uid == adminUid;
@@ -97,7 +103,7 @@ service cloud.firestore {
    allow delete: if false;
   }
   match /students/{studentRecordId} {
-   allow get: if isActiveHeadMasterForSchool(resource.data.schoolId) || linkedParent(studentRecordId);
+   allow get: if isActiveHeadMasterForSchool(resource.data.schoolId) || linkedParent(studentRecordId) || linkedStudent(studentRecordId);
    allow list: if isActiveHeadMasterForSchool(resource.data.schoolId);
    allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId)
     && request.resource.data.createdBy == request.auth.uid
@@ -117,7 +123,7 @@ service cloud.firestore {
   }
   // A Parent may resolve a known Student ID, but this lookup has no name, DOB or Secret Code.
   match /studentLookup/{studentId} {
-   allow get: if anonymousParent() || (isActiveHeadMaster() && (!exists(/databases/$(database)/documents/studentLookup/$(studentId)) || isActiveHeadMasterForSchool(resource.data.schoolId)));
+   allow get: if anonymousParent() || linkedStudent(resource.data.studentRecordId) || (isActiveHeadMaster() && (!exists(/databases/$(database)/documents/studentLookup/$(studentId)) || isActiveHeadMasterForSchool(resource.data.schoolId)));
    allow list: if false;
    allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId);
    allow update: if isActiveHeadMasterForSchool(resource.data.schoolId)

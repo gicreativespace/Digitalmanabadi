@@ -8,7 +8,7 @@ function setupBottomNavigation(){
 }
 function updateBottomNavigation(){
  const nav=document.querySelector("#bottomNav");
- const visible=Boolean(state.role && state.authenticated && state.role!=="superadmin");
+ const visible=Boolean(state.role && state.authenticated && !["superadmin","student"].includes(state.role));
  nav.hidden=!visible;
  document.body.classList.toggle("has-authenticated-role",visible);
  const active=state.view==="dashboard"?"navHome":state.view==="profile"?"navProfile":state.view==="settings"?"navSettings":state.view==="module" && state.module==="Events & Calendar"?"navCalendar":"";
