@@ -145,6 +145,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
   if(state.teacherLoginNotice){show(state.teacherLoginNotice,"info");state.teacherLoginNotice=null;}
  }
  function login(){
+  if(state.role==="parent"&&auth.currentUser&&!auth.currentUser.isAnonymous&&String(auth.currentUser.email||"").endsWith("@parents.dagguluruschool.in")){renderParentPinGate(!hasParentPin());return;}
   const role=roleNames[state.role],view=roleLoginViews[state.role]({T,state}),community=view.kind==="community",teacher=view.kind==="teacher";
   const meta={
    hm:{kicker:"SCHOOL LEADERSHIP",title:T("ప్రధానోపాధ్యాయుల ప్రవేశం","Head Master Access"),note:T("పాఠశాల నిర్వహణకు ఒకే సురక్షిత ప్రవేశం.","One secure gateway for school leadership."),quote:T("నాయకత్వం అభ్యాసానికి స్ఫూర్తినిస్తేనే పాఠశాల మరింత బలపడుతుంది.","A school grows stronger when leadership inspires learning.")},
@@ -181,8 +182,8 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    main.querySelector("#communityHelp").onclick=()=>show(T("నమోదు అభ్యర్థన ప్రస్తుతం Preview Modeలో ఉంది. నిజమైన ఖాతా అనుమతి మరియు Sign-in ఇంకా అనుసంధానం కాలేదు. Head Master‌ను సంప్రదించండి.","Registration requests are currently in Preview Mode. Account approval and secure sign-in are not connected yet. Please contact the Head Master."),"info");
    return;
   }
-  if(state.role==="parent")main.querySelector("#startLink").onclick=()=>{state.view="link";render()};
-  main.querySelector("#forgotAccess").onclick=async()=>{
+  const forgotButton=main.querySelector("#forgotAccess");
+  if(forgotButton)forgotButton.onclick=async()=>{
    clear();
    if(state.role==="teacher"){show(T("Teacher PIN Recovery ప్రస్తుతం అందుబాటులో లేదు. సురక్షిత ధృవీకరణ అనుసంధానం అయ్యే వరకు Head Master‌ను సంప్రదించండి.","Teacher PIN recovery is not available yet. Please contact the Head Master until secure verification is connected."),"info");return}
    if(state.role==="parent"){state.view="link";render();return}
@@ -215,20 +216,12 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     return;
    }
    if(state.role==="parent"){
-    const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("అన్‌లాక్ చేస్తోంది…","Unlocking…");
+    const b=main.querySelector("#loginGo"),mobile=id.replace(/\D/g,""),password=main.querySelector("#loginPassword").value;
+    b.disabled=true;b.textContent=T("ప్రవేశిస్తోంది…","Signing in…");
     try{
-     const {verifyParentPin,hasParentPin,getParentChildren}=await import("../sections/parent/parent-service.js");
-     if(!hasParentPin())throw new Error("DEVICE_REGISTRATION_REQUIRED");
-     if(!await verifyParentPin(pin))throw new Error("PIN does not match.");
-     const children=await getParentChildren();
-     if(!children.length)throw new Error("DEVICE_REGISTRATION_REQUIRED");
-     state.parentChildren=children;state.linkedStudent=children[0];state.parentName=localStorage.getItem("gim_parent_name")||"";
-     state.parentLinked=true;state.authenticated=true;localStorage.setItem("gim_role","parent");localStorage.setItem("gim_authenticated","true");state.view="dashboard";render();
-    }catch(error){
-     if(error.message==="DEVICE_REGISTRATION_REQUIRED"){state.view="link";render();return;}
-     show(error.message==="PIN does not match."?T("App Lock PIN సరిపోలలేదు.","Incorrect App Lock PIN."):T("Parent వివరాలు లోడ్ కాలేదు. మళ్లీ నమోదు చేయండి.","Parent details could not be loaded. Please register again."));
-     b.disabled=false;b.textContent=T("యాప్‌ను అన్‌లాక్ చేయండి","Unlock App");
-    }
+     await signInParentAccount(mobile,password);
+     await renderParentPinGate(!hasParentPin());
+    }catch(error){show(error?.message||T("Parent Login పూర్తి కాలేదు.","Parent sign-in failed."));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Sign In Securely");}
     return;
    }
    show(T("ఈ Roleకు సురక్షిత Login ఇంకా అందుబాటులో లేదు.","Secure sign-in is not available for this role yet."),"info");
