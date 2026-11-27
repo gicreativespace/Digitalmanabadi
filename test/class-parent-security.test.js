@@ -64,7 +64,7 @@ test("Class Management imports CSV and Excel rosters and provisions Parent accou
   assert.match(modulePage, /xlsx\.mjs/);
   assert.match(modulePage, /importStudentRoster\(pendingRoster\)/);
   assert.match(modulePage, /downloadRosterCredentials/);
-  assert.match(modulePage, /updateStudentDetails/);
+  assert.match(modulePage, /updateStudentDetails/);\n  assert.match(service, /export async function moveStudentClass/);\n  assert.match(modulePage, /data-edit-student-form/);
 });
 
 test("Parent PIN is a local device lock, not a server credential", async () => {
@@ -74,7 +74,8 @@ test("Parent PIN is a local device lock, not a server credential", async () => {
   assert.match(service, /localStorage\.setItem\(PIN_KEY/);
   assert.doesNotMatch(service, /setDoc\(.*PIN|parentProfiles.*pin/i);
   assert.match(section, /saveParentPin/);
-  assert.match(login, /Parent Login ID/);\n  assert.match(login, /loginPassword/);
+  assert.match(login, /Parent Login ID/);
+  assert.match(login, /loginPassword/);
 });
 
 test("Legacy API and Firebase Admin source are not present", async () => {
