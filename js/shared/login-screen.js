@@ -196,7 +196,16 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
    finally{b.disabled=false;b.textContent=T("Password మర్చిపోయారా?","Forgot Password?")}
   };
   main.querySelector("#loginGo").onclick=async()=>{
-   clear();const id=main.querySelector("#loginId").value.trim(),pin=main.querySelector("#loginPin").value;
+   clear();const id=main.querySelector("#loginId").value.trim();
+   if(state.role==="parent"){
+    const password=main.querySelector("#loginPassword").value,b=main.querySelector("#loginGo");
+    if(!id||!password){show(T("మొబైల్ నంబర్ మరియు Password నమోదు చేయండి.","Enter your mobile number and password."),"warning");return;}
+    b.disabled=true;b.textContent=T("ప్రవేశిస్తోంది…","Signing in…");
+    try{await signInParentAccount(id,password);await renderParentPinGate(!hasParentPin());}
+    catch(error){show(error?.message||T("Parent Login పూర్తి కాలేదు.","Parent sign-in failed."));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Sign In Securely");}
+    return;
+   }
+   const pin=main.querySelector("#loginPin").value;
    if(!id||!pin){show(T("దయచేసి అవసరమైన రెండు వివరాలూ నమోదు చేయండి.","Please enter both required fields."),"warning");return}
    if(state.role==="hm"){
     const b=main.querySelector("#loginGo");b.disabled=true;b.textContent=T("ధృవీకరిస్తోంది…","Verifying…");
@@ -215,15 +224,7 @@ export function createLoginScreen({main,state,T,roleNames,roleMeta,iconSvg,rende
     catch(e){state.hmPasswordJustVerified=false;show(errorText(e,"hm"));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Secure Login")}
     return;
    }
-   if(state.role==="parent"){
-    const b=main.querySelector("#loginGo"),mobile=id.replace(/\D/g,""),password=main.querySelector("#loginPassword").value;
-    b.disabled=true;b.textContent=T("ప్రవేశిస్తోంది…","Signing in…");
-    try{
-     await signInParentAccount(mobile,password);
-     await renderParentPinGate(!hasParentPin());
-    }catch(error){show(error?.message||T("Parent Login పూర్తి కాలేదు.","Parent sign-in failed."));b.disabled=false;b.textContent=T("సురక్షితంగా ప్రవేశించండి","Sign In Securely");}
-    return;
-   }
+
    show(T("ఈ Roleకు సురక్షిత Login ఇంకా అందుబాటులో లేదు.","Secure sign-in is not available for this role yet."),"info");
   };
  }
