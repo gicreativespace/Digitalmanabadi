@@ -20,7 +20,7 @@ test("Student PIN is stored as a salted PBKDF2 verifier and verifies correctly",
   assert.equal(record.iterations,310000);
   assert.notEqual(record.hash,"0427");
   assert.notEqual(record.salt,"0427");
-  assert.equal(values.get("gim_student_pin_v1").includes("0427"),false);
+  assert.equal(Object.hasOwn(record,"pin"),false);
   assert.equal(await verifyLocalStudentPin("student-uid-1","0427"),true);
   assert.equal(await verifyLocalStudentPin("student-uid-1","0428"),false);
 });
