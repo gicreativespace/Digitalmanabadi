@@ -238,9 +238,9 @@ export async function importStudentRoster(entries){
   const normalized=entries.map((row,index)=>{
     const classId=text(row.classId).toLowerCase().replace(" ","-");
     const name=text(row.name).slice(0,100),gender=text(row.gender),dob=normalizeDob(row.dob);
-    const parentName=text(row.parentName).slice(0,80),parentMobile=text(row.parentMobile).replace(/\\D/g,"");
+    const parentName=text(row.parentName).slice(0,80),parentMobile=text(row.parentMobile).replace(/\D/g,"");
     const parentRelationship=text(row.relationship||"Guardian"),section=text(row.section).toUpperCase();
-    if(!CLASSES.has(classId)||name.length<2||!["Male","Female","Other"].includes(gender)||parentName.length<2||!/^\\d{10}$/.test(parentMobile)||!["Father","Mother","Guardian","Other"].includes(parentRelationship)) throw new Error("Row "+(index+2)+": check Class, Name, DOB, Gender, Parent Name, 10-digit Parent Mobile and Relationship.");
+    if(!CLASSES.has(classId)||name.length<2||!["Male","Female","Other"].includes(gender)||parentName.length<2||!/^\d{10}$/.test(parentMobile)||!["Father","Mother","Guardian","Other"].includes(parentRelationship)) throw new Error("Row "+(index+2)+": check Class, Name, DOB, Gender, Parent Name, 10-digit Parent Mobile and Relationship.");
     if(section&&!/^[A-Z0-9]{1,4}$/.test(section)) throw new Error("Row "+(index+2)+": invalid Section.");
     return {classId,name,gender,dob,parentName,parentMobile,parentRelationship,section};
   });
