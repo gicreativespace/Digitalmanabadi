@@ -10,7 +10,7 @@ globalThis.localStorage={
   removeItem:key=>values.delete(key)
 };
 
-const {saveLocalStudentPin,verifyLocalStudentPin,getLocalStudentPinRecord}=await import("../js/sections/student/pin-auth.js");
+const {saveLocalStudentPin,verifyLocalStudentPin,getLocalStudentPinRecord,clearLocalStudentPinRecord}=await import("../js/sections/student/pin-auth.js");
 
 test("Student PIN is stored as a salted PBKDF2 verifier and verifies correctly",async()=>{
   await saveLocalStudentPin("student-uid-1","0427");
@@ -23,6 +23,14 @@ test("Student PIN is stored as a salted PBKDF2 verifier and verifies correctly",
   assert.equal(Object.hasOwn(record,"pin"),false);
   assert.equal(await verifyLocalStudentPin("student-uid-1","0427"),true);
   assert.equal(await verifyLocalStudentPin("student-uid-1","0428"),false);
+});
+
+test("A forgotten Student PIN can be cleared for Secret Code re-verification",async()=>{
+  await saveLocalStudentPin("student-uid-reset","1234");
+  assert.ok(getLocalStudentPinRecord("student-uid-reset"));
+  clearLocalStudentPinRecord("student-uid-reset");
+  assert.equal(getLocalStudentPinRecord("student-uid-reset"),null);
+  assert.equal(await verifyLocalStudentPin("student-uid-reset","1234"),false);
 });
 
 test("Student PIN rejects non-four-digit values",async()=>{
