@@ -1,6 +1,6 @@
 import { renderCalendarMarkup } from "./calendar.js";
 import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
-import { listClassrooms, listClassStudents, createClassStudents, createStudentLogin } from "../sections/class-management/class-service.js";
+import { listClassrooms, listClassStudents, createClassStudents, createStudentLogin, updateClassroomSettings } from "../sections/class-management/class-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
@@ -43,24 +43,29 @@ function classManagementMarkup(){
  '</style><div class="class-admin"><header class="class-admin-hero"><div><div class="class-admin-kicker">MPMPS SCHOOL · ACADEMIC STRUCTURE</div><h3>'+T("తరగతుల నిర్వహణ","Class Management")+'</h3><p>'+T("తరగతిని ఎంచుకుని విద్యార్థుల వివరాలను ఒకే Sheet‌లో నమోదు చేయండి.","Choose a class and enter all student details in one sheet.")+'</p></div><div class="class-admin-mark" aria-hidden="true">CM</div></header>'+
  '<div class="class-admin-grid">'+classes.map((name,index)=>'<button type="button" class="class-admin-tile" data-class-open="class-'+(index+1)+'" aria-expanded="false"><span class="class-admin-number">'+String(index+1).padStart(2,"0")+'</span><span><strong>'+T(name.replace("Class ","")+"వ తరగతి",name)+'</strong><small>'+T("తరగతి Sheet తెరవండి · విద్యార్థుల రికార్డులు","Open class sheet · Student records")+'</small></span></button>').join("")+'</div>'+
  '<section class="class-admin-panel" id="classStudentPanel" hidden><div class="class-admin-panel-head"><h4 id="classStudentTitle"></h4><span id="classStudentStatus" class="class-admin-status" role="status" aria-live="polite"></span></div>'+
+ '<div class="class-strength-setup" id="classSettingsPanel"><strong>'+T("తరగతి సెట్టింగ్స్","Class Settings")+'</strong><div class="teacher-admin-grid"><div class="field"><label for="classSectionsInput">'+T("Sections (ఐచ్ఛికం)","Sections (optional)")+'</label><input id="classSectionsInput" type="text" maxlength="60" placeholder="A, B, C"></div><div class="field"><label for="classTeacherSelect">'+T("Class Teacher","Class Teacher")+'</label><select id="classTeacherSelect"><option value="">'+T("కేటాయించలేదు","Not assigned")+'</option></select></div></div><div class="class-sheet-actions"><button type="button" class="btn secondary" id="saveClassSettings">'+T("సెట్టింగ్స్ సేవ్ చేయండి","Save Class Settings")+'</button><span id="classSettingsStatus" class="class-admin-status" role="status"></span></div><small>'+T("Sections ఉంటే విద్యార్థులను వాటికి కేటాయించండి. Roll Number మాత్రం మొత్తం తరగతికి ఒకే క్రమంలో కొనసాగుతుంది.","Assign students to configured sections. Roll numbers continue in one shared sequence across the whole class.")+'</small></div>'+
+ '<div class="class-strength-setup" id="classSectionFilterWrap"><label for="classSectionFilter">'+T("విభాగం వారీగా చూడండి","View by Section")+'</label><select id="classSectionFilter"><option value="">'+T("అన్ని Sections","All Sections")+'</option></select></div>'+
  '<div id="classStrengthSetup" class="class-strength-setup"><label for="classStrengthInput">'+T("ఈ తరగతి మొత్తం విద్యార్థుల సంఖ్య (Strength)","Total number of students in this class (Strength)")+'</label><div class="class-strength-controls"><input id="classStrengthInput" type="number" min="1" max="99" inputmode="numeric" placeholder="'+T("ఉదా: 35","e.g. 35")+'"><button type="button" class="btn" id="createClassSheet">'+T("Create Class Sheet","Create Class Sheet")+'</button></div><small>'+T("Strength 1 నుంచి 99 మధ్య నమోదు చేయండి. ఇప్పటికే ఉన్న విద్యార్థుల రికార్డులు అలాగే ఉంటాయి.","Enter a strength between 1 and 99. Existing student records will be preserved.")+'</small></div>'+
  '<div id="classSheetWorkspace" hidden>'+
  '<div class="class-sheet-toolbar"><p>'+T("ప్రతి Row ఒక విద్యార్థి. Save చేసినప్పుడు Roll Number, Student ID మరియు Secret Code ఆటోమేటిక్‌గా రూపొందుతాయి.","Each row is one student. Roll Number, Student ID and Secret Code are generated automatically when saved.")+'</p><div class="class-sheet-actions"><button type="button" class="btn secondary" id="addStudentRows">+ '+T("5 Rows జోడించండి","Add 5 Rows")+'</button><button type="button" class="btn" id="saveAllStudents">'+T("అన్ని వివరాలు సేవ్ చేయండి","Save All Students")+'</button></div></div>'+
- '<div class="class-sheet-wrap"><table class="class-student-sheet"><thead><tr><th>'+T("Roll No.","Roll No.")+'</th><th>'+T("విద్యార్థి పేరు","Student Name")+'</th><th>'+T("లింగం","Gender")+'</th><th>'+T("పుట్టిన తేదీ","Date of Birth")+'</th><th>'+T("తొలగించు","Remove")+'</th></tr></thead><tbody id="studentEntryRows"></tbody></table></div>'+
+ '<div class="class-sheet-wrap"><table class="class-student-sheet"><thead><tr><th>'+T("Roll No.","Roll No.")+'</th><th>'+T("Section","Section")+'</th><th>'+T("విద్యార్థి పేరు","Student Name")+'</th><th>'+T("లింగం","Gender")+'</th><th>'+T("పుట్టిన తేదీ","Date of Birth")+'</th><th>'+T("తొలగించు","Remove")+'</th></tr></thead><tbody id="studentEntryRows"></tbody></table></div>'+
  '<div class="class-sheet-footer"><small>'+T("పేరు, లింగం, పుట్టిన తేదీ తప్పనిసరి. ఖాళీ Rows సేవ్ కావు.","Name, gender and date of birth are required. Empty rows are ignored.")+'</small><button type="button" class="btn secondary" id="addOneStudentRow">+ '+T("ఒక Row","Add One Row")+'</button></div></div>'+
  '<div id="classStudentList" class="class-student-list"><div class="class-admin-empty">'+T("విద్యార్థుల రికార్డులు లోడ్ అవుతాయి.","Student records will appear here.")+'</div></div></section></div>';
 }
 async function bindClassManagement(){
  const panel=main.querySelector("#classStudentPanel"),title=main.querySelector("#classStudentTitle"),status=main.querySelector("#classStudentStatus"),list=main.querySelector("#classStudentList"),rowsBox=main.querySelector("#studentEntryRows");
  if(!panel||!rowsBox)return;
- let activeClassId="",rowSequence=0,targetStrength=0,existingCount=0;
+ let activeClassId="",rowSequence=0,targetStrength=0,existingCount=0,activeSections=[],currentStudents=[],classroomConfig={},teacherRecords=[];
  const esc=v=>escapeHtml(String(v??""));
  const formatDob=v=>/^\d{8}$/.test(String(v||""))?String(v).slice(0,2)+"/"+String(v).slice(2,4)+"/"+String(v).slice(4):String(v||"—");
  const genderLabel=v=>({Male:T("పురుషుడు","Male"),Female:T("స్త్రీ","Female"),Other:T("ఇతర","Other")}[v]||v||"—");
  const say=(v,bad=false)=>{status.textContent=v;status.className=bad?"class-admin-error":"class-admin-status";};
  const addRow=(values={})=>{
   const key=String(++rowSequence);
-  const row='<tr data-entry-row="'+key+'"><td data-label="'+T("Roll No.","Roll No.")+'"><span class="class-sheet-roll">Auto</span></td>'+
+  const sectionCell=activeSections.length
+   ?'<td data-label="Section"><select data-student-section required><option value="">'+T("ఎంచుకోండి","Select")+'</option>'+activeSections.map(section=>'<option value="'+esc(section)+'" '+(values.section===section?"selected":"")+'>'+esc(section)+'</option>').join("")+'</select></td>'
+   :'<td data-label="Section">—<input type="hidden" data-student-section value=""></td>';
+  const row='<tr data-entry-row="'+key+'"><td data-label="'+T("Roll No.","Roll No.")+'"><span class="class-sheet-roll">Auto</span></td>'+sectionCell+
    '<td data-label="'+T("పేరు","Name")+'"><input data-student-name maxlength="100" autocomplete="off" placeholder="'+T("విద్యార్థి పూర్తి పేరు","Student full name")+'" value="'+esc(values.name||"")+'"></td>'+
    '<td data-label="'+T("లింగం","Gender")+'"><select data-student-gender><option value="">'+T("ఎంచుకోండి","Select")+'</option><option value="Male" '+(values.gender==="Male"?"selected":"")+'>'+T("పురుషుడు","Male")+'</option><option value="Female" '+(values.gender==="Female"?"selected":"")+'>'+T("స్త్రీ","Female")+'</option><option value="Other" '+(values.gender==="Other"?"selected":"")+'>'+T("ఇతర","Other")+'</option></select></td>'+
    '<td data-label="'+T("పుట్టిన తేదీ","Date of Birth")+'"><input data-student-dob inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" value="'+esc(values.dob||"")+'"></td>'+
@@ -69,8 +74,10 @@ async function bindClassManagement(){
  };
  const emptyRows=(count=0)=>{rowsBox.innerHTML="";for(let i=0;i<count;i++)addRow();};
  const renderStudents=students=>{
-  if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ తరగతిలో ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students have been added to this class yet.")+'</div>';return;}
-  list.innerHTML='<h4>'+T("ఇప్పటికే నమోదైన విద్యార్థులు","Registered Students")+'</h4>'+students.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>'+T("Student ID: ","Student ID: ")+esc(st.studentId)+' · '+T("Roll No.","Roll No.")+' '+esc(st.rollNumber)+'</small></div><span class="class-admin-status">'+(st.authUid?T("Login Created","Login Created"):T("Login Pending","Login Pending"))+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(st.dob))+'</b></div><div><span>'+T("Student Login ID","Student Login ID")+'</span><b>'+esc(st.loginId||"—")+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(st.secretCode||"—")+'</b></div></div><div class="class-sheet-actions" style="margin-top:12px"><button type="button" class="btn '+(st.authUid?'secondary':'')+'" data-create-student-login data-student-record-id="'+esc(st.studentRecordId)+'" '+(st.authUid?'disabled':'')+'>'+(st.authUid?T("Login Created","Login Created"):T("Create Student Login","Create Student Login"))+'</button></div></article>').join("");
+  const sectionFilter=main.querySelector("#classSectionFilter")?.value||"";
+  const visible=sectionFilter?students.filter(st=>(st.section||"")===sectionFilter):students;
+  if(!visible.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ విభాగంలో విద్యార్థులు లేరు.","No students are enrolled in this section.")+'</div>';return;}
+  list.innerHTML='<h4>'+T("ఇప్పటికే నమోదైన విద్యార్థులు","Registered Students")+'</h4>'+visible.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>'+T("Student ID: ","Student ID: ")+esc(st.studentId)+' · '+T("Roll No.","Roll No.")+' '+esc(st.rollNumber)+' · '+T("Section","Section")+' '+esc(st.section||"—")+'</small></div><span class="class-admin-status">'+(st.authUid?T("Login Created","Login Created"):T("Login Pending","Login Pending"))+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(st.dob))+'</b></div><div><span>'+T("Student Login ID","Student Login ID")+'</span><b>'+esc(st.loginId||"—")+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(st.secretCode||"—")+'</b></div></div><div class="class-sheet-actions" style="margin-top:12px"><button type="button" class="btn '+(st.authUid?'secondary':'')+'" data-create-student-login data-student-record-id="'+esc(st.studentRecordId)+'" '+(st.authUid?'disabled':'')+'>'+(st.authUid?T("Login Created","Login Created"):T("Create Student Login","Create Student Login"))+'</button></div></article>').join("");
  };
  list.addEventListener("click",async event=>{
   const button=event.target.closest("[data-create-student-login]");
@@ -90,11 +97,22 @@ async function bindClassManagement(){
  });
 
  const strengthSetup=main.querySelector("#classStrengthSetup"),workspace=main.querySelector("#classSheetWorkspace"),strengthInput=main.querySelector("#classStrengthInput");
+ const settingsStatus=main.querySelector("#classSettingsStatus"),sectionsInput=main.querySelector("#classSectionsInput"),classTeacherSelect=main.querySelector("#classTeacherSelect"),sectionFilter=main.querySelector("#classSectionFilter");
  const loadClass=async classId=>{
   activeClassId=classId;targetStrength=0;existingCount=0;panel.hidden=false;workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value="";title.textContent=T(classId.slice(-1)+"వ తరగతి","Class "+classId.slice(-1));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';rowsBox.innerHTML="";
   main.querySelectorAll("[data-class-open]").forEach(btn=>btn.setAttribute("aria-expanded",String(btn.dataset.classOpen===classId)));
-  try{const result=await listClassStudents(classId);const students=result.students||[];existingCount=students.length;renderStudents(students);say(T("ఇప్పటికే నమోదైన విద్యార్థులు: ","Existing students: ")+existingCount);}
-  catch(error){list.innerHTML='<div class="class-admin-error">'+esc(error.message||T("వివరాలు లోడ్ కాలేదు.","Could not load records."))+'</div>';say(T("డేటా లోడ్ కాలేదు.","Could not load data."),true);}
+  try{
+   const [classroomsResult,studentResult]=await Promise.all([listClassrooms(),listClassStudents(classId)]);
+   classroomConfig=(classroomsResult.classrooms||[]).find(item=>item.classId===classId)||{};
+   activeSections=Array.isArray(classroomConfig.sections)?classroomConfig.sections:[];
+   currentStudents=studentResult.students||[];existingCount=currentStudents.length;
+   sectionsInput.value=activeSections.join(", ");
+   if(!teacherRecords.length){try{const teachers=await listTeacherRecords();teacherRecords=teachers.teachers||[];}catch{}}
+   classTeacherSelect.innerHTML='<option value="">'+T("కేటాయించలేదు","Not assigned")+'</option>'+teacherRecords.filter(t=>t.status==="active").map(t=>'<option value="'+esc(t.teacherId)+'" '+(t.teacherId===classroomConfig.classTeacherId?"selected":"")+'>'+esc(t.name)+' · '+esc(t.teacherId)+'</option>').join("");
+   if(classroomConfig.classTeacherId&&!teacherRecords.some(t=>t.teacherId===classroomConfig.classTeacherId))classTeacherSelect.insertAdjacentHTML("beforeend",'<option selected value="'+esc(classroomConfig.classTeacherId)+'">'+esc(classroomConfig.classTeacherName||classroomConfig.classTeacherId)+' · '+T("పాత కేటాయింపు","Existing assignment")+'</option>');
+   sectionFilter.innerHTML='<option value="">'+T("అన్ని Sections","All Sections")+'</option>'+activeSections.map(section=>'<option value="'+esc(section)+'">'+esc(section)+'</option>').join("");
+   renderStudents(currentStudents);say(T("ఇప్పటికే నమోదైన విద్యార్థులు: ","Existing students: ")+existingCount);
+  }catch(error){list.innerHTML='<div class="class-admin-error">'+esc(error.message||T("వివరాలు లోడ్ కాలేదు.","Could not load records."))+'</div>';say(T("డేటా లోడ్ కాలేదు.","Could not load data."),true);}
   panel.scrollIntoView({behavior:"smooth",block:"start"});
  };
  main.querySelectorAll("[data-class-open]").forEach(btn=>btn.onclick=()=>loadClass(btn.dataset.classOpen));
@@ -104,16 +122,27 @@ async function bindClassManagement(){
   if(strength<existingCount){say(T("ఈ తరగతిలో ఇప్పటికే ","This class already has ")+existingCount+T(" మంది విద్యార్థులు ఉన్నారు. Strength అంతకంటే తక్కువగా ఉండకూడదు."," students. Strength cannot be lower than the existing count."),true);return;}
   targetStrength=strength;workspace.hidden=false;strengthSetup.hidden=true;emptyRows(Math.max(0,targetStrength-existingCount));say(T("Class Strength: ","Class Strength: ")+targetStrength+" · "+T("ఇప్పటికే నమోదు: ","Already registered: ")+existingCount+" · "+T("కొత్త Rows: ","New rows: ")+(targetStrength-existingCount));
  };
+ sectionFilter.onchange=()=>renderStudents(currentStudents);
+ main.querySelector("#saveClassSettings").onclick=async()=>{
+  const button=main.querySelector("#saveClassSettings");button.disabled=true;
+  if(settingsStatus)settingsStatus.textContent=T("సేవ్ చేస్తోంది…","Saving…");
+  try{
+   await updateClassroomSettings(activeClassId,{sections:sectionsInput.value,classTeacherId:classTeacherSelect.value});
+   if(settingsStatus)settingsStatus.textContent=T("సెట్టింగ్స్ సేవ్ అయ్యాయి.","Settings saved.");
+   await loadClass(activeClassId);
+  }catch(error){if(settingsStatus)settingsStatus.textContent=error?.message||T("సెట్టింగ్స్ సేవ్ కాలేదు.","Could not save settings.");}
+  finally{button.disabled=false;}
+ };
  const addRowsWithinStrength=count=>{const remaining=Math.max(0,targetStrength-existingCount-rowsBox.querySelectorAll("[data-entry-row]").length);for(let i=0;i<Math.min(count,remaining);i++)addRow();if(remaining===0)say(T("నమోదు చేసిన Class Strength‌కు సరిపడా Rows ఇప్పటికే ఉన్నాయి.","All rows for the selected class strength are already present."),true);};
  main.querySelector("#addStudentRows").onclick=()=>addRowsWithinStrength(5);
  main.querySelector("#addOneStudentRow").onclick=()=>addRowsWithinStrength(1);
  rowsBox.addEventListener("click",event=>{const remove=event.target.closest("[data-remove-row]");if(remove){remove.closest("tr").remove();}});
  main.querySelector("#saveAllStudents").onclick=async()=>{
   if(!activeClassId)return;
-  const entries=[...rowsBox.querySelectorAll("[data-entry-row]")].map(row=>({key:row.dataset.entryRow,name:row.querySelector("[data-student-name]").value.trim(),gender:row.querySelector("[data-student-gender]").value,dob:row.querySelector("[data-student-dob]").value.trim()}));
+  const entries=[...rowsBox.querySelectorAll("[data-entry-row]")].map(row=>({key:row.dataset.entryRow,name:row.querySelector("[data-student-name]").value.trim(),gender:row.querySelector("[data-student-gender]").value,dob:row.querySelector("[data-student-dob]").value.trim(),section:row.querySelector("[data-student-section]")?.value||""}));
   const filled=entries.filter(row=>row.name||row.gender||row.dob);
   if(!filled.length){say(T("ముందుగా కనీసం ఒక విద్యార్థి వివరాలు నమోదు చేయండి.","Enter at least one student before saving."),true);return;}
-  const invalid=filled.filter(row=>row.name.length<2||!["Male","Female","Other"].includes(row.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(row.dob));
+  const invalid=filled.filter(row=>row.name.length<2||!["Male","Female","Other"].includes(row.gender)||!/^\d{2}\/\d{2}\/\d{4}$/.test(row.dob)||(activeSections.length&&!activeSections.includes(row.section)));
   if(invalid.length){say(T("పేరు, లింగం మరియు DD/MM/YYYY పుట్టిన తేదీ అన్ని Rows‌లో సరిచూడండి.","Check name, gender and DD/MM/YYYY date of birth in every filled row."),true);return;}
   if(filled.length>Math.max(0,targetStrength-existingCount)){say(T("నమోదు చేయబోయే విద్యార్థుల సంఖ్య Class Strength‌లో మిగిలిన స్థానాలకంటే ఎక్కువగా ఉంది.","The number of students exceeds the remaining class strength."),true);return;}
   const button=main.querySelector("#saveAllStudents"),addButtons=[main.querySelector("#addStudentRows"),main.querySelector("#addOneStudentRow")];
@@ -122,7 +151,7 @@ async function bindClassManagement(){
   const created=response.created||[];
   const failed=(response.failed||[]).map(item=>({row:filled[item.index],error:{message:item.message}}));
   try{
-   const result=await listClassStudents(activeClassId);existingCount=(result.students||[]).length;renderStudents(result.students||[]);
+   const result=await listClassStudents(activeClassId);currentStudents=result.students||[];existingCount=currentStudents.length;renderStudents(currentStudents);
   }catch(error){say(T("కొన్ని రికార్డులు సేవ్ అయ్యాయి, కానీ జాబితాను రీలోడ్ చేయలేకపోయాం.","Some records were saved, but the list could not be reloaded."),true);}
   rowsBox.innerHTML="";
   if(failed.length){failed.forEach(item=>addRow(item.row));say(T("విజయవంతంగా సేవ్: ","Saved successfully: ")+created.length+" · "+T("మళ్లీ ప్రయత్నించాల్సినవి: ","Need retry: ")+failed.length,true);}
