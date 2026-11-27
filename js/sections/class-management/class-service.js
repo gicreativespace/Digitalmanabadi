@@ -17,13 +17,9 @@ function academicYearCode(){
   const parts=new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",year:"2-digit"}).format(new Date());
   return parts;
 }
-function createStudentSecretCode(dob){
-  const value=String(dob??"");
-  if(!/^\d{8}$/.test(value)) throw new Error("A valid student date of birth is required to generate the login code.");
-  const dobDDMMYY=value.slice(0,4)+value.slice(6,8);
-  const code=919720-Number(dobDDMMYY);
-  if(!Number.isInteger(code)||code<100000||code>999999) throw new Error("Could not generate a valid six-digit student code.");
-  return String(code);
+function randomSecretCode(){
+  const bytes=crypto.getRandomValues(new Uint32Array(1));
+  return String(100000000000n + (BigInt(bytes[0]) * 900000000000n / 4294967296n)).padStart(12,"0");
 }
 export function getStudentLoginId(studentId){return String(studentId)+"@dagguluruschool.in";}
 async function sha256(value){
@@ -67,7 +63,7 @@ export async function createClassStudent(classId,payload){
   const name=text(payload.name).slice(0,100),gender=text(payload.gender),dob=normalizeDob(payload.dob);
   if(name.length<2||!["Male","Female","Other"].includes(gender)) throw new Error("Enter all required student details.");
   const classNumber=Number(classId.slice(-1)),year=academicYearCode(),recordRef=doc(collection(db,"students"));
-  const secretCode=createStudentSecretCode(dob),secretCodeHash=await sha256(secretCode);
+  const secretCode=randomSecretCode(),secretCodeHash=await sha256(secretCode);
   const counterId=hm.schoolId+"_"+year+"_"+classId,counterRef=doc(db,"studentCounters",counterId);
   const lookupRefBase="studentLookup/";
   let created;
@@ -118,7 +114,7 @@ export async function createStudentLogin(studentRecordId){
   const secretSnapshot=await getDoc(doc(db,"studentSecrets",String(studentRecordId)));
   if(!secretSnapshot.exists()) throw new Error("Student Secret Code was not found.");
   const secretCode=String(secretSnapshot.data().secretCode||"");
-  if(!/^\d{6}$/.test(secretCode)) throw new Error("The student's Secret Code is invalid. Please contact GI Support.");
+  if(!/^\d{12}$/.test(secretCode)) throw new Error("The student's Secret Code is invalid. Please contact GI Support.");
   const loginId=getStudentLoginId(student.studentId);
   const secondaryApp=initializeApp(auth.app.options,"student-provision-"+String(studentRecordId)+"-"+crypto.randomUUID());
   const secondaryAuth=getAuth(secondaryApp);
