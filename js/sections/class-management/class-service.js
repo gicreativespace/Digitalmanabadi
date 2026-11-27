@@ -320,3 +320,37 @@ export async function updateStudentDetails(studentRecordId,payload={}){
   if(lookup.exists()) await updateDoc(doc(db,"studentLookup",String(current.studentId)),{section});
   return {studentRecordId:String(studentRecordId),name,gender,dob,section};
 }
+
+export async function moveStudentClass(studentRecordId,targetClassId,sectionValue=""){
+  if(!CLASSES.has(targetClassId)) throw new Error("Choose a valid target class.");
+  const hm=await requireHeadMaster(),studentRef=doc(db,"students",String(studentRecordId)),snapshot=await getDoc(studentRef);
+  if(!snapshot.exists()) throw new Error("Student record was not found.");
+  const student=snapshot.data();
+  if(student.schoolId!==hm.schoolId) throw new Error("This student belongs to another school.");
+  if(student.classId===targetClassId) return updateStudentSection(studentRecordId,sectionValue);
+  if(student.authUid||student.loginCreatedAt) throw new Error("This student already has a Firebase Student Login. Contact GI Support before changing the class so the login ID can be migrated safely.");
+  const year=String(student.academicYear||academicYearCode()),classNumber=Number(targetClassId.slice(-1));
+  const classroomRef=doc(db,"classrooms",hm.schoolId+"_"+targetClassId);
+  const counterRef=doc(db,"studentCounters",hm.schoolId+"_"+year+"_"+targetClassId);
+  const oldLookupRef=doc(db,"studentLookup",String(student.studentId));
+  const section=text(sectionValue).toUpperCase();
+  let updated;
+  await runTransaction(db,async tx=>{
+    const [latestStudent,classroom,counter]=await Promise.all([tx.get(studentRef),tx.get(classroomRef),tx.get(counterRef)]);
+    if(!latestStudent.exists()||latestStudent.data().schoolId!==hm.schoolId) throw new Error("Student record changed. Refresh and try again.");
+    const sections=classroom.exists()&&Array.isArray(classroom.data().sections)?classroom.data().sections:[];
+    if(sections.length&&!section) throw new Error("Choose a Section for the target class.");
+    if(section&&!sections.includes(section)) throw new Error("Choose a Section configured for the target class.");
+    const roll=Number(counter.exists()?counter.data().lastRoll||0:0)+1;
+    if(roll>99) throw new Error("The target class has reached its 99-student roll limit for this academic year.");
+    const rollNumber=String(roll).padStart(2,"0"),studentId=year+String(classNumber).padStart(2,"0")+rollNumber;
+    const newLookupRef=doc(db,"studentLookup",studentId),collision=await tx.get(newLookupRef);
+    if(collision.exists()) throw new Error("The generated Student ID already exists. Retry the class move.");
+    tx.update(studentRef,{classId:targetClassId,classNumber,section,rollNumber,studentId,loginId:getStudentLoginId(studentId),updatedBy:hm.uid,updatedAt:serverTimestamp()});
+    tx.delete(oldLookupRef);
+    tx.set(newLookupRef,{studentRecordId:String(studentRecordId),studentId,loginId:getStudentLoginId(studentId),classId:targetClassId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
+    tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId:targetClassId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
+    updated={studentId,rollNumber,classId:targetClassId,section};
+  });
+  return updated;
+}
