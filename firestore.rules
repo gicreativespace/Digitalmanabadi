@@ -4,8 +4,11 @@ service cloud.firestore {
   function signedIn() {
    return request.auth != null;
   }
-  function anonymousParent() {
-   return signedIn() && request.auth.token.firebase.sign_in_provider == "anonymous";
+  function isParent() {
+   return signedIn()
+    && exists(/databases/$(database)/documents/parentProfiles/$(request.auth.uid))
+    && get(/databases/$(database)/documents/parentProfiles/$(request.auth.uid)).data.role == "PARENT"
+    && get(/databases/$(database)/documents/parentProfiles/$(request.auth.uid)).data.status == "active";
   }
   function adminPath() {
    return /databases/$(database)/documents/platformAdmins/$(request.auth.uid);
@@ -33,9 +36,9 @@ service cloud.firestore {
    return isActiveHeadMaster() && get(adminPath()).data.schoolId == schoolId;
   }
   function linkedParent(studentRecordId) {
-   return anonymousParent()
-    && exists(/databases/$(database)/documents/parentLinks/$(studentRecordId))
-    && get(/databases/$(database)/documents/parentLinks/$(studentRecordId)).data.parentUid == request.auth.uid;
+   return isParent()
+    && exists(/databases/$(database)/documents/parentLinks/$(studentRecordId + "_" + request.auth.uid))
+    && get(/databases/$(database)/documents/parentLinks/$(studentRecordId + "_" + request.auth.uid)).data.parentUid == request.auth.uid;
   }
   function linkedStudent(studentRecordId) {
    return signedIn()
@@ -123,7 +126,7 @@ service cloud.firestore {
   }
   // A Parent may resolve a known Student ID, but this lookup has no name, DOB or Secret Code.
   match /studentLookup/{studentId} {
-   allow get: if anonymousParent() || linkedStudent(resource.data.studentRecordId) || (isActiveHeadMaster() && (!exists(/databases/$(database)/documents/studentLookup/$(studentId)) || isActiveHeadMasterForSchool(resource.data.schoolId)));
+   allow get: if isParent() || linkedStudent(resource.data.studentRecordId) || (isActiveHeadMaster() && (!exists(/databases/$(database)/documents/studentLookup/$(studentId)) || isActiveHeadMasterForSchool(resource.data.schoolId)));
    allow list: if false;
    allow create: if isActiveHeadMasterForSchool(request.resource.data.schoolId);
    allow update: if isActiveHeadMasterForSchool(resource.data.schoolId)
@@ -131,41 +134,40 @@ service cloud.firestore {
    allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);
   }
   match /parentProfiles/{uid} {
-   allow get: if anonymousParent() && request.auth.uid == uid;
-   allow list: if false;
-   allow create: if anonymousParent()
-    && request.auth.uid == uid
+   allow get: if (signedIn() && request.auth.uid == uid) || (isActiveHeadMaster() && isActiveHeadMasterForSchool(resource.data.schoolId));
+   allow list: if isActiveHeadMasterForSchool(resource.data.schoolId);
+   allow create, update: if isActiveHeadMasterForSchool(request.resource.data.schoolId)
     && request.resource.data.uid == uid
-    && request.resource.data.parentName is string
-    && request.resource.data.parentName.size() >= 2;
-   allow update: if anonymousParent()
-    && request.auth.uid == uid
-    && request.resource.data.uid == uid
-    && request.resource.data.parentName == resource.data.parentName;
+    && request.resource.data.role == "PARENT"
+    && request.resource.data.status == "active"
+    && request.resource.data.mobile is string;
    allow delete: if false;
   }
   match /parentClaims/{claimId} {
-   allow create, update: if anonymousParent()
+   allow create: if isParent()
     && claimId == request.auth.uid + "_" + request.resource.data.studentRecordId
     && request.resource.data.parentUid == request.auth.uid
     && exists(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId))
     && exists(/databases/$(database)/documents/studentSecrets/$(request.resource.data.studentRecordId))
     && get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.status == "active"
+    && get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.schoolId == get(/databases/$(database)/documents/parentProfiles/$(request.auth.uid)).data.schoolId
+    && get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.parentMobile == get(/databases/$(database)/documents/parentProfiles/$(request.auth.uid)).data.mobile
     && request.resource.data.studentId == get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.studentId
     && request.resource.data.dob == get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.dob
     && request.resource.data.secretCodeHash == get(/databases/$(database)/documents/studentSecrets/$(request.resource.data.studentRecordId)).data.secretCodeHash;
    allow read, update, delete: if false;
   }
-  match /parentLinks/{studentRecordId} {
+  match /parentLinks/{linkId} {
    allow get, list: if isActiveHeadMasterForSchool(resource.data.schoolId)
-    || (anonymousParent() && resource.data.parentUid == request.auth.uid);
-   allow create, update: if anonymousParent()
+    || (isParent() && resource.data.parentUid == request.auth.uid);
+   allow create: if isParent()
+    && linkId == request.resource.data.studentRecordId + "_" + request.auth.uid
     && request.resource.data.parentUid == request.auth.uid
-    && request.resource.data.studentRecordId == studentRecordId
     && request.resource.data.relationship in ["Father", "Mother", "Guardian", "Other"]
-    && request.resource.data.schoolId == get(/databases/$(database)/documents/students/$(studentRecordId)).data.schoolId
-    && existsAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + studentRecordId))
-    && getAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + studentRecordId)).data.parentUid == request.auth.uid;
+    && request.resource.data.schoolId == get(/databases/$(database)/documents/students/$(request.resource.data.studentRecordId)).data.schoolId
+    && existsAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + request.resource.data.studentRecordId))
+    && getAfter(/databases/$(database)/documents/parentClaims/$(request.auth.uid + "_" + request.resource.data.studentRecordId)).data.parentUid == request.auth.uid;
+   allow update: if isParent() && resource.data.parentUid == request.auth.uid && request.resource.data.parentUid == request.auth.uid;
    allow delete: if isActiveHeadMasterForSchool(resource.data.schoolId);
   }
 
