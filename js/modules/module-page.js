@@ -1,6 +1,6 @@
 import { renderCalendarMarkup } from "./calendar.js";
 import { createTeacherRecord, createTeacherLogin, listTeacherRecords, updateTeacherRecord, setTeacherStatus } from "../sections/teacher/teacher-service.js";
-import { listClassrooms, listClassStudents, createClassStudents } from "../sections/class-management/class-service.js";
+import { listClassrooms, listClassStudents, createClassStudents, createStudentLogin } from "../sections/class-management/class-service.js";
 import { renderMidDayMealMarkup } from "./mid-day-meal.js";
 import { renderPosterStudioMarkup, setupPosterStudio } from "./poster-studio.js";
 
@@ -70,8 +70,25 @@ async function bindClassManagement(){
  const emptyRows=(count=0)=>{rowsBox.innerHTML="";for(let i=0;i<count;i++)addRow();};
  const renderStudents=students=>{
   if(!students.length){list.innerHTML='<div class="class-admin-empty">'+T("ఈ తరగతిలో ఇంకా విద్యార్థులు నమోదు కాలేదు.","No students have been added to this class yet.")+'</div>';return;}
-  list.innerHTML='<h4>'+T("ఇప్పటికే నమోదైన విద్యార్థులు","Registered Students")+'</h4>'+students.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>'+T("Student ID: ","Student ID: ")+esc(st.studentId)+' · '+T("Roll No.","Roll No.")+' '+esc(st.rollNumber)+'</small></div><span class="class-admin-status">'+T("క్రియాశీలం","Active")+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(st.dob))+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(st.secretCode||"—")+'</b></div></div></article>').join("");
+  list.innerHTML='<h4>'+T("ఇప్పటికే నమోదైన విద్యార్థులు","Registered Students")+'</h4>'+students.map(st=>'<article class="class-student-card"><div class="class-student-head"><div><strong>'+esc(st.name)+'</strong><small>'+T("Student ID: ","Student ID: ")+esc(st.studentId)+' · '+T("Roll No.","Roll No.")+' '+esc(st.rollNumber)+'</small></div><span class="class-admin-status">'+(st.authUid?T("Login Created","Login Created"):T("Login Pending","Login Pending"))+'</span></div><div class="class-student-info"><div><span>'+T("లింగం","Gender")+'</span><b>'+esc(genderLabel(st.gender))+'</b></div><div><span>'+T("పుట్టిన తేదీ","Date of Birth")+'</span><b>'+esc(formatDob(st.dob))+'</b></div><div><span>'+T("Student Login ID","Student Login ID")+'</span><b>'+esc(st.loginId||"—")+'</b></div><div class="class-secret"><span>'+T("Permanent Secret Code · Head Master Only","Permanent Secret Code · Head Master Only")+'</span><b>'+esc(st.secretCode||"—")+'</b></div></div><div class="class-sheet-actions" style="margin-top:12px"><button type="button" class="btn '+(st.authUid?'secondary':'')+'" data-create-student-login data-student-record-id="'+esc(st.studentRecordId)+'" '+(st.authUid?'disabled':'')+'>'+(st.authUid?T("Login Created","Login Created"):T("Create Student Login","Create Student Login"))+'</button></div></article>').join("");
  };
+ list.addEventListener("click",async event=>{
+  const button=event.target.closest("[data-create-student-login]");
+  if(!button||button.disabled)return;
+  const recordId=button.dataset.studentRecordId;
+  button.disabled=true;button.textContent=T("Login సృష్టిస్తోంది…","Creating Login…");
+  try{
+   const result=await createStudentLogin(recordId);
+   const refreshed=await listClassStudents(activeClassId);
+   renderStudents(refreshed.students||[]);
+   say(T("Student Login విజయవంతంగా సృష్టించబడింది: ","Student Login created successfully: ")+result.loginId);
+   toast(T("Student Login ID: ","Student Login ID: ")+result.loginId);
+  }catch(error){
+   button.disabled=false;button.textContent=T("మళ్లీ ప్రయత్నించండి","Retry Login Creation");
+   say(error?.message||T("Student Login సృష్టించలేకపోయాం.","Could not create the Student Login."),true);
+  }
+ });
+
  const strengthSetup=main.querySelector("#classStrengthSetup"),workspace=main.querySelector("#classSheetWorkspace"),strengthInput=main.querySelector("#classStrengthInput");
  const loadClass=async classId=>{
   activeClassId=classId;targetStrength=0;existingCount=0;panel.hidden=false;workspace.hidden=true;strengthSetup.hidden=false;strengthInput.value="";title.textContent=T(classId.slice(-1)+"వ తరగతి","Class "+classId.slice(-1));say(T("విద్యార్థుల వివరాలు లోడ్ అవుతున్నాయి…","Loading student records…"));list.innerHTML='<div class="class-admin-empty">'+T("లోడ్ అవుతోంది…","Loading…")+'</div>';rowsBox.innerHTML="";
