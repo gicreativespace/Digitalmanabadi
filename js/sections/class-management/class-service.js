@@ -1,5 +1,5 @@
 import { auth, db } from "../../firebase-client.js";
-import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser, getAuth, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
@@ -40,11 +40,12 @@ export async function listClassrooms(){
   const result=[];
   for(let n=1;n<=5;n++){
     const id="class-"+n,snap=await getDoc(doc(db,"classrooms",hm.schoolId+"_"+id));
-    result.push({classId:id,classNumber:n,exists:snap.exists(),...(snap.exists()?snap.data():{})});
+    const data=snap.exists()?snap.data():{};
+    result.push({classId:id,classNumber:n,exists:snap.exists(),sections:Array.isArray(data.sections)?data.sections:[],classTeacherId:data.classTeacherId||"",classTeacherName:data.classTeacherName||"",...data});
   }
   return {classrooms:result};
 }
-export async function listClassStudents(classId){
+export async function listClassStudents(classId, sectionFilter=""){
   if(!CLASSES.has(classId)) throw new Error("Choose a valid class.");
   const hm=await requireHeadMaster();
   const q=query(collection(db,"students"),where("schoolId","==",hm.schoolId),where("classId","==",classId));
@@ -54,8 +55,9 @@ export async function listClassStudents(classId){
     const secret=await getDoc(doc(db,"studentSecrets",item.id));
     students.push({studentRecordId:item.id,...data,secretCode:secret.exists()?secret.data().secretCode:"",loginId:data.loginId||getStudentLoginId(data.studentId)});
   }
-  students.sort((a,b)=>Number(a.rollNumber)-Number(b.rollNumber));
-  return {students};
+  const filtered=sectionFilter?students.filter(student=>(student.section||"")===sectionFilter):students;
+  filtered.sort((a,b)=>Number(a.rollNumber)-Number(b.rollNumber));
+  return {students:filtered};
 }
 export async function createClassStudent(classId,payload){
   if(!CLASSES.has(classId)) throw new Error("Choose a valid class.");
@@ -64,8 +66,13 @@ export async function createClassStudent(classId,payload){
   if(name.length<2||!["Male","Female","Other"].includes(gender)) throw new Error("Enter all required student details.");
   const classNumber=Number(classId.slice(-1)),year=academicYearCode(),recordRef=doc(collection(db,"students"));
   const secretCode=randomSecretCode(),secretCodeHash=await sha256(secretCode);
+  const classroomRef=doc(db,"classrooms",hm.schoolId+"_"+classId);
+  const classroomSnapshot=await getDoc(classroomRef);
+  const configuredSections=classroomSnapshot.exists()&&Array.isArray(classroomSnapshot.data().sections)?classroomSnapshot.data().sections:[];
+  const section=text(payload.section).toUpperCase();
+  if(section&&!configuredSections.includes(section)) throw new Error("Choose a section configured for this class.");
+  if(configuredSections.length&&!section) throw new Error("Choose a section for every student.");
   const counterId=hm.schoolId+"_"+year+"_"+classId,counterRef=doc(db,"studentCounters",counterId);
-  const lookupRefBase="studentLookup/";
   let created;
   await runTransaction(db,async tx=>{
     const counter=await tx.get(counterRef),roll=Number(counter.exists()?counter.data().lastRoll||0:0)+1;
@@ -74,9 +81,9 @@ export async function createClassStudent(classId,payload){
     const studentRef=recordRef,secretRef=doc(db,"studentSecrets",recordRef.id),lookupRef=doc(db,"studentLookup",studentId);
     const lookup=await tx.get(lookupRef);
     if(lookup.exists()) throw new Error("Student ID already exists. Please retry.");
-    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,rollNumber,studentId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+    tx.set(studentRef,{studentRecordId:recordRef.id,schoolId:hm.schoolId,classId,classNumber,section,rollNumber,studentId,academicYear:year,name,gender,dob,status:"active",createdBy:hm.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     tx.set(secretRef,{schoolId:hm.schoolId,studentRecordId:recordRef.id,secretCode,secretCodeHash,createdAt:serverTimestamp()});
-    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,classId,rollNumber,schoolId:hm.schoolId,status:"active"});
+    tx.set(lookupRef,{studentRecordId:recordRef.id,studentId,classId,section,rollNumber,schoolId:hm.schoolId,status:"active"});
     tx.set(counterRef,{lastRoll:roll,schoolId:hm.schoolId,classId,academicYear:year,updatedAt:serverTimestamp()},{merge:true});
     tx.set(doc(db,"classrooms",hm.schoolId+"_"+classId),{schoolId:hm.schoolId,classId,classNumber,updatedBy:hm.uid,updatedAt:serverTimestamp()},{merge:true});
     created={studentRecordId:recordRef.id,studentId,rollNumber,secretCode};
@@ -101,6 +108,55 @@ export async function createClassStudents(classId, entries){
   return {created,failed};
 }
 
+
+export async function updateClassroomSettings(classId, payload={}){
+  if(!CLASSES.has(classId)) throw new Error("Choose a valid class.");
+  const hm=await requireHeadMaster();
+  const classNumber=Number(classId.slice(-1));
+  const rawSections=Array.isArray(payload.sections)?payload.sections:String(payload.sections||"").split(",");
+  const sections=[...new Set(rawSections.map(value=>text(value).toUpperCase()).filter(Boolean))];
+  if(sections.length>12||sections.some(value=>!/^[A-Z0-9]{1,4}$/.test(value))) throw new Error("Use up to 12 section names, each containing 1–4 letters or numbers.");
+  const classTeacherId=text(payload.classTeacherId);
+  let classTeacherName="";
+  if(classTeacherId){
+    const teacherSnapshot=await getDoc(doc(db,"teachers",classTeacherId));
+    if(!teacherSnapshot.exists()) throw new Error("The selected Class Teacher was not found.");
+    const teacher=teacherSnapshot.data();
+    if(teacher.status!=="active"||!(teacher.assignedClasses||[]).includes("Class "+classNumber)) throw new Error("Choose an active teacher assigned to this class.");
+    classTeacherName=text(teacher.name);
+  }
+  const studentsSnapshot=await getDocs(query(collection(db,"students"),where("schoolId","==",hm.schoolId),where("classId","==",classId)));
+  const invalidExisting=studentsSnapshot.docs.some(item=>{
+    const assigned=text(item.data().section).toUpperCase();
+    return assigned&&!sections.includes(assigned);
+  });
+  if(invalidExisting) throw new Error("A section currently has enrolled students. Move those students before removing that section.");
+  await setDoc(doc(db,"classrooms",hm.schoolId+"_"+classId),{
+    schoolId:hm.schoolId,classId,classNumber,sections,classTeacherId,classTeacherName,
+    updatedBy:hm.uid,updatedAt:serverTimestamp()
+  },{merge:true});
+  return {classId,sections,classTeacherId,classTeacherName};
+}
+
+export async function getStudentProfileForAuth(user=auth.currentUser){
+  if(!user||!user.email) throw new Error("Student sign-in is required.");
+  const match=/^(\d{6})@dagguluruschool\.in$/i.exec(String(user.email));
+  if(!match) throw new Error("This account is not a Student Login.");
+  const studentId=match[1];
+  const lookupSnapshot=await getDoc(doc(db,"studentLookup",studentId));
+  if(!lookupSnapshot.exists()) throw new Error("Student profile could not be verified. Contact the Head Master.");
+  const lookup=lookupSnapshot.data();
+  const studentSnapshot=await getDoc(doc(db,"students",String(lookup.studentRecordId||"")));
+  if(!studentSnapshot.exists()) throw new Error("Student profile could not be verified. Contact the Head Master.");
+  const student=studentSnapshot.data();
+  if(student.studentId!==studentId||student.authUid!==user.uid||student.status!=="active") throw new Error("This Student account is inactive or not linked. Contact the Head Master.");
+  return {
+    studentRecordId:lookup.studentRecordId,studentId:student.studentId,name:student.name,
+    classId:student.classId,classNumber:student.classNumber,section:student.section||"",
+    rollNumber:student.rollNumber,academicYear:student.academicYear,schoolId:student.schoolId,
+    status:student.status,linked:true
+  };
+}
 
 export async function createStudentLogin(studentRecordId){
   const hm=await requireHeadMaster();
