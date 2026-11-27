@@ -193,6 +193,7 @@ export async function createStudentLogin(studentRecordId){
   if(!secretSnapshot.exists()) throw new Error("Student Secret Code was not found.");
   const secretCode=String(secretSnapshot.data().secretCode||"");
   if(!/^\d{12}$/.test(secretCode)) throw new Error("The student's Secret Code is invalid. Please contact GI Support.");
+  if(!/^\d{6}$/.test(String(student.studentId||""))) throw new Error("The Student ID is not in the approved six-digit format. Please contact GI Support.");
   const loginId=getStudentLoginId(student.studentId);
   const secondaryApp=initializeApp(auth.app.options,"student-provision-"+String(studentRecordId)+"-"+crypto.randomUUID());
   const secondaryAuth=getAuth(secondaryApp);
