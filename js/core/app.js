@@ -198,7 +198,7 @@ onAuthStateChanged(auth,async user=>{
  if(state.role==="student"){
   initialAuthRestoreHandled=true;
   if(!user){
-   state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;
+   state.studentProfile=null;state.studentPinMode=null;state.studentPortalError=null;state.authenticated=false;
    localStorage.removeItem("gim_authenticated");
    state.view="login";render();return;
   }
@@ -209,7 +209,7 @@ onAuthStateChanged(auth,async user=>{
    state.authenticated=false;localStorage.setItem("gim_role","student");localStorage.removeItem("gim_authenticated");
    state.view="login";render();
   }catch(error){
-   state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;
+   state.studentProfile=null;state.studentPinMode=null;state.studentPortalError=error?.message||"Student profile could not be verified.";state.authenticated=false;
    localStorage.removeItem("gim_authenticated");
    state.view="login";render();
   }
