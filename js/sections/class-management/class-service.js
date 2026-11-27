@@ -254,6 +254,12 @@ export async function importStudentRoster(entries){
   }
   const classroomData=await listClassrooms();
   const configs=new Map((classroomData.classrooms||[]).map(item=>[item.classId,item]));
+  for(const classId of new Set(normalized.map(row=>row.classId))){
+    const existing=await listClassStudents(classId);
+    const known=new Set((existing.students||[]).map(row=>String(row.name||"").trim().toLowerCase()+"|"+String(row.dob||"")));
+    const duplicate=normalized.find(row=>row.classId===classId&&known.has(row.name.toLowerCase()+"|"+row.dob));
+    if(duplicate) throw new Error("Student already exists in "+classId+": "+duplicate.name+". Edit the existing record instead of importing it again.");
+  }
   for(let i=0;i<normalized.length;i++){
     const row=normalized[i],sections=configs.get(row.classId)?.sections||[];
     if(sections.length&&!row.section) throw new Error("Row "+(i+2)+": choose a configured section for "+row.name+".");
