@@ -3,6 +3,9 @@ import { auth } from "../firebase-client.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getTeacherProfile } from "../sections/teacher/teacher-service.js";
 import { getLocalTeacherPinRecord } from "../sections/teacher/pin-auth.js";
+import { getStudentProfileForAuth } from "../sections/class-management/class-service.js";
+import { getLocalStudentPinRecord } from "../sections/student/pin-auth.js";
+import { createStudentPortal } from "../sections/student/student-portal.js";
 import { getCurrentHeadMasterProfile, getLocalHeadMasterPinRecord } from "../sections/head-master/pin-auth.js";
 import { showTributeSplash } from "../shared/tribute-splash.js";
 import { createTranslator, createDictionaryTranslator } from "../shared/translations.js";
@@ -33,6 +36,7 @@ const roleDashboardIntro = {
 };
 
 const savedRole = localStorage.getItem("gim_role") || null;
+const studentPortalRequested = new URLSearchParams(window.location.search).get("portal") === "student";
 const savedAuth = localStorage.getItem("gim_authenticated") === "true";
 // Browser-local preview flags are not authentication. Teacher sessions are restored only through Firebase Auth; legacy Parent and Community previews are discarded.
 const stalePreviewSession = savedAuth && ["parent","community"].includes(savedRole);
@@ -40,11 +44,11 @@ if (stalePreviewSession) {
   localStorage.removeItem("gim_role");
   localStorage.removeItem("gim_authenticated");
 }
-const restoredRole = stalePreviewSession ? null : savedRole;
+const restoredRole = studentPortalRequested ? "student" : stalePreviewSession || savedRole === "student" ? null : savedRole;
 const state = {
-  role: restoredRole === "superadmin" ? null : restoredRole, authenticated: Boolean(restoredRole && savedAuth && !["hm","superadmin","teacher"].includes(restoredRole)),
-  view: restoredRole === "teacher" ? "login" : restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole) ? "dashboard" : restoredRole && restoredRole !== "superadmin" ? "login" : "welcome", module: null,
-  superAdminProfile: null, headMasterProfile: null, teacherProfile: null,
+  role: restoredRole === "superadmin" ? null : restoredRole, authenticated: Boolean(restoredRole && savedAuth && !["hm","superadmin","teacher","student"].includes(restoredRole)),
+  view: restoredRole === "student" || restoredRole === "teacher" ? "login" : restoredRole && savedAuth && !["hm","superadmin"].includes(restoredRole) ? "dashboard" : restoredRole && restoredRole !== "superadmin" ? "login" : "welcome", module: null,
+  superAdminProfile: null, headMasterProfile: null, teacherProfile: null, studentProfile: null, studentPinMode: null,
   teacherPinMode: null, teacherLoginStep: "id", teacherLoginRecord: null, teacherEnrollmentInProgress: false, teacherLoginNotice: null,
   theme: localStorage.getItem("gim_theme") || "light",
   lang: localStorage.getItem("gim_lang") || "te",
@@ -141,11 +145,11 @@ function roleCard(ic,te,en,role,tone){
   <span class="role-arrow" aria-hidden="true">↗</span>
  </button>`;
 }
-function login(){loginScreen.render();}
+function login(){if(state.role==="student")studentPortal.renderLogin();else loginScreen.render();}
 function communityRegister(){alumniSponsorSection.renderRegistration();}
 function linking(){parentSection.renderLinking();}
 function parentAddChild(){parentSection.renderAddChild();}
-function dashboard(){dashboardScreen.render();if(state.role==="parent"){const add=main.querySelector("#parentAddChild");if(add)add.onclick=()=>{state.view="parentAddChild";render();};}}
+function dashboard(){if(state.role==="student"){studentPortal.renderDashboard();return;}dashboardScreen.render();if(state.role==="parent"){const add=main.querySelector("#parentAddChild");if(add)add.onclick=()=>{state.view="parentAddChild";render();};}}
 function profilePage(){accountScreens.profilePage();}
 function settingsPage(){accountScreens.settingsPage();}
 function superAdmin(){
@@ -180,6 +184,7 @@ const loginScreen = createLoginScreen({
  main,state,T,roleNames,roleMeta,iconSvg,render,toast,APP_CONFIG,authenticateHeadMaster,sendPortalPasswordReset,signOutPortal,
  roleLoginViews:{hm:getHeadMasterLoginView,teacher:getTeacherLoginView,parent:getParentLoginView,community:getAlumniSponsorLoginView}
 });
+const studentPortal = createStudentPortal({main,state,T,render});
 const dashboardScreen = createDashboardScreen({main,state,T,roleMeta,modules,iconSvg,render,roleDashboardIntro,APP_CONFIG,escapeHtml,renderSuperAdminDashboard,signOutPortal});
 const accountScreens = createAccountScreens({main,state,roleNames,APP_CONFIG,render,toggleLanguage,toggleTheme,signOutPortal,T});
 const footerController = createFooterController({state,T,render});
@@ -190,6 +195,26 @@ setupFooter();setupBottomNavigation();updateBottomNavigation();
 // Restore only a valid Firebase Head Master session, then require the device PIN.
 let initialAuthRestoreHandled=false;
 onAuthStateChanged(auth,async user=>{
+ if(state.role==="student"){
+  initialAuthRestoreHandled=true;
+  if(!user){
+   state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;
+   localStorage.removeItem("gim_authenticated");
+   state.view="login";render();return;
+  }
+  try{
+   const profile=await getStudentProfileForAuth(user);
+   state.studentProfile=profile;
+   state.studentPinMode=getLocalStudentPinRecord(user.uid)?"unlock":"setup";
+   state.authenticated=false;localStorage.setItem("gim_role","student");localStorage.removeItem("gim_authenticated");
+   state.view="login";render();
+  }catch(error){
+   state.studentProfile=null;state.studentPinMode=null;state.authenticated=false;
+   localStorage.removeItem("gim_authenticated");
+   state.view="login";render();
+  }
+  return;
+ }
  if(state.role==="teacher"){
   initialAuthRestoreHandled=true;
   if(state.teacherEnrollmentInProgress)return;
@@ -255,6 +280,17 @@ onAuthStateChanged(auth,async user=>{
 });
 showTributeSplash(render, 2000);
 
+
+// Student and Parent PINs are device-local convenience locks; Firebase Auth remains the identity boundary.
+let studentWasBackgrounded=false;
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden && state.role==="student" && state.authenticated){
+  studentWasBackgrounded=true;state.authenticated=false;state.studentPinMode="unlock";state.view="login";
+  localStorage.removeItem("gim_authenticated");
+ }else if(!document.hidden && studentWasBackgrounded){
+  studentWasBackgrounded=false;render();
+ }
+});
 
 // Parent's four-digit PIN is a device-local screen lock only.
 let parentWasBackgrounded=false;
